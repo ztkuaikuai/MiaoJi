@@ -14,6 +14,18 @@
 
 /* 颜色变量 */
 
+// 引入uView颜色文件
+@import "@/uni_modules/uview-ui/theme.scss";
+@import "@/uni_modules/uview-ui/index.scss";
+
+/* 自定义主题 */
+$mj-color-bgc: #9fcba7; //主题色
+$mj-text-color: #212121; // 主要文字色
+$mj-text-color-grey: rgba(0,0,0, 0.6); // 辅助色
+$mj-bg-color: #fafafa; // 背景色
+
+
+
 /* 行为相关颜色 */
 $uni-color-primary: #007aff;
 $uni-color-success: #4cd964;
