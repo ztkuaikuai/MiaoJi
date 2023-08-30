@@ -17,7 +17,9 @@ export default {
 // 引入uView基础样式
 @import "@/uni_modules/uview-ui/index.scss";
 
-:root {
-	box-sizing: border-box;
+// 为每个页面设置公共样式
+page {
+	background-color: $mj-bg-color;
 }
+
 </style>

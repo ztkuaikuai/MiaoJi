@@ -50,8 +50,10 @@
 
 <style lang="scss">
 	.bill-card {
+		padding-right: 24rpx;
 		margin-bottom: 36rpx;
 		.header {
+			padding-left: 24rpx;
 			display: flex;
 			justify-content: space-between;
 			color: $mj-text-color-grey;
@@ -59,6 +61,7 @@
 		}
 		.content {
 			.swipe-action-item {
+				background-color: $mj-bg-color;
 				display: flex;
 				justify-content: space-between;
 				height: 100rpx;
@@ -66,6 +69,7 @@
 				font-size: 32rpx;
 				padding: 16rpx 0;
 				.left {
+					padding-left: 24rpx;
 					display: flex;
 					justify-content: right;
 					align-items: center;

@@ -76,7 +76,7 @@
 	.home {
 		.swiper {
 			height: 300rpx;
-			background-color: $mj-color-bgc;
+			background-color: $mj-theme-color;
 			border-radius: 0 0 40rpx 40rpx;
 			
 			.swiper-item {
@@ -118,10 +118,10 @@
 			}
 		}
 		.bills {
-			padding: 0 24rpx 104rpx;
-			// margin-bottom: 92rpx;
+			padding-bottom: 104rpx;
 			.header {
 				margin: 16rpx 0;
+				padding-left: 12rpx;
 				display: flex;
 				align-items: center;
 				color: #000;
