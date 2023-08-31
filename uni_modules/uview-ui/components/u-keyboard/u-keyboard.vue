@@ -9,7 +9,7 @@
 	    @close="popupClose"
 	    :zIndex="zIndex"
 	    :customStyle="{
-			backgroundColor: 'rgb(214, 218, 220)'
+			backgroundColor: '#ffffff'
 		}"
 	>
 		<view class="u-keyboard">

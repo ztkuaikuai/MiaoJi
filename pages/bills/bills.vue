@@ -3,13 +3,14 @@
 		<view class="header-fixed">
 			<!-- 日期类型选择器 需要输出选择类型和时间戳，之后数据库进行筛选，拿到数据进行渲染 -->
 			<mj-datetype-picker></mj-datetype-picker>
-			<view class="filter">
+			<view class="filter" @tap="toFilterBills">
+				<!-- 当有筛选条件时，加粗 -->
 				筛选
 			</view>
 		</view>
 		<view class="card-chart">
 			<view class="ucharts">
-				图表放置位置
+				<qiun-data-charts type="column" :opts="opts" :chartData="chartsDataColumn" :ontouch="true" />
 			</view>
 		</view>
 		<view class="card-money">
@@ -25,21 +26,71 @@
 				<u-icon name="order" size="48rpx" color="#212121"></u-icon>
 				<text>账单明细</text>
 			</view>
-			<!-- 需要底部钩子，按需加载 -->
+			<!-- 需要 到达底部钩子，按需加载 -->
 			<mj-bill-card v-for="item in 3"></mj-bill-card>
 		</view>
 	</view>
 </template>
 
 <script>
+	import demodata from "@/mockdata/demodata.json"
 	export default {
 		data() {
 			return {
-				
+				// 图表数据
+				chartsDataColumn: {},
+				// 图表配置
+				opts: {
+					dataLabel: false,
+					enableScroll: true,
+					fontSize: 10,
+					enableMarkLine: true,
+					color: ['#fa424e','#16a168'],
+					yAxis: {
+						disabled: true,
+						disableGrid: true
+					},
+					xAxis: {
+						itemCount: 10,
+						labelCount: 5,
+						fontSize: 10,
+					},
+					// 图例配置（下方的支出，收入）
+					legend: {
+						margin: 0
+					},
+					extra: {
+						tooltip: {
+							showArrow: false,
+							bgOpacity: 0.5,
+							fontSize: 12,
+							lineHeight: 16,
+							legendShape: 'circle'
+						},
+						column: {
+							width: 10,
+							seriesGap: 4,
+							barBorderCircle: true,
+							activeBgOpacity: 0.04
+						}
+					},
+				}
 			};
 		},
+		onReady() {
+			this.getServerData()
+		},
 		methods: {
-			
+			getServerData() {
+				setTimeout(()=> {
+					this.chartsDataColumn=JSON.parse(JSON.stringify(demodata.Column))
+				}, 600)
+			},
+			toFilterBills() {
+				uni.navigateTo({
+					url:"/pagesFilter/filter-bills/filter-bills"
+				})
+			}
 		}
 	}
 </script>
@@ -71,9 +122,13 @@
 		border-radius: 36rpx;
 		padding: 8rpx;
 		box-shadow: rgba(0, 0, 0, 0.03) 0px 20px 25px -5px, rgba(0, 0, 0, 0.01) 0px 10px 10px -5px;
+		.ucharts {
+			width: 100%;
+			height: 100%;
+		}
 	}
 	.card-money {
-		margin: 20px 28rpx 0;
+		margin: 20rpx 28rpx 0;
 		box-sizing: border-box;
 		background-color: #fff;
 		height: 88rpx;

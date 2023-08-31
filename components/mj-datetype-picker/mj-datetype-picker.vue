@@ -5,7 +5,6 @@
 		<view class="item" @tap="tapDateBtn">
 			2023年7月<u-icon name="arrow-down" size="24rpx" color="#212121" bold top="4rpx"></u-icon>
 		</view>
-		<!-- 这里有些问题，点击遮罩无法隐藏 解决：因为绑定事件的时候给了父级.datetype-picker，导致点击遮罩的时候也出发了事件tapDateBtn，从而使遮罩无法隐藏-->
 		<u-picker @confirm="getDateType" @cancel="showPicker = false" @close="showPicker = false" :show="showPicker" :columns="columns" confirmColor="#9fcba7" :closeOnClickOverlay="true" ></u-picker>
 		
 		<u-datetime-picker
@@ -30,8 +29,8 @@
 			title="请选择要查询的年份"
 			:closeOnClickOverlay="true"
 		></u-picker>
-		<!-- 自定义选择 -->
-		<u-popup :show="showCustom" @close="showCustom = false" :closeOnClickOverlay="false">
+		<!-- 自定义选择:暂时不用 -->
+		<!-- <u-popup :show="showCustom" @close="showCustom = false" :closeOnClickOverlay="false">
 			<u-toolbar
 				@confirm="getDates"
 				@cancel="showCustom = false"
@@ -41,9 +40,9 @@
 				<u-cell title="开始时间" label="2023年8月1日" :isLink="true" arrow-direction="right" @click="customPicker"></u-cell>
 				<u-cell title="结束时间" label="2023年8月31日" :isLink="true" @click="customPicker"></u-cell>
 			</u-cell-group>
-		</u-popup>
+		</u-popup> -->
 		
-		<u-datetime-picker
+		<!-- <u-datetime-picker
 			@confirm="getCustomDate"
 			@cancel="showCustomPicker = false"
 			:show="showCustomPicker"
@@ -52,7 +51,7 @@
 			:maxDate="Date.now()"
 			title="请选择要查询的日期"
 			confirmColor="#9fcba7"
-		></u-datetime-picker>
+		></u-datetime-picker> -->
 		
 	</view>
 </template>
@@ -65,11 +64,12 @@
 				showPicker: false,
 				showMonthPicker: false,
 				showYearPicker: false,
-				columns: [['月账单','年账单','自选日期']],
+				columns: [['月账单','年账单']],
+				// columns: [['月账单','年账单','自选日期']],
 				years: [[2020,2021,2022,2023]],
 				now: Date.now(),
-				showCustom: false,
-				showCustomPicker: false
+				// showCustom: false,
+				// showCustomPicker: false
 			};
 		},
 		methods: {
@@ -77,7 +77,7 @@
 			tapDateBtn() {
 				this.showPicker = true
 			},
-			// 获得用户选择的日期筛选类型  0 月账单  1 年账单  2 自选日期  dateType
+			// 获得用户选择的日期筛选类型  0 月账单  1 年账单    dateType
 			getDateType(res) { 
 				this.showPicker = false
 				// 根据类型展示对应的picker
@@ -86,14 +86,15 @@
 			showDatePicker(type) {
 				if(type == 0) {
 					this.showMonthPicker = true
-				} else if(type == 1) {
+				} else {
 					console.log("查询年账单");
 					this.showYearPicker = true
 					
-				} else {
-					console.log("自定义查询");
-					this.showCustom = true
-				}
+				} 
+				// else {
+				// 	console.log("自定义查询");
+				// 	this.showCustom = true
+				// }
 				
 			},
 			// 点击月份选择器确认按钮
@@ -105,19 +106,19 @@
 				console.log(res.value[0]);
 				this.showYearPicker = false
 			},
-			// 点击自定义 触发
-			customPicker() {
-				this.showCustomPicker = true
-			},
-			//  点击日期具体选择器确定按钮触发
-			getCustomDate(res) {
-				console.log(res);
-			},
-			// 点击2个日期选择器界面的确认按钮触发
-			getDates(res) {
-				console.log(res);
-				this.showCustom = false
-			}
+			// // 点击自定义 触发
+			// customPicker() {
+			// 	this.showCustomPicker = true
+			// },
+			// //  点击日期具体选择器确定按钮触发
+			// getCustomDate(res) {
+			// 	console.log(res);
+			// },
+			// // 点击2个日期选择器界面的确认按钮触发
+			// getDates(res) {
+			// 	console.log(res);
+			// 	this.showCustom = false
+			// }
 		}
 	}
 </script>
