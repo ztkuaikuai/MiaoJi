@@ -25,34 +25,39 @@
 				"navigationBarTitleText": "我的",
 				"enablePullDownRefresh": false
 			}
-
 		}
-	    
-    ],
+	],
 	"subPackages": [{
-		"root": "pagesAccount",
-		"pages": [{
-			"path": "keep-accounts/keep-accounts",
-			"style": {
-				"navigationBarTitleText": "记一笔",
-				"enablePullDownRefresh": false
-			}
-		}]
-	},{
-		"root": "pagesMy",
-		"pages": [
-			{
-			    "path" : "userInfo/userInfo",
-			    "style" :                                                                                    
-			    {
-			        "navigationBarTitleText": "我的",
-			        "enablePullDownRefresh": false
-			    }
-			    
-			}
-		]
-	}
-	
+			"root": "pagesAccount",
+			"pages": [{
+				"path": "make-an-account/make-an-account",
+				"style": {
+					"navigationBarTitleText": "记一笔",
+					"enablePullDownRefresh": false
+				}
+			}]
+		}, {
+			"root": "pagesMy",
+			"pages": [{
+				"path": "user-info/user-info",
+				"style": {
+					"navigationBarTitleText": "我的",
+					"enablePullDownRefresh": false
+				}
+
+			}]
+		}, {
+			"root": "pagesFilter",
+			"pages": [{
+				"path": "filter-bills/filter-bills",
+				"style": {
+					"navigationBarTitleText": "筛选",
+					"enablePullDownRefresh": false
+				}
+
+			}]
+		}
+
 	],
 	"preloadRule": {
 		"pages/index/index": {
@@ -62,6 +67,14 @@
 		"pages/my/my": {
 			"network": "all",
 			"packages": ["pagesMy"]
+		},
+		"pages/bills/bills": {
+			"network": "all",
+			"packages": ["pagesFilter"]
+		},
+		"pages/charts/charts": {
+			"network": "all",
+			"packages": ["pagesFilter"]
 		}
 	},
 	"globalStyle": {

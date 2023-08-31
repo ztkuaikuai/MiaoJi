@@ -3,7 +3,8 @@
 		<view class="header-fixed">
 			<!-- 日期类型选择器 需要输出选择类型和时间戳，之后数据库进行筛选，拿到数据进行渲染 -->
 			<mj-datetype-picker></mj-datetype-picker>
-			<view class="filter">
+			<view class="filter" @tap="toFilterBills">
+				<!-- 当有筛选条件时，加粗 -->
 				筛选
 			</view>
 		</view>
@@ -84,6 +85,11 @@
 				setTimeout(()=> {
 					this.chartsDataColumn=JSON.parse(JSON.stringify(demodata.Column))
 				}, 600)
+			},
+			toFilterBills() {
+				uni.navigateTo({
+					url:"/pagesFilter/filter-bills/filter-bills"
+				})
 			}
 		}
 	}

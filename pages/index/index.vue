@@ -70,7 +70,7 @@
 			},
 			toKeepAccounts() {
 				uni.navigateTo({
-					url:"/pagesAccount/keep-accounts/keep-accounts"
+					url:"/pagesAccount/make-an-account/make-an-account"
 				})
 			}
 		}

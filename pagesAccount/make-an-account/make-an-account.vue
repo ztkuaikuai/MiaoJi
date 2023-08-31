@@ -80,6 +80,7 @@
 <style lang="scss" scoped>
 	.keep-accounts {
 		.header-tabs {
+			height: 80rpx;
 			background-color: $mj-theme-color;
 			display: flex;
 			justify-content: center;

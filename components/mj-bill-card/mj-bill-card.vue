@@ -14,8 +14,7 @@
 							<u-avatar icon="red-packet-fill" fontSize="24"></u-avatar>
 							<view class="info">
 								<view>餐饮</view>
-								<!-- 设置超过一行就... -->
-								<view class="minor">备注信备备注信备备注信备</view>
+								<view class="minor">备注信备备注信备备注信备</view> <!-- 设置超过一行就... 可以使用u-text组件 -->
 							</view>
 						</view>
 						<view class="right">

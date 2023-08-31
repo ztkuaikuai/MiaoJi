@@ -5,7 +5,7 @@
 			<mj-datetype-picker></mj-datetype-picker>
 			<!-- 先只考虑饼图 -->
 			<!-- <view class="tabs"><u-tabs :list="[{name:'饼图'},{name: '日历'}]" @click="clickTab" lineColor="#2e3548"></u-tabs></view> -->
-			<view class="filter">
+			<view class="filter" @tap="toFilterBills">
 				筛选
 			</view>
 		</view>
@@ -121,7 +121,11 @@
 					this.chartData = JSON.parse(JSON.stringify(res));
 				}, 500);
 			},
-
+			toFilterBills() {
+				uni.navigateTo({
+					url:"/pagesFilter/filter-bills/filter-bills"
+				})
+			}
 		}
 	}
 </script>

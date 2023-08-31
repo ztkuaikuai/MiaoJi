@@ -99,7 +99,7 @@
 		methods: {
 			clickUserCard() {
 				uni.navigateTo({
-					url:"/pagesMy/userInfo/userInfo"
+					url:"/pagesMy/user-info/user-info"
 				})
 			},
 			clickOption(name) {

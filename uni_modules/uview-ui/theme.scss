@@ -2,7 +2,7 @@
 // uni.scss中引入的样式会同时混入到全局样式文件和单独每一个页面的样式中，造成微信程序包太大，
 // 故uni.scss只建议放scss变量名相关样式，其他的样式可以通过main.js或者App.vue引入
 
-$u-main-color: #303133;
+$u-main-color: #212121;
 $u-content-color: #606266;
 $u-tips-color: #909193;
 $u-light-color: #c0c4cc;

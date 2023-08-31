@@ -14,7 +14,7 @@
 				:style="[itemStyle(index)]"
 				@tap="keyboardClick(item)"
 				hover-class="u-hover-class"
-				:hover-stay-time="200"
+				:hover-stay-time="100"
 			>
 				<text class="u-keyboard__button-wrapper__button__text">{{ item }}</text>
 			</view>
@@ -23,7 +23,7 @@
 				v-else
 				class="u-keyboard__button-wrapper__button u-keyboard__button-wrapper__button--gray"
 				hover-class="u-hover-class"
-				:hover-stay-time="200"
+				:hover-stay-time="100"
 				@touchstart.stop="backspaceClick"
 				@touchend="clearTimer"
 			>
