@@ -1,17 +1,19 @@
 <template>
-	<view class="uni-section">
+	<view class="uni-section" :style="white ? 'background-color: #fff;' : ''">
 		<view class="uni-section-header" @click="onClick">
-				<view class="uni-section-header__decoration" v-if="type" :class="type" />
-        <slot v-else name="decoration"></slot>
+			<view class="uni-section-header__decoration" v-if="type" :class="type" />
+			<slot v-else name="decoration"></slot>
 
-        <view class="uni-section-header__content">
-          <text :style="{'font-size':titleFontSize,'color':titleColor}" class="uni-section__content-title" :class="{'distraction':!subTitle}">{{ title }}</text>
-          <text v-if="subTitle" :style="{'font-size':subTitleFontSize,'color':subTitleColor}" class="uni-section-header__content-sub">{{ subTitle }}</text>
-        </view>
+			<view class="uni-section-header__content">
+				<text :style="{'font-size':titleFontSize,'color':titleColor}" class="uni-section__content-title"
+					:class="{'distraction':!subTitle}">{{ title }}</text>
+				<text v-if="subTitle" :style="{'font-size':subTitleFontSize,'color':subTitleColor}"
+					class="uni-section-header__content-sub">{{ subTitle }}</text>
+			</view>
 
-        <view class="uni-section-header__slot-right">
-          <slot name="right"></slot>
-        </view>
+			<view class="uni-section-header__slot-right">
+				<slot name="right"></slot>
+			</view>
 		</view>
 
 		<view class="uni-section-content" :style="{padding: _padding}">
@@ -21,7 +23,6 @@
 </template>
 
 <script>
-
 	/**
 	 * Section 标题栏
 	 * @description 标题栏
@@ -40,7 +41,7 @@
 
 	export default {
 		name: 'UniSection',
-    emits:['click'],
+		emits: ['click'],
 		props: {
 			type: {
 				type: String,
@@ -51,11 +52,11 @@
 				required: true,
 				default: ''
 			},
-      titleFontSize: {
-        type: String,
-        default: '14px'
-      },
-			titleColor:{
+			titleFontSize: {
+				type: String,
+				default: '14px'
+			},
+			titleColor: {
 				type: String,
 				default: '#333'
 			},
@@ -63,28 +64,32 @@
 				type: String,
 				default: ''
 			},
-      subTitleFontSize: {
-        type: String,
-        default: '12px'
-      },
-      subTitleColor: {
-        type: String,
-        default: '#999'
-      },
+			subTitleFontSize: {
+				type: String,
+				default: '12px'
+			},
+			subTitleColor: {
+				type: String,
+				default: '#999'
+			},
 			padding: {
 				type: [Boolean, String],
 				default: false
+			},
+			white: {
+				type: Boolean,
+				default: false
 			}
 		},
-    computed:{
-      _padding(){
-        if(typeof this.padding === 'string'){
-          return this.padding
-        }
+		computed: {
+			_padding() {
+				if (typeof this.padding === 'string') {
+					return this.padding
+				}
 
-        return this.padding?'10px':''
-      }
-    },
+				return this.padding ? '10px' : ''
+			}
+		},
 		watch: {
 			title(newVal) {
 				if (uni.report && newVal !== '') {
@@ -92,76 +97,79 @@
 				}
 			}
 		},
-    methods: {
+		methods: {
 			onClick() {
 				this.$emit('click')
 			}
 		}
 	}
 </script>
-<style lang="scss" >
+<style lang="scss">
 	$uni-primary: #2979ff !default;
 
 	.uni-section {
 		background-color: $mj-bg-color;
-    .uni-section-header {
-      position: relative;
-      /* #ifndef APP-NVUE */
-      display: flex;
-      /* #endif */
-      flex-direction: row;
-      align-items: center;
-      padding: 12px 0;
-      font-weight: normal;
 
-      &__decoration{
-        margin-right: 6px;
-        background-color: $mj-theme-color;
-        &.line {
-          width: 4px;
-          height: 12px;
-          border-radius: 10px;
-        }
+		.uni-section-header {
+			position: relative;
+			/* #ifndef APP-NVUE */
+			display: flex;
+			/* #endif */
+			flex-direction: row;
+			align-items: center;
+			padding: 12px 0;
+			font-weight: normal;
 
-        &.circle {
-          width: 8px;
-          height: 8px;
-          border-top-right-radius: 50px;
-          border-top-left-radius: 50px;
-          border-bottom-left-radius: 50px;
-          border-bottom-right-radius: 50px;
-        }
+			&__decoration {
+				margin-right: 6px;
+				background-color: $mj-theme-color;
 
-        &.square {
-          width: 8px;
-          height: 8px;
-        }
-      }
+				&.line {
+					width: 4px;
+					height: 12px;
+					border-radius: 10px;
+				}
 
-      &__content {
-        /* #ifndef APP-NVUE */
-        display: flex;
-        /* #endif */
-        flex-direction: column;
-        flex: 1;
-        color: #333;
+				&.circle {
+					width: 8px;
+					height: 8px;
+					border-top-right-radius: 50px;
+					border-top-left-radius: 50px;
+					border-bottom-left-radius: 50px;
+					border-bottom-right-radius: 50px;
+				}
 
-        .distraction {
-          flex-direction: row;
-          align-items: center;
-        }
-        &-sub {
-          margin-top: 2px;
-        }
-      }
+				&.square {
+					width: 8px;
+					height: 8px;
+				}
+			}
 
-      &__slot-right{
-        font-size: 14px;
-      }
-    }
+			&__content {
+				/* #ifndef APP-NVUE */
+				display: flex;
+				/* #endif */
+				flex-direction: column;
+				flex: 1;
+				color: #333;
 
-    .uni-section-content{
-      font-size: 14px;
-    }
+				.distraction {
+					flex-direction: row;
+					align-items: center;
+				}
+
+				&-sub {
+					margin-top: 2px;
+				}
+			}
+
+			&__slot-right {
+				font-size: 14px;
+			}
+		}
+
+		.uni-section-content {
+			font-size: 14px;
+		}
 	}
 </style>

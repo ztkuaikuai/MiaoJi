@@ -53,6 +53,7 @@
 				<u-cell icon="weixin-fill" title="联系作者" :isLink="true"></u-cell>
 				<u-cell icon="info-circle" title="关于" :isLink="true"></u-cell>
 			</u-cell-group>
+			<!--可以尝试用 uni-group分组 组件 -->
 		</view>
 	</view>
 </template>
@@ -97,7 +98,9 @@
 		},
 		methods: {
 			clickUserCard() {
-				console.log("点击了用户卡片");
+				uni.navigateTo({
+					url:"/pagesMy/userInfo/userInfo"
+				})
 			},
 			clickOption(name) {
 				console.log("点击了常用功能", name);
@@ -158,7 +161,7 @@
 					align-items: center;
 					width: 148rpx;
 					height: 124rpx;
-					background-color: #efefef;
+					background-color: #f1f1f1;
 					border-radius: 30%;
 					color: $mj-text-color;
 

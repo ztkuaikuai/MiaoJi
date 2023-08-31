@@ -9,6 +9,7 @@
 			:key="index"
 		>
 			<view
+				v-if="index != 3"
 				class="u-keyboard__button-wrapper__button"
 				:style="[itemStyle(index)]"
 				@tap="keyboardClick(item)"
@@ -17,8 +18,25 @@
 			>
 				<text class="u-keyboard__button-wrapper__button__text">{{ item }}</text>
 			</view>
+			
+			<view
+				v-else
+				class="u-keyboard__button-wrapper__button u-keyboard__button-wrapper__button--gray"
+				hover-class="u-hover-class"
+				:hover-stay-time="200"
+				@touchstart.stop="backspaceClick"
+				@touchend="clearTimer"
+			>
+				<u-icon
+					name="backspace"
+					color="#303133"
+					size="28"
+				></u-icon>
+			</view>
+			
 		</view>
-		<view
+		<!-- 取消的盒子 -->
+		<!-- <view
 			class="u-keyboard__button-wrapper"
 		>
 			<view
@@ -34,7 +52,7 @@
 					size="28"
 				></u-icon>
 			</view>
-		</view>
+		</view> -->
 	</view>
 </template>
 
@@ -59,7 +77,9 @@
 				backspace: 'backspace', // 退格键内容
 				dot: '.', // 点
 				timer: null, // 长按多次删除的事件监听
-				cardX: 'X' // 身份证的X符号
+				cardX: 'X' ,// 身份证的X符号
+				minus: '-',
+				plus: '+'
 			};
 		},
 		computed: {
@@ -74,7 +94,7 @@
 					}
 				} else if (!this.dotDisabled && this.mode == 'number') {
 					if (!this.random) {
-						return [1, 2, 3, 4, 5, 6, 7, 8, 9, this.dot, 0];
+						return [1, 2, 3, this.backspace, 4, 5, 6, this.minus, 7, 8, 9, this.plus, '再记', 0, this.dot, '保存'];
 					} else {
 						return uni.$u.randomArray([1, 2, 3, 4, 5, 6, 7, 8, 9, this.dot, 0]);
 					}
@@ -123,7 +143,7 @@
 			// 获取键盘显示的内容
 			keyboardClick(val) {
 				// 允许键盘显示点模式和触发非点按键时，将内容转为数字类型
-				if (!this.dotDisabled && val != this.dot && val != this.cardX) val = Number(val);
+				// if (!this.dotDisabled && val != this.dot && val != this.cardX) val = Number(val);
 				this.$emit('change', val);
 			}
 		}
@@ -132,22 +152,18 @@
 
 <style lang="scss" scoped>
 	@import "../../libs/css/components.scss";
-	$u-number-keyboard-background-color:rgb(224, 228, 230) !default;
-	$u-number-keyboard-padding:8px 10rpx 8px 10rpx !default;
-	$u-number-keyboard-button-width:222rpx !default;
-	$u-number-keyboard-button-margin:4px 6rpx !default;
-	$u-number-keyboard-button-border-top-left-radius:4px !default;
-	$u-number-keyboard-button-border-top-right-radius:4px !default;
-	$u-number-keyboard-button-border-bottom-left-radius:4px !default;
-	$u-number-keyboard-button-border-bottom-right-radius:4px !default;
+	$u-number-keyboard-background-color:#9fcba7 !default;
+	$u-number-keyboard-padding:0 !default;
+	$u-number-keyboard-button-width:187.5rpx !default;
+	$u-number-keyboard-button-margin:0 !default;
 	$u-number-keyboard-button-height: 90rpx!default;
-	$u-number-keyboard-button-background-color:#FFFFFF !default;
-	$u-number-keyboard-button-box-shadow:0 2px 0px #BBBCBE !default;
-	$u-number-keyboard-text-font-size:20px !default;
+	$u-number-keyboard-button-background-color:#9fcba7 !default;
+	$u-number-keyboard-button-box-shadow: none !default;
+	$u-number-keyboard-text-font-size:40rpx !default;
 	$u-number-keyboard-text-font-weight:500 !default;
 	$u-number-keyboard-text-color:$u-main-color !default;
-	$u-number-keyboard-gray-background-color:rgb(200, 202, 210) !default;
-	$u-number-keyboard-u-hover-class-background-color: #BBBCC6 !default;
+	$u-number-keyboard-gray-background-color:#9fcba7 !default;
+	$u-number-keyboard-u-hover-class-background-color: rgba(255,255,255,0.5) !default;
 
 	.u-keyboard {
 		@include flex;
@@ -156,15 +172,14 @@
 		background-color: $u-number-keyboard-background-color;
 		flex-wrap: wrap;
 		padding: $u-number-keyboard-padding;
+		border-radius: 40rpx 40rpx 0 0 ;
+		overflow: hidden;
 
 		&__button-wrapper {
 			box-shadow: $u-number-keyboard-button-box-shadow;
 			margin: $u-number-keyboard-button-margin;
-			border-top-left-radius: $u-number-keyboard-button-border-top-left-radius;
-			border-top-right-radius: $u-number-keyboard-button-border-top-right-radius;
-			border-bottom-left-radius: $u-number-keyboard-button-border-bottom-left-radius;
-			border-bottom-right-radius: $u-number-keyboard-button-border-bottom-right-radius;
-
+			border-radius: 4px;
+			
 			&__button {
 				width: $u-number-keyboard-button-width;
 				height: $u-number-keyboard-button-height;
@@ -172,15 +187,13 @@
 				@include flex;
 				justify-content: center;
 				align-items: center;
-				border-top-left-radius: $u-number-keyboard-button-border-top-left-radius;
-				border-top-right-radius: $u-number-keyboard-button-border-top-right-radius;
-				border-bottom-left-radius: $u-number-keyboard-button-border-bottom-left-radius;
-				border-bottom-right-radius: $u-number-keyboard-button-border-bottom-right-radius;
-
+				border-radius: 4px;
+				padding: 8rpx 0;
+				
 				&__text {
 					font-size: $u-number-keyboard-text-font-size;
 					font-weight: $u-number-keyboard-text-font-weight;
-					color: $u-number-keyboard-text-color;
+					color: rgba(0,0,0, 0.6);
 				}
 
 				&--gray {

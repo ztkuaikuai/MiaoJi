@@ -48,8 +48,8 @@
 			<mj-bill-card v-for="item in 3"></mj-bill-card>
 		</view>
 		<!-- 固定定位，最底下 -->
-		<view class="bottom-btn">
-			<u-button  text="点我记账" color="#9fcba7" shape="circle"></u-button>
+		<view class="bottom-btn" >
+			<u-button  text="点我记账" color="#9fcba7" shape="circle" @click="toKeepAccounts"></u-button>
 		</view>
 	</view>
 </template>
@@ -67,6 +67,11 @@
 		methods: {
 			tapEye() {
 				this.isEyeShow = !this.isEyeShow
+			},
+			toKeepAccounts() {
+				uni.navigateTo({
+					url:"/pagesAccount/keep-accounts/keep-accounts"
+				})
 			}
 		}
 	}
@@ -135,6 +140,7 @@
 			width: 100%;
 			padding: 0 24rpx 12rpx;
 			bottom: 0;
+			opacity: 0.98;
 		}
 	}
 </style>

@@ -329,7 +329,7 @@
 					}
 
 					&__text {
-						font-size: 15px;
+						font-size: 30rpx;
 						color: $u-content-color;
 
 						&--disabled {

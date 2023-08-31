@@ -27,7 +27,43 @@
 			}
 
 		}
+	    
+    ],
+	"subPackages": [{
+		"root": "pagesAccount",
+		"pages": [{
+			"path": "keep-accounts/keep-accounts",
+			"style": {
+				"navigationBarTitleText": "记一笔",
+				"enablePullDownRefresh": false
+			}
+		}]
+	},{
+		"root": "pagesMy",
+		"pages": [
+			{
+			    "path" : "userInfo/userInfo",
+			    "style" :                                                                                    
+			    {
+			        "navigationBarTitleText": "我的",
+			        "enablePullDownRefresh": false
+			    }
+			    
+			}
+		]
+	}
+	
 	],
+	"preloadRule": {
+		"pages/index/index": {
+			"network": "all",
+			"packages": ["pagesAccount"]
+		},
+		"pages/my/my": {
+			"network": "all",
+			"packages": ["pagesMy"]
+		}
+	},
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "妙记",
