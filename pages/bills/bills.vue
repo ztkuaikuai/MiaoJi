@@ -10,7 +10,7 @@
 		</view>
 		<view class="card-chart">
 			<view class="ucharts">
-				<qiun-data-charts type="column" :opts="opts" :chartData="chartsDataColumn" :ontouch="true" />
+				<qiun-data-charts type="column" :opts="opts" :chartData="chartsDataColumn" :ontouch="true" canvasId="uchartscolumn1" :canvas2d="true" />
 			</view>
 		</view>
 		<view class="card-money">
@@ -84,7 +84,7 @@
 			getServerData() {
 				setTimeout(()=> {
 					this.chartsDataColumn=JSON.parse(JSON.stringify(demodata.Column))
-				}, 600)
+				}, 1000)
 			},
 			toFilterBills() {
 				uni.navigateTo({

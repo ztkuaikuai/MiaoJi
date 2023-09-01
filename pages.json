@@ -45,6 +45,13 @@
 					"enablePullDownRefresh": false
 				}
 
+			}, {
+				"path": "feedback/feedback",
+				"style": {
+					"navigationBarTitleText": "反馈",
+					"enablePullDownRefresh": false
+				}
+
 			}]
 		}, {
 			"root": "pagesFilter",

@@ -49,7 +49,8 @@
 			
 			<!-- 其他 -->
 			<uni-section class="section" title="其他" type="line" titleFontSize="28rpx" titleColor="#212121"></uni-section>
-			<u-cell-group :border="false">
+			<u-cell-group :border="false" >
+				<u-cell icon="file-text" title="反馈问题" :isLink="true" @click="clickFeedback"></u-cell>
 				<u-cell icon="weixin-fill" title="联系作者" :isLink="true"></u-cell>
 				<u-cell icon="info-circle" title="关于" :isLink="true"></u-cell>
 			</u-cell-group>
@@ -107,6 +108,11 @@
 			},
 			clickLike(name) {
 				console.log("点击了偏好", name);
+			},
+			clickFeedback() {
+				uni.navigateTo({
+					url:"/pagesMy/feedback/feedback"
+				})
 			}
 		}
 	}
