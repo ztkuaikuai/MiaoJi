@@ -63,6 +63,22 @@
 				}
 
 			}]
+		}, {
+			"root": "uni_modules/uni-id-pages/pages",
+			"pages": [{
+				"path": "login/login-withoutpwd",
+				"style": {
+					"navigationBarTitleText": "一键登录",
+					"enablePullDownRefresh": false
+				}
+			}, {
+				"path": "userinfo/deactivate/deactivate",
+				"style": {
+					"navigationBarTitleText": "注销账号",
+					"enablePullDownRefresh": false
+				}
+
+			}]
 		}
 
 	],
@@ -73,7 +89,7 @@
 		},
 		"pages/my/my": {
 			"network": "all",
-			"packages": ["pagesMy"]
+			"packages": ["pagesMy", "uni_modules/uni-id-pages/pages"]
 		},
 		"pages/bills/bills": {
 			"network": "all",

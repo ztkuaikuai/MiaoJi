@@ -1,0 +1,18 @@
+{
+	"passwordSecret": [{
+		"type": "hmac-sha256",
+		"version": 1
+	}],
+	"passwordStrength": "medium",
+	"tokenSecret": "kuaikuaitzztkuaikuai",
+	"mp-weixin": {
+		"tokenExpiresIn": 259200,
+		"tokenExpiresThreshold": 86400,
+		"oauth": {
+			"weixin": {
+				"appid": "wx3c9ce7c6b461f399",
+				"appsecret": "accb7c06d2e37b0fa2fd269d6f2ac2c7"
+			}
+		}
+	}
+}
