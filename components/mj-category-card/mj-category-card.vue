@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<view v-for="item in 7">
+		<view v-for="item in 14">
 			<view class="category-card">
 				 <view class="left">
 				 	<u-avatar icon="star-fill" font-size="48rpx" ></u-avatar>

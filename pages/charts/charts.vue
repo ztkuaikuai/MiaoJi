@@ -19,16 +19,16 @@
 					</u-radio-group>
 				</view>
 				<view class="money">
-					<view class="expend">
+					<view class="expend" @tap="tapExpend">
 						<u--text mode="price" text="964.32" color="#dd524d" margin="0 0 0 20rpx" bold></u--text>
 					</view>
-					<view class="income">
+					<view class="income" @tap="tapIncome">
 						<u--text mode="price" text="2150.02" color="#219a6d" margin="0 0 0 20rpx" bold></u--text>
 					</view>
 				</view>
 			</view>
 			<view class="ucharts">
-				<qiun-data-charts type="ring" :opts="opts" :chartData="chartData" />
+				<qiun-data-charts type="ring" :opts="opts" :chartData="chartData" canvasId="uchartsring1" :canvas2d="true" />
 			</view>
 		</view>
 		<!-- 组件放置位置，传递分类，分类支出，交易数量信息进去，渲染分类百分比卡片 -->
@@ -125,6 +125,13 @@
 				uni.navigateTo({
 					url:"/pagesFilter/filter-bills/filter-bills"
 				})
+			},
+			// 点击了月支出下方金额的文字
+			tapExpend() {
+				this.type = '月支出'
+			},
+			tapIncome() {
+				this.type = '月收入'
 			}
 		}
 	}
@@ -173,7 +180,8 @@
 					justify-content: start;
 					align-items: center;
 					.expend {
-						width: 266rpx;
+						width: 166rpx;
+						margin-right: 100rpx;
 					}
 				}
 			}

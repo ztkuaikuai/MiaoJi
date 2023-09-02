@@ -97,7 +97,8 @@
 				const style = {
 					justifyContent: 'center',
 					alignItems: 'center',
-					display: 'flex'
+					display: 'flex',
+					zIndex: 10076
 				}
 				// 将遮罩设置为100%透明度，避免出现灰色背景
 				style.backgroundColor = 'rgba(0, 0, 0, 0)'

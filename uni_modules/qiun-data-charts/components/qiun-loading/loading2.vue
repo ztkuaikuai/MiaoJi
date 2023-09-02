@@ -45,20 +45,20 @@
 }
 .container .shape.shape1 {
   left: 0;
-  background-color: #1890FF;
+  background-color: #9fcba7;
 }
 .container .shape.shape2 {
   right: 0;
-  background-color: #91CB74;
+  background-color: #61a7ee;
 }
 .container .shape.shape3 {
   bottom: 0;
-  background-color: #FAC858;
+  background-color: #f28780;
 }
 .container .shape.shape4 {
   bottom: 0;
   right: 0;
-  background-color: #EE6666;
+  background-color: #ffdf82;
 }
 
 

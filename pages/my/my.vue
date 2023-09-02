@@ -4,10 +4,10 @@
 		<uni-card :is-shadow="true" @click="clickUserCard" shadow="rgba(149, 157, 165, 0.2) 0px 8px 24px;">
 			<view class="user-card">
 				<view class="left">
-					<u-avatar :src="avatarSrc" size="100rpx"></u-avatar>
+					<u-avatar :src="userInfo.avatarSrc" size="100rpx"></u-avatar>
 					<view class="main">
 						<view class="username">
-							Hi 砖吐筷筷
+							Hi {{userInfo.nickname || '朋友'}}
 						</view>
 						<view class="day">
 							今天是你记账的第168天
@@ -49,9 +49,12 @@
 			
 			<!-- 其他 -->
 			<uni-section class="section" title="其他" type="line" titleFontSize="28rpx" titleColor="#212121"></uni-section>
-			<u-cell-group :border="false">
+			<u-cell-group :border="false" >
+				<u-cell icon="file-text" title="反馈问题" :isLink="true" @click="clickFeedback"></u-cell>
 				<u-cell icon="weixin-fill" title="联系作者" :isLink="true"></u-cell>
 				<u-cell icon="info-circle" title="关于" :isLink="true"></u-cell>
+				<u-cell icon="question" title="退出登录" :isLink="true" @click="logout"></u-cell>
+				<u-cell icon="warning" title="注销账号" :isLink="true" @click="deactivate"></u-cell>
 			</u-cell-group>
 			<!--可以尝试用 uni-group分组 组件 -->
 		</view>
@@ -60,10 +63,16 @@
 
 <script>
 	import colorGradient from '../../uni_modules/uview-ui/libs/function/colorGradient';
+	import {mutations} from '@/uni_modules/uni-id-pages/common/store.js'
+	const db = uniCloud.database()
+	const uniIdCo = uniCloud.importObject('uni-id-co')
 	export default {
 		data() {
 			return {
-				avatarSrc: '/static/头像.jpg',
+				userInfo: {
+					avatarSrc: '',
+					nickname: '',
+				},
 				optionList: [{
 						name: 'list-dot',
 						title: '收支分类'
@@ -107,7 +116,44 @@
 			},
 			clickLike(name) {
 				console.log("点击了偏好", name);
+			},
+			clickFeedback() {
+				uni.navigateTo({
+					url:"/pagesMy/feedback/feedback"
+				})
+			},
+			logout() {
+				mutations.logout()
+				console.log("成功登出")
+			},
+			deactivate() {
+				uni.navigateTo({
+					url:"/uni_modules/uni-id-pages/pages/userinfo/deactivate/deactivate"
+				})
+			},
+			// 页面挂载时获取数据  1 如果有缓存，获取缓存进行渲染  2 若无缓存，获取db数据，并赋值+存入缓存
+			async getUserInfo() {
+				const storageUserInfo = uni.getStorageSync('mj-user-info')
+				if(storageUserInfo){
+					Object.assign(this.userInfo, storageUserInfo)
+				} else {
+					const res = await db.collection("uni-id-users").where("_id == $cloudEnv_uid").field("_id,nickname,avatar").get()
+					const {avatar: avatarSrc, nickname} = res.result.data[0]
+					Object.assign(this.userInfo, {avatarSrc, nickname})
+					uni.setStorageSync('mj-user-info', this.userInfo)
+				}
+			},
+			resetUserInfo() {
+				const storageUserInfo = uni.getStorageSync('mj-user-info')
+				Object.assign(this.userInfo, storageUserInfo)
 			}
+			
+		},
+		mounted() {
+			this.getUserInfo()
+		},
+		onShow() {
+			this.resetUserInfo()
 		}
 	}
 </script>
@@ -136,6 +182,7 @@
 						font-size: 40rpx;
 						line-height: 40rpx;
 						color: $mj-text-color;
+						margin-bottom: 16rpx;
 					}
 
 					.day {
