@@ -35,6 +35,20 @@
 					"navigationBarTitleText": "记一笔",
 					"enablePullDownRefresh": false
 				}
+			}, {
+				"path": "make-an-asset/make-an-asset",
+				"style": {
+					"navigationBarTitleText": "添加资产",
+					"enablePullDownRefresh": false
+				}
+
+			}, {
+				"path": "set-asset/set-asset",
+				"style": {
+					"navigationBarTitleText": "配置资产",
+					"enablePullDownRefresh": false
+				}
+
 			}]
 		}, {
 			"root": "pagesMy",
@@ -137,5 +151,13 @@
 			}
 		]
 	},
-	"uniIdRouter": {}
+	"uniIdRouter": {
+		"loginPage": "uni_modules/uni-id-pages/pages/login/login-withoutpwd", 
+		"needLogin": [
+			"pagesMy/.*",
+			"pagesAccount/.*",
+			"pagesFilter/.*"
+		],
+		"resToLogin": true
+	}
 }

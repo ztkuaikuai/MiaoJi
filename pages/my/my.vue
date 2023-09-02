@@ -22,7 +22,8 @@
 		<!-- 修改了uni-section的样式，背景色和装饰line颜色改变,padding -->
 		<view class="options">
 			<!-- 常用功能 -->
-			<uni-section class="section" title="常用功能" type="line" titleFontSize="28rpx" titleColor="#212121"></uni-section>
+			<uni-section class="section" title="常用功能" type="line" titleFontSize="28rpx"
+				titleColor="#212121"></uni-section>
 			<!-- grid组件 -->
 			<u-grid :border="false" @click="clickOption" col="4">
 				<u-grid-item v-for="item in optionList">
@@ -35,7 +36,8 @@
 				</u-grid-item>
 			</u-grid>
 			<!-- 偏好 -->
-			<uni-section class="section" title="偏好" type="line" titleFontSize="28rpx" titleColor="#212121"></uni-section>
+			<uni-section class="section" title="偏好" type="line" titleFontSize="28rpx"
+				titleColor="#212121"></uni-section>
 			<u-grid :border="false" @click="clickLike" col="4">
 				<u-grid-item v-for="item in likeList">
 					<view class="content">
@@ -46,24 +48,26 @@
 					</view>
 				</u-grid-item>
 			</u-grid>
-			
+
 			<!-- 其他 -->
-			<uni-section class="section" title="其他" type="line" titleFontSize="28rpx" titleColor="#212121"></uni-section>
-			<u-cell-group :border="false" >
+			<uni-section class="section" title="其他" type="line" titleFontSize="28rpx"
+				titleColor="#212121"></uni-section>
+			<u-cell-group :border="false">
 				<u-cell icon="file-text" title="反馈问题" :isLink="true" @click="clickFeedback"></u-cell>
 				<u-cell icon="weixin-fill" title="联系作者" :isLink="true"></u-cell>
 				<u-cell icon="info-circle" title="关于" :isLink="true"></u-cell>
 				<u-cell icon="question" title="退出登录" :isLink="true" @click="logout"></u-cell>
 				<u-cell icon="warning" title="注销账号" :isLink="true" @click="deactivate"></u-cell>
 			</u-cell-group>
-			<!--可以尝试用 uni-group分组 组件 -->
 		</view>
 	</view>
 </template>
 
 <script>
 	import colorGradient from '../../uni_modules/uview-ui/libs/function/colorGradient';
-	import {mutations} from '@/uni_modules/uni-id-pages/common/store.js'
+	import {
+		mutations
+	} from '@/uni_modules/uni-id-pages/common/store.js'
 	const db = uniCloud.database()
 	const uniIdCo = uniCloud.importObject('uni-id-co')
 	export default {
@@ -108,7 +112,7 @@
 		methods: {
 			clickUserCard() {
 				uni.navigateTo({
-					url:"/pagesMy/user-info/user-info"
+					url: "/pagesMy/user-info/user-info"
 				})
 			},
 			clickOption(name) {
@@ -119,7 +123,7 @@
 			},
 			clickFeedback() {
 				uni.navigateTo({
-					url:"/pagesMy/feedback/feedback"
+					url: "/pagesMy/feedback/feedback"
 				})
 			},
 			logout() {
@@ -128,32 +132,52 @@
 			},
 			deactivate() {
 				uni.navigateTo({
-					url:"/uni_modules/uni-id-pages/pages/userinfo/deactivate/deactivate"
+					url: "/uni_modules/uni-id-pages/pages/userinfo/deactivate/deactivate"
 				})
 			},
-			// 页面挂载时获取数据  1 如果有缓存，获取缓存进行渲染  2 若无缓存，获取db数据，并赋值+存入缓存
+			// 页面挂载时获取数据  1 如果有缓存，获取缓存进行渲染  2 若无缓存，获取db数据，并赋值+存入缓存 
 			async getUserInfo() {
-				const storageUserInfo = uni.getStorageSync('mj-user-info')
-				if(storageUserInfo){
-					Object.assign(this.userInfo, storageUserInfo)
-				} else {
-					const res = await db.collection("uni-id-users").where("_id == $cloudEnv_uid").field("_id,nickname,avatar").get()
-					const {avatar: avatarSrc, nickname} = res.result.data[0]
-					Object.assign(this.userInfo, {avatarSrc, nickname})
-					uni.setStorageSync('mj-user-info', this.userInfo)
+				try {
+					const storageUserInfo = uni.getStorageSync('mj-user-info')
+					if (storageUserInfo) {
+						Object.assign(this.userInfo, storageUserInfo)
+					} else {
+						const res = await db.collection("uni-id-users").where("_id == $cloudEnv_uid").field(
+							"_id,nickname,avatar").get()
+						const {
+							avatar: avatarSrc,
+							nickname
+						} = res.result.data[0]
+						Object.assign(this.userInfo, {
+							avatarSrc,
+							nickname
+						})
+						uni.setStorageSync('mj-user-info', this.userInfo)
+					}
+				} catch (err) {
+					// console.log(err);
 				}
 			},
 			resetUserInfo() {
 				const storageUserInfo = uni.getStorageSync('mj-user-info')
 				Object.assign(this.userInfo, storageUserInfo)
 			}
-			
+
 		},
-		mounted() {
+		onReady() {
 			this.getUserInfo()
 		},
 		onShow() {
+			// 判断用户是否登录，如果未登录 则跳转到登录页
+			const {uid} = uniCloud.getCurrentUserInfo()
+			if (!uid) {
+				uni.navigateTo({
+					url: "/uni_modules/uni-id-pages/pages/login/login-withoutpwd"
+				})
+				return
+			}
 			this.resetUserInfo()
+
 		}
 	}
 </script>

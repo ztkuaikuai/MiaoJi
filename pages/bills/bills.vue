@@ -15,10 +15,10 @@
 		</view>
 		<view class="card-money">
 			<view class="left">
-				月结余：￥555.23
+				月结余：<u--text mode="price" text="2150.02" color="#219a6d" size="24rpx" bold></u--text>
 			</view>
 			<view class="right">
-				日均支出：￥55.23
+				日均支出：<u--text mode="price" text="250.02" color="#dd524d" size="24rpx" bold></u--text>
 			</view>
 		</view>
 		<view class="bill-list">
@@ -80,6 +80,16 @@
 		onReady() {
 			this.getServerData()
 		},
+		onShow() {
+			// 判断用户是否登录，如果未登录 则跳转到登录页
+			const {uid} = uniCloud.getCurrentUserInfo()
+			if (!uid) {
+				uni.navigateTo({
+					url: "/uni_modules/uni-id-pages/pages/login/login-withoutpwd"
+				})
+				return
+			}
+		},
 		methods: {
 			getServerData() {
 				setTimeout(()=> {
@@ -139,6 +149,14 @@
 		align-items: center;
 		color: $mj-text-color;
 		box-shadow: rgba(0, 0, 0, 0.03) 0px 20px 25px -5px, rgba(0, 0, 0, 0.01) 0px 10px 10px -5px;
+		.left {
+			display: flex;
+			justify-content: start;
+		}
+		.right {
+			display: flex;
+			justify-content: start;
+		}
 	}
 	.bill-list {
 		.header {

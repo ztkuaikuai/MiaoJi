@@ -89,6 +89,16 @@
 		onReady() {
 			this.getServerData();
 		},
+		onShow() {
+			// 判断用户是否登录，如果未登录 则跳转到登录页
+			const {uid} = uniCloud.getCurrentUserInfo()
+			if (!uid) {
+				uni.navigateTo({
+					url: "/uni_modules/uni-id-pages/pages/login/login-withoutpwd"
+				})
+				return
+			}
+		},
 		methods: {
 			clickTab(e) {
 				console.log(e);
