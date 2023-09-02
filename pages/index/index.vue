@@ -1,7 +1,7 @@
 <template>
 	<view class="home">
 		<swiper class="swiper" circular :indicator-dots="true" indicator-dots="rgba(0, 0, 0, .3)"
-			indicator-active-color="#303344" duration="500" :circular="false">
+			indicator-active-color="#303344" duration="500" :circular="false" @change="swiperChange">
 			<swiper-item class="swiper-item">
 				<view class="header">
 					本月支出(元)
@@ -39,7 +39,7 @@
 				<view class="bottom"></view>
 			</swiper-item>
 		</swiper>
-		<view class="bills">
+		<view class="bills" v-show="!isIndexShow">
 			<view class="header">
 				<u-icon name="order" size="48rpx" color="#212121"></u-icon>
 				<text>近三日账单</text>
@@ -47,9 +47,17 @@
 			<!-- 组件：账单卡片 -->
 			<mj-bill-card v-for="item in 3"></mj-bill-card>
 		</view>
+		
+		<view class="asset" v-if="isIndexShow">
+			<view class="header">
+				<u-icon name="rmb-circle" size="48rpx" color="#212121"></u-icon>
+				<text>我的资产</text>
+			</view>
+			<mj-asset-card></mj-asset-card>
+		</view>
 		<!-- 固定定位，最底下 -->
 		<view class="bottom-btn" >
-			<u-button  text="点我记账" color="#9fcba7" shape="circle" @click="toKeepAccounts"></u-button>
+			<u-button  :text="bottomBtnText" color="#9fcba7" shape="circle" @click="clickBottomBtn"></u-button>
 		</view>
 	</view>
 </template>
@@ -59,20 +67,51 @@
 		data() {
 			return {
 				isEyeShow: true,
+				isIndexShow: 0,  // 0 展示首页  1 展示资产页
+				bottomBtnText: '点我记账'
 			}
 		},
 		onLoad() {
-
+			
+		},
+		onReady() {
+			this.checkUserTokenExpierd()
 		},
 		methods: {
 			tapEye() {
 				this.isEyeShow = !this.isEyeShow
 			},
-			toKeepAccounts() {
+			swiperChange(res) {
+				this.isIndexShow = res.detail.current
+				this.isIndexShow ? this.bottomBtnText = '添加资产' : this.bottomBtnText = '点我记账'
+				
+			},
+			clickBottomBtn() {
+				// 判断用户是否登录，如果未登录 则跳转到登录页
+				const {uid} = uniCloud.getCurrentUserInfo()
+				if (!uid) {
+					uni.navigateTo({
+						url: "/uni_modules/uni-id-pages/pages/login/login-withoutpwd"
+					})
+					return
+				}
+				let url = ''
+				this.isIndexShow ? url = '/pagesAccount/make-an-asset/make-an-asset' : url = '/pagesAccount/make-an-account/make-an-account'
 				uni.navigateTo({
-					url:"/pagesAccount/make-an-account/make-an-account"
+					url
 				})
+			},
+			// 检查老用户的token是否过期，如果过期则跳转登录
+			checkUserTokenExpierd() {
+				const tokenExpierd = uni.getStorageSync('uni_id_token_expired')
+				if(tokenExpierd != 0 && tokenExpierd <= Date.now()) {
+					console.log("检查到token过期");
+					uni.navigateTo({
+						url: "/uni_modules/uni-id-pages/pages/login/login-withoutpwd"
+					})
+				}
 			}
+			
 		}
 	}
 </script>
@@ -122,7 +161,7 @@
 				}
 			}
 		}
-		.bills {
+		.bills,.asset {
 			padding-bottom: 104rpx;
 			.header {
 				margin: 16rpx 0;
@@ -131,6 +170,9 @@
 				align-items: center;
 				color: #000;
 				font-size: 32rpx;
+				text {
+					padding-left: 8rpx;
+				}
 			}
 		}
 		.bottom-btn {
@@ -138,7 +180,7 @@
 			z-index: 999;
 			position: fixed;
 			width: 100%;
-			padding: 0 24rpx 12rpx;
+			padding: 0 24rpx 12px;
 			bottom: 0;
 			opacity: 0.98;
 		}

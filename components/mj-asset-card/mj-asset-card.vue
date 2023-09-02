@@ -1,25 +1,20 @@
 <template>
-	<view class="bill-card">
-		<view class="header">
-			<text>8月29日 今天</text>
-			<text>支出:40.00 收:40.00</text>
-		</view>
+	<view class="asset-card">
 		<!-- 这里需要循环 -->
-		<view class="content" >
+		<view class="content">
 			<!-- 滑动单元格 -->
 			<u-swipe-action>
-				<u-swipe-action-item :options="options"  v-for="item in 3" :threshold="80">
-					<view class="swipe-action-item" >
+				<u-swipe-action-item :options="options" v-for="item in 3" :threshold="80" @click="clickBtn" >
+					<view class="swipe-action-item">
 						<view class="left">
-							<u-avatar icon="red-packet-fill" fontSize="24"></u-avatar>
+							<u-avatar icon="zhifubao" fontSize="24"></u-avatar>
 							<view class="info">
-								<view>餐饮</view>
-								<view class="minor">备注信备备注信备备注信备</view> <!-- 设置超过一行就... 可以使用u-text组件 -->
+								<view>交通银行</view>
 							</view>
 						</view>
 						<view class="right">
-							<view class="money"><u--text mode="price" text="250.02" color="#dd524d" size="32rpx" bold></u--text></view>
-							<view class="minor">微信钱包</view>
+							<view class="money"><u--text mode="price" text="250.02" color="#dd524d" size="32rpx"
+									bold></u--text></view>
 						</view>
 					</view>
 					<view class="line" v-if="item != 2">
@@ -33,10 +28,16 @@
 
 <script>
 	export default {
-		name: "mj-bill-card",
+		name: "mj-asset-card",
 		data() {
 			return {
 				options: [{
+					text: "编辑",
+					style: {
+						backgroundColor: '#959595',
+						padding: '0 40rpx'
+					}
+				}, {
 					text: "删除",
 					style: {
 						backgroundColor: '#e94459',
@@ -44,21 +45,22 @@
 					}
 				}]
 			};
+		},
+		methods: {
+			clickBtn({index}) { // 0 点击了编辑  1 点击了删除
+				if(index == 0) {
+					uni.navigateTo({
+						// 需要传递的参数  type  资产金额 是否隐藏 是否计入总资产 用户名？ 
+						url:"/pagesAccount/set-asset/set-asset?type=wx"
+					})
+				}
+			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-	.bill-card {
-		padding-right: 24rpx;
-		margin-bottom: 36rpx;
-		.header {
-			padding-left: 24rpx;
-			display: flex;
-			justify-content: space-between;
-			color: $mj-text-color-grey;
-			font-size: 28rpx;
-		}
+	.asset-card {
 		.content {
 			.swipe-action-item {
 				background-color: $mj-bg-color;
@@ -68,11 +70,13 @@
 				color: $mj-text-color;
 				font-size: 32rpx;
 				padding: 8rpx 0;
+
 				.left {
 					padding-left: 24rpx;
 					display: flex;
 					justify-content: right;
 					align-items: center;
+
 					.info {
 						display: flex;
 						flex-direction: column;
@@ -80,6 +84,7 @@
 						padding-left: 24rpx;
 					}
 				}
+
 				.right {
 					display: flex;
 					flex-direction: column;
@@ -87,17 +92,18 @@
 					align-items: flex-end;
 					padding-right: 20rpx;
 				}
+
 				.minor {
 					color: $mj-text-color-grey;
 					font-size: 24rpx;
 				}
 			}
+
 			.line {
 				display: flex;
 				justify-content: center;
 			}
-		
-			
 		}
+
 	}
 </style>
