@@ -118,7 +118,11 @@
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "妙记",
 		"navigationBarBackgroundColor": "#9fcba7",
-		"backgroundColor": "#9fcba7"
+		"backgroundColor": "#9fcba7",
+		"backgroundTextStyle": "light",
+		"mp-weixin": {
+			"visualEffectInBackground": "hidden"
+		}
 	},
 	"tabBar": {
 		"color": "#c9c9c9",

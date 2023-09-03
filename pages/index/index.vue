@@ -63,6 +63,7 @@
 </template>
 
 <script>
+	import UT from '@/utils/user-state.js'
 	export default {
 		data() {
 			return {
@@ -75,7 +76,9 @@
 			
 		},
 		onReady() {
-			this.checkUserTokenExpierd()
+			const state = UT.checkUserTokenExpierd() // 检查老用户的token是否过期，如果过期则跳转登录，并返回true；没过期返回false
+			if(state) return
+			// console.log("用户token没过期，继续执行下面的逻辑");
 		},
 		methods: {
 			tapEye() {
@@ -90,7 +93,7 @@
 				// 判断用户是否登录，如果未登录 则跳转到登录页
 				const {uid} = uniCloud.getCurrentUserInfo()
 				if (!uid) {
-					uni.navigateTo({
+					uni.redirectTo({
 						url: "/uni_modules/uni-id-pages/pages/login/login-withoutpwd"
 					})
 					return
@@ -101,16 +104,18 @@
 					url
 				})
 			},
-			// 检查老用户的token是否过期，如果过期则跳转登录
-			checkUserTokenExpierd() {
-				const tokenExpierd = uni.getStorageSync('uni_id_token_expired')
-				if(tokenExpierd != 0 && tokenExpierd <= Date.now()) {
-					console.log("检查到token过期");
-					uni.navigateTo({
-						url: "/uni_modules/uni-id-pages/pages/login/login-withoutpwd"
-					})
-				}
-			}
+			// 检查老用户的token是否过期，如果过期则跳转登录，并返回true；没过期返回false
+			// checkUserTokenExpierd() {
+			// 	const tokenExpierd = uni.getStorageSync('uni_id_token_expired')
+			// 	if(tokenExpierd != 0 && tokenExpierd <= Date.now()) {
+			// 		// console.log("检查到token过期");
+			// 		uni.navigateTo({
+			// 			url: "/uni_modules/uni-id-pages/pages/login/login-withoutpwd"
+			// 		})
+			// 		return true
+			// 	}
+			// 	return false
+			// }
 			
 		}
 	}

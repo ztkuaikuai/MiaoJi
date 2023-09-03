@@ -119,13 +119,14 @@
 		methods: {
 			clickBottomBtn() {
 				// 1 验证表单  用户名可选， 金额必填，不能为空，可有两位小数num 类型。
-				// 2 获取表单数据 即assetInfo中的数据
+				// 2 如果校验通过 ， 获取表单数据 即assetInfo中的数据
 				// 3 整合账户数据 上传至数据库  （资产类型、资产金额、用户id、是否隐藏、是否计入总资产、资产名（可选）
-				console.log("点击了btn", this.assetInfo);
+				// console.log("点击了btn", this.assetInfo);
 				this.$refs.uForm.validate().then(res => {
 					uni.$u.toast('校验通过')
 				}).catch(errors => {
-					uni.$u.toast(errors)
+					// console.log(errors);
+					uni.$u.toast(errors[0].message)
 				})
 
 			}
