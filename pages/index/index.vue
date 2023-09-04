@@ -26,14 +26,14 @@
 					净资产(元)
 				</view>
 				<view class="moneyContent">
-					<u--text mode="price" text="998.32" size="72rpx" color="#000"></u--text>
+					<u--text mode="price" :text="totalAssets" size="72rpx" color="#000"></u--text>
 					<view class="eye" @tap="tapEye">
 						<u-icon v-if="isEyeShow" name="eye-fill" size="56rpx" color="rgba(0,0,0, 0.4)"></u-icon>
 						<u-icon v-else name="eye-off" size="56rpx" color="rgba(0,0,0, 0.4)"></u-icon>
 					</view>
 				</view>
 				<view class="footer">
-					<text>总资产<text class="bold">2,134.84</text></text>
+					<text>总资产<text class="bold">{{totalAssets}}</text></text>
 				</view>
 				<!-- 占位 -->
 				<view class="bottom"></view>
@@ -53,7 +53,7 @@
 				<u-icon name="rmb-circle" size="48rpx" color="#212121"></u-icon>
 				<text>我的资产</text>
 			</view>
-			<mj-asset-card></mj-asset-card>
+			<mj-asset-card :userAssetsFromDB="userAssets"></mj-asset-card>
 		</view>
 		<!-- 固定定位，最底下 -->
 		<view class="bottom-btn" >
@@ -64,21 +64,31 @@
 
 <script>
 	import UT from '@/utils/user-state.js'
+	const db = uniCloud.database()
 	export default {
 		data() {
 			return {
 				isEyeShow: true,
 				isIndexShow: 0,  // 0 展示首页  1 展示资产页
-				bottomBtnText: '点我记账'
+				bottomBtnText: '点我记账',
+				userAssets: []
 			}
 		},
-		onLoad() {
-			
+		computed: {
+			// 计算总资产
+			totalAssets() {
+				// 筛选出计入总资产的资产项
+				let userAssetsIncludeInTotalAssets = this.userAssets.filter(item => item.include_in_total_assets == true)
+				userAssetsIncludeInTotalAssets.forEach(item => item.asset_balance = item.asset_balance / 100)
+				return userAssetsIncludeInTotalAssets.reduce((lastValue, currentArr) => lastValue + currentArr.asset_balance , 0)
+			}
 		},
 		onReady() {
 			const state = UT.checkUserTokenExpierd() // 检查老用户的token是否过期，如果过期则跳转登录，并返回true；没过期返回false
 			if(state) return
 			// console.log("用户token没过期，继续执行下面的逻辑");
+			// 获取用户资产列表
+			this.getUserAssets()
 		},
 		methods: {
 			tapEye() {
@@ -104,18 +114,11 @@
 					url
 				})
 			},
-			// 检查老用户的token是否过期，如果过期则跳转登录，并返回true；没过期返回false
-			// checkUserTokenExpierd() {
-			// 	const tokenExpierd = uni.getStorageSync('uni_id_token_expired')
-			// 	if(tokenExpierd != 0 && tokenExpierd <= Date.now()) {
-			// 		// console.log("检查到token过期");
-			// 		uni.navigateTo({
-			// 			url: "/uni_modules/uni-id-pages/pages/login/login-withoutpwd"
-			// 		})
-			// 		return true
-			// 	}
-			// 	return false
-			// }
+			async getUserAssets() {
+				const res = await db.collection("mj-user-assets").where(" auth.uid == doc.user_id ").get()
+				// console.log(res.result.data);
+				this.userAssets = res.result.data
+			}
 			
 		}
 	}

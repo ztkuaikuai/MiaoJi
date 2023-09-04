@@ -1,7 +1,7 @@
 {
 	"bsonType": "object",
 	"permission": {
-		"read": true,
+		"read": "doc._id == auth.uid",
 		"create": "'CREATE_UNI_ID_USERS' in auth.permission",
 		"update": "doc._id == auth.uid || 'UPDATE_UNI_ID_USERS' in auth.permission",
 		"delete": "'DELETE_UNI_ID_USERS' in auth.permission"
@@ -230,6 +230,16 @@
 			"permission": {
 				"read": "'READ_UNI_ID_USERS' in auth.permission",
 				"write": "'CREATE_UNI_ID_USERS' in auth.permission || 'UPDATE_UNI_ID_USERS' in auth.permission"
+			}
+		},
+		"user_setting": {
+			"bsonType": "object",
+			"description": "记录用户配置，如主题配色",
+			"properties": {
+				"theme_color": {
+					"bsonType": "string",
+					"description": "小程序主题配色"
+				}
 			}
 		}
 	},

@@ -1,0 +1,54 @@
+{
+	"bsonType": "object",
+	"required": ["user_id","asset_type","asset_creation_date","asset_balance","hide_in_interface","include_in_total_assets"],
+	"permission": {
+		"read": "doc.user_id == auth.uid",
+		"create": true,
+		"update": "doc.user_id == auth.uid",
+		"delete": "doc.user_id == auth.uid"
+	},
+	"properties": {
+		"_id": {
+			"description": "资产ID，系统自动生成"
+		},
+		"user_id": {
+			"bsonType": "string",
+			"description": "外键，关联用户id",
+			"forceDefaultValue": {
+			  "$env": "uid"
+			},
+			"foreignKey": "uni-id-users._id"
+		},
+		"asset_type": {
+			"bsonType": "string",
+			"description": "资产类型，如none不计入资产，计入收支；wx 微信钱包",
+			"defaultValue": "none"
+		},
+		"asset_creation_date": {
+			"bsonType": "timestamp",
+			"description": "添加资产日期",
+			"forceDefaultValue": {
+			  "$env": "now"
+			}
+		},
+		"asset_balance": {
+			"bsonType": "int",
+			"description": "账户余额，以分为单位",
+			"defaultValue": 0
+		},
+		"hide_in_interface": {
+			"bsonType": "bool",
+			"description": "是否在界面隐藏",
+			"defaultValue": false
+		},
+		"include_in_total_assets": {
+			"bsonType": "bool",
+			"description": "是否计入总资产",
+			"defaultValue": true
+		},
+		"asset_name": {
+			"bsonType": "string",
+			"description": "资产名，用户自定义"
+		}
+	}
+}

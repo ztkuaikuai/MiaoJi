@@ -55,16 +55,21 @@
 
 <script>
 	import colorGradient from '../../uni_modules/uview-ui/libs/function/colorGradient';
+	const db = uniCloud.database()
+	
 	export default {
 		data() {
 			return {
 				type: '',
+				// 表单信息
 				assetInfo: {
 					assetName: '',
-					balance: 123,
+					balance: '',
 					isHideInAssetPage: false,
-					isIncludedInTotalAssets: true
+					isIncludedInTotalAssets: true,
+					assetType: '',
 				},
+				// 所有资产的数据
 				assets: [{
 					icon: 'zhifubao',
 					title: '支付宝',
@@ -72,12 +77,9 @@
 				}, {
 					icon: 'weixin-fill',
 					title: '微信钱包',
-					type: 'wx'
-				}, {
-					icon: 'rmb-circle',
-					title: '零元购',
-					type: 'lyg'
+					type: 'weixin'
 				}],
+				// 用户选择的资产，渲染页面用的数据
 				asset: {},
 				isHideTotalAssetsBox: false,
 				rules: {
@@ -97,20 +99,19 @@
 							validator: (rule, value, callback) => {
 								return uni.$u.test.amount(value)
 							},
-							message: '最多填写两位小数'
+							message: '请勿以0开头，最多填写两位小数。如果金额设置为0，请填入0.00'
 						},
 					]
 				},
 			};
 		},
-		onLoad({
-			type
-		}) {
+		onLoad( {type} ) {
 			this.type = type
 			const arr = this.assets.filter(item => {
 				return item.type == type
 			})
 			this.asset = arr[0]
+			this.assetInfo.assetType = arr[0].type
 			console.log('asset', this.asset);
 		},
 		onReady() {
@@ -120,12 +121,21 @@
 			clickBottomBtn() {
 				// 1 验证表单  用户名可选， 金额必填，不能为空，可有两位小数num 类型。
 				// 2 如果校验通过 ， 获取表单数据 即assetInfo中的数据
-				// 3 整合账户数据 上传至数据库  （资产类型、资产金额、用户id、是否隐藏、是否计入总资产、资产名（可选）
-				// console.log("点击了btn", this.assetInfo);
-				this.$refs.uForm.validate().then(res => {
-					uni.$u.toast('校验通过')
+				// 3 整合账户数据  上传至数据库  （资产类型、资产金额：单位为分、是否隐藏、是否计入总资产、资产名（可选））
+				
+				this.$refs.uForm.validate().then(async () => {
+					let userAsset = Object.assign({},this.assetInfo)
+					userAsset.balance = userAsset.balance * 100  // 单位改为分
+					const res = await db.collection("mj-user-assets").add({
+						"asset_type": userAsset.assetType,
+						"asset_balance": userAsset.balance,
+						"hide_in_interface": userAsset.isHideInAssetPage,
+						"include_in_total_assets": userAsset.isIncludedInTotalAssets,
+						"asset_name": userAsset.assetName
+					})
+					uni.navigateBack({delta: 2})
 				}).catch(errors => {
-					// console.log(errors);
+					console.log(errors);
 					uni.$u.toast(errors[0].message)
 				})
 

@@ -11,7 +11,7 @@
 				<u-swipe-action-item :options="options"  v-for="item in 3" :threshold="80">
 					<view class="swipe-action-item" >
 						<view class="left">
-							<u-avatar icon="red-packet-fill" fontSize="24"></u-avatar>
+							<mj-icon-with-background type="heart" size="48rpx"></mj-icon-with-background>
 							<view class="info">
 								<view>餐饮</view>
 								<view class="minor">备注信备备注信备备注信备</view> <!-- 设置超过一行就... 可以使用u-text组件 -->

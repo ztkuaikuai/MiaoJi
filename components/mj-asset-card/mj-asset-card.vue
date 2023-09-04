@@ -4,16 +4,16 @@
 		<view class="content">
 			<!-- 滑动单元格 -->
 			<u-swipe-action>
-				<u-swipe-action-item :options="options" v-for="item in 3" :threshold="80" @click="clickBtn" >
+				<u-swipe-action-item :options="options" v-for="asset in userAssetsShow" :threshold="80" @click="clickBtn" >
 					<view class="swipe-action-item">
 						<view class="left">
-							<u-avatar icon="zhifubao" fontSize="24"></u-avatar>
+							<u-avatar :icon="asset.asset_type" fontSize="24"></u-avatar>
 							<view class="info">
-								<view>交通银行</view>
+								<view>{{asset.asset_type}}</view>
 							</view>
 						</view>
 						<view class="right">
-							<view class="money"><u--text mode="price" text="250.02" color="#dd524d" size="32rpx"
+							<view class="money"><u--text mode="price" :text="asset.asset_balance / 100" color="#212121" size="32rpx"
 									bold></u--text></view>
 						</view>
 					</view>
@@ -23,12 +23,18 @@
 				</u-swipe-action-item>
 			</u-swipe-action>
 		</view>
+		<view class="hideAsset" @click="clickHideAsset">查看隐藏资产</view>
 	</view>
 </template>
 
 <script>
+	// 1 配置自定义icon  使用了 u-cell中的icon和  avatar的icon   ;avatar的icon   替换为自己的icon组件
+	// 2 拿到type对应的表（含有type、icon、title）理应保存在用户缓存中
+	// 3 渲染到页面
+	
 	export default {
 		name: "mj-asset-card",
+		props: ['userAssetsFromDB'],
 		data() {
 			return {
 				options: [{
@@ -43,7 +49,7 @@
 						backgroundColor: '#e94459',
 						padding: '0 40rpx'
 					}
-				}]
+				}],
 			};
 		},
 		methods: {
@@ -54,7 +60,33 @@
 						url:"/pagesAccount/set-asset/set-asset?type=wx"
 					})
 				}
+			},
+			// 筛选用户资产：显示or隐藏
+			filterUserAssets() {
+				this.userAssetsShow = this.userAssetsFromDB.filter(item => {
+					return item.hide_in_interface == false
+				})
+				console.log(this.userAssetsShow);
+			},
+			clickHideAsset() {
+				console.log("查看隐藏资产");
 			}
+		},
+		computed: {
+			userAssetsShow() {
+				return this.userAssetsFromDB.filter(item => {
+					return item.hide_in_interface == false
+				})
+			},
+			// 隐藏资产，一定不计入总资产
+			userAssetsHide() {
+				return this.userAssetsFromDB.filter(item => {
+					return item.hide_in_interface == true
+				})
+			}
+		},
+		onReady() {
+			console.log('onReady',this.userAssetsFromDB);
 		}
 	}
 </script>
@@ -103,6 +135,13 @@
 				display: flex;
 				justify-content: center;
 			}
+		}
+		.hideAsset {
+			display: flex;
+			justify-content: center;
+			font-size: 24rpx;
+			color: $mj-text-color-grey;
+			margin-top: 20px;
 		}
 
 	}

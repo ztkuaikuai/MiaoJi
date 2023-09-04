@@ -17,11 +17,7 @@
 				},{
 					icon: 'weixin-fill',
 					title: '微信钱包',
-					type: 'wx'
-				},{
-					icon: 'rmb-circle',
-					title: '零元购',
-					type: 'lyg'
+					type: 'weixin'
 				}],
 			};
 		},
