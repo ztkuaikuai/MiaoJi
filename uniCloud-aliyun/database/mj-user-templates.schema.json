@@ -3,7 +3,7 @@
 	"required": ["user_id","template_creation_date","category_code","bill_type","bill_amount","asset_id"],
 	"permission": {
 		"read": "doc.user_id == auth.uid",
-		"create": true,
+		"create": " 'USER' in auth.role",
 		"update": "doc.user_id == auth.uid",
 		"delete": "doc.user_id == auth.uid"
 	},

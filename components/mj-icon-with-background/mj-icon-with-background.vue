@@ -1,13 +1,13 @@
 <template>
 	<view class="mj-icon">
-		<uni-icons :type="type" :size="size" :color="color"></uni-icons>
+		<uni-icons :type="type" :size="size" :color="color" :customPrefix="customPrefix" ></uni-icons>
 	</view>
 </template>
 
 <script>
 	export default {
 		name:"mj-icon-with-background",
-		props: ['type','size','color'],
+		props: ['type','size','color','customPrefix'],
 		data() {
 			return {
 				

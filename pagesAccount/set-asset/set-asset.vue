@@ -99,7 +99,7 @@
 							validator: (rule, value, callback) => {
 								return uni.$u.test.amount(value)
 							},
-							message: '请勿以0开头，最多填写两位小数。如果金额设置为0，请填入0.00'
+							message: '最多填写两位小数。如果金额设置为0，请填入0.00'
 						},
 					]
 				},

@@ -79,7 +79,6 @@
 			totalAssets() {
 				// 筛选出计入总资产的资产项
 				let userAssetsIncludeInTotalAssets = this.userAssets.filter(item => item.include_in_total_assets == true)
-				userAssetsIncludeInTotalAssets.forEach(item => item.asset_balance = item.asset_balance / 100)
 				return userAssetsIncludeInTotalAssets.reduce((lastValue, currentArr) => lastValue + currentArr.asset_balance , 0)
 			}
 		},
@@ -116,8 +115,9 @@
 			},
 			async getUserAssets() {
 				const res = await db.collection("mj-user-assets").where(" auth.uid == doc.user_id ").get()
-				// console.log(res.result.data);
 				this.userAssets = res.result.data
+				// 统一修改金额
+				this.userAssets.forEach(item => item.asset_balance = item.asset_balance / 100)
 			}
 			
 		}

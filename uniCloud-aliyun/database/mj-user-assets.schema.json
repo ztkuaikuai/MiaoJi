@@ -3,7 +3,7 @@
 	"required": ["user_id","asset_type","asset_creation_date","asset_balance","hide_in_interface","include_in_total_assets"],
 	"permission": {
 		"read": "doc.user_id == auth.uid",
-		"create": true,
+		"create": " 'USER' in auth.role",
 		"update": "doc.user_id == auth.uid",
 		"delete": "doc.user_id == auth.uid"
 	},
