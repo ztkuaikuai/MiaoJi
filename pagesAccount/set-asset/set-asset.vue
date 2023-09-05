@@ -59,7 +59,7 @@
 	import colorGradient from '../../uni_modules/uview-ui/libs/function/colorGradient';
 	import ICONCONFIG from "@/utils/icon-config.js";
 	const db = uniCloud.database()
-	
+
 	export default {
 		data() {
 			return {
@@ -119,7 +119,6 @@
 					success: () => {}
 				})
 			}
-			
 		},
 		onReady() {
 			this.$refs.uForm.setRules(this.rules)
