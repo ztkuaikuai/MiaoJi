@@ -55,7 +55,7 @@
 				<view class="accounts"  v-for="item in 3"> <!-- 此处遍历，输入 icon，资产名 -->
 					<view class="oneAccount"> 
 						<view class="left">
-							<u-avatar icon="weixin-fill" fontSize="24" ></u-avatar>
+							<mj-icon-with-background type="weixin" size="48rpx"></mj-icon-with-background>
 							<view class="info">
 								<view>微信钱包</view>
 							</view>

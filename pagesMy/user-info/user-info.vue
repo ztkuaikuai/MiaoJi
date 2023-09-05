@@ -18,12 +18,15 @@
 		</mj-card>
 		<mj-card title="个人信息">
 			<u-cell-group :border="false">
-				<u-cell icon="weixin-fill" title="会员编号" label="88484882"
-					iconStyle="fontSize: 48rpx; paddingRight: 24rpx" :border="false" clickable></u-cell>
-				<u-cell @click="clickName" icon="info-circle" title="昵称" :label="userInfo.nickname || '点我设置昵称'"
-					iconStyle="fontSize: 48rpx; paddingRight: 24rpx" :border="false" clickable></u-cell>
-				<u-cell icon="info-circle" title="加入时间" label="2022-04-21"
-					iconStyle="fontSize: 48rpx; paddingRight: 24rpx" :border="false"></u-cell>
+				<u-cell title="会员编号" label="00000001" :border="false" clickable>
+					<uni-icons type="vip" size="48rpx" slot="icon" class="userinfo-icon"></uni-icons>
+				</u-cell>
+				<u-cell @click="clickName" title="昵称" :label="userInfo.nickname || '点我设置昵称'" :border="false" clickable>
+					<uni-icons type="person" size="48rpx" slot="icon" class="userinfo-icon"></uni-icons>
+				</u-cell>
+				<u-cell title="加入时间" label="2022-04-21" :border="false">
+					<uni-icons type="paperplane" size="48rpx" slot="icon" class="userinfo-icon"></uni-icons>
+				</u-cell>
 			</u-cell-group>
 		</mj-card>
 		<u-popup :show="showNicaNamePop" mode="center" :round="10" @close="showNicaNamePop = false"
@@ -149,7 +152,9 @@
 				}
 			}
 		}
-
+		.userinfo-icon {
+			padding-right: 24rpx;
+		}
 		.btn {
 			margin-top: 10px;
 			font-size: 32rpx;

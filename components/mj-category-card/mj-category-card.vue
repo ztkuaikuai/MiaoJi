@@ -3,7 +3,7 @@
 		<view v-for="item in 14">
 			<view class="category-card">
 				 <view class="left">
-				 	<u-avatar icon="star-fill" font-size="48rpx" ></u-avatar>
+					<mj-icon-with-background type="fire" size="48rpx"></mj-icon-with-background>
 					<view class="main">
 						<view class="font">
 							餐饮<text>42.38%</text>

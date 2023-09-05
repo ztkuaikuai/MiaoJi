@@ -1,7 +1,7 @@
 {
 	"bsonType": "object",
 	"permission": {
-		"read": true,
+		"read": "doc._id == auth.uid",
 		"create": "'CREATE_UNI_ID_USERS' in auth.permission",
 		"update": "doc._id == auth.uid || 'UPDATE_UNI_ID_USERS' in auth.permission",
 		"delete": "'DELETE_UNI_ID_USERS' in auth.permission"
@@ -56,44 +56,6 @@
 				"write": "'CREATE_UNI_ID_USERS' in auth.permission || 'UPDATE_UNI_ID_USERS' in auth.permission"
 			}
 		},
-		"last_login_ip": {
-			"bsonType": "string",
-			"description": "最后登录时 IP 地址",
-			"permission": {
-				"read": "doc._id == auth.uid || 'READ_UNI_ID_USERS' in auth.permission",
-				"write": "'CREATE_UNI_ID_USERS' in auth.permission || 'UPDATE_UNI_ID_USERS' in auth.permission"
-			}
-		},
-		"mobile": {
-			"bsonType": "string",
-			"description": "手机号码",
-			"pattern": "^\\+?[0-9-]{3,20}$",
-			"title": "手机号码",
-			"trim": "both",
-			"permission": {
-				"read": "doc._id == auth.uid || 'READ_UNI_ID_USERS' in auth.permission",
-				"write": "'CREATE_UNI_ID_USERS' in auth.permission || 'UPDATE_UNI_ID_USERS' in auth.permission"
-			}
-		},
-		"mobile_confirmed": {
-			"bsonType": "int",
-			"defaultValue": 0,
-			"description": "手机号验证状态：0 未验证 1 已验证",
-			"enum": [{
-					"text": "未验证",
-					"value": 0
-				},
-				{
-					"text": "已验证",
-					"value": 1
-				}
-			],
-			"title": "手机号验证状态",
-			"permission": {
-				"read": "doc._id == auth.uid || 'READ_UNI_ID_USERS' in auth.permission",
-				"write": "'CREATE_UNI_ID_USERS' in auth.permission || 'UPDATE_UNI_ID_USERS' in auth.permission"
-			}
-		},
 		"nickname": {
 			"bsonType": "string",
 			"description": "用户昵称",
@@ -109,17 +71,6 @@
 			"description": "注册时间",
 			"forceDefaultValue": {
 				"$env": "now"
-			},
-			"permission": {
-				"read": "doc._id == auth.uid || 'READ_UNI_ID_USERS' in auth.permission",
-				"write": "'CREATE_UNI_ID_USERS' in auth.permission || 'UPDATE_UNI_ID_USERS' in auth.permission"
-			}
-		},
-		"register_ip": {
-			"bsonType": "string",
-			"description": "注册时 IP 地址",
-			"forceDefaultValue": {
-				"$env": "clientIP"
 			},
 			"permission": {
 				"read": "doc._id == auth.uid || 'READ_UNI_ID_USERS' in auth.permission",
@@ -188,16 +139,6 @@
 				"write": "'CREATE_UNI_ID_USERS' in auth.permission || 'UPDATE_UNI_ID_USERS' in auth.permission"
 			}
 		},
-		"username": {
-			"bsonType": "string",
-			"description": "用户名，不允许重复",
-			"title": "用户名",
-			"trim": "both",
-			"permission": {
-				"read": "doc._id == auth.uid || 'READ_UNI_ID_USERS' in auth.permission",
-				"write": "'CREATE_UNI_ID_USERS' in auth.permission || 'UPDATE_UNI_ID_USERS' in auth.permission"
-			}
-		},
 		"wx_openid": {
 			"bsonType": "object",
 			"description": "微信各个平台openid",
@@ -229,6 +170,24 @@
 			"description": "微信unionid",
 			"permission": {
 				"read": "'READ_UNI_ID_USERS' in auth.permission",
+				"write": "'CREATE_UNI_ID_USERS' in auth.permission || 'UPDATE_UNI_ID_USERS' in auth.permission"
+			}
+		},
+		"user_setting": {
+			"bsonType": "object",
+			"description": "记录用户配置，如主题配色",
+			"properties": {
+				"theme_color": {
+					"bsonType": "string",
+					"description": "小程序主题配色"
+				}
+			}
+		},
+		"last_login_ip": {
+			"bsonType": "string",
+			"description": "最后登录时 IP 地址",
+			"permission": {
+				"read": "doc._id == auth.uid || 'READ_UNI_ID_USERS' in auth.permission",
 				"write": "'CREATE_UNI_ID_USERS' in auth.permission || 'UPDATE_UNI_ID_USERS' in auth.permission"
 			}
 		}

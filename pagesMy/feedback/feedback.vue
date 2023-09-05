@@ -1,7 +1,7 @@
 <template>
 	<view class="feedback">
 		<view class="btn">
-			<u-button text="点我反馈" openType="feedback" type="primary" plain ></u-button>
+			<u-button text="点我反馈" openType="feedback" type="primary" ></u-button>
 		</view>
 	</view>
 </template>

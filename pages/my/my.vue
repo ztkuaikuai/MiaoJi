@@ -29,7 +29,7 @@
 				<u-grid-item v-for="item in optionList">
 					<view class="content">
 						<view class="grid-item">
-							<u-icon :name="item.name" size="48rpx"></u-icon>
+							<uni-icons :type="item.type" size="48rpx" :customPrefix="item.customPrefix"></uni-icons>
 							<view class="grid-text">{{item.title}}</view>
 						</view>
 					</view>
@@ -42,7 +42,7 @@
 				<u-grid-item v-for="item in likeList">
 					<view class="content">
 						<view class="grid-item">
-							<u-icon :name="item.name" size="48rpx"></u-icon>
+							<uni-icons :type="item.type" size="48rpx" :customPrefix="item.customPrefix"></uni-icons>
 							<view class="grid-text">{{item.title}}</view>
 						</view>
 					</view>
@@ -53,21 +53,29 @@
 			<uni-section class="section" title="其他" type="line" titleFontSize="28rpx"
 				titleColor="#212121"></uni-section>
 			<u-cell-group :border="false">
-				<u-cell icon="file-text" title="反馈问题" :isLink="true" @click="clickFeedback"></u-cell>
-				<u-cell icon="weixin-fill" title="联系作者" :isLink="true"></u-cell>
-				<u-cell icon="info-circle" title="关于" :isLink="true"></u-cell>
-				<u-cell icon="question" title="退出登录" :isLink="true" @click="logout"></u-cell>
-				<u-cell icon="warning" title="注销账号" :isLink="true" @click="deactivate"></u-cell>
+				<u-cell title="反馈问题" :isLink="true" @click="clickFeedback">
+					<uni-icons slot="icon" type="compose" size="36rpx"></uni-icons>
+				</u-cell>
+				<u-cell title="联系作者" :isLink="true">
+					<uni-icons slot="icon" type="personadd" size="36rpx"></uni-icons>
+				</u-cell>
+				<u-cell title="关于" :isLink="true">
+					<uni-icons slot="icon" type="info" size="36rpx"></uni-icons>
+				</u-cell>
+				<u-cell title="退出登录" :isLink="true" @click="logout">
+					<uni-icons slot="icon" type="mj-logout" size="32rpx" customPrefix="miaoji"></uni-icons>
+				</u-cell>
+				<u-cell title="注销账号" :isLink="true" @click="deactivate">
+					<uni-icons slot="icon" type="mj-stop" size="32rpx" customPrefix="miaoji"></uni-icons>
+				</u-cell>
 			</u-cell-group>
 		</view>
 	</view>
 </template>
 
 <script>
-	import colorGradient from '../../uni_modules/uview-ui/libs/function/colorGradient';
-	import {
-		mutations
-	} from '@/uni_modules/uni-id-pages/common/store.js'
+	import UT from '@/utils/user-state.js'
+	import {mutations} from '@/uni_modules/uni-id-pages/common/store.js'
 	const db = uniCloud.database()
 	const uniIdCo = uniCloud.importObject('uni-id-co')
 	export default {
@@ -78,33 +86,28 @@
 					nickname: '',
 				},
 				optionList: [{
-						name: 'list-dot',
-						title: '收支分类'
-					},
-					{
-						name: 'rmb-circle',
+						type: 'wallet',
 						title: '我的资产'
 					},
 					{
-						name: 'order',
-						title: '多账本'
+						type: 'mj-layout',
+						title: '模板管理',
+						customPrefix: "miaoji"
 					},
 					{
-						name: 'order',
-						title: '多账本'
+						type: 'mj-reloadtime',
+						title: '定时记账',
+						customPrefix: "miaoji"
 					},
 					{
-						name: 'order',
-						title: '多账本'
+						type: 'mj-YUAN',
+						title: '预算设置',
+						customPrefix: "miaoji"
 					}
 				],
 				likeList: [{
-						name: 'list-dot',
-						title: '收支分类'
-					},
-					{
-						name: 'rmb-circle',
-						title: '我的资产'
+						type: 'color',
+						title: '个性化'
 					}
 				]
 			};
@@ -165,13 +168,16 @@
 
 		},
 		onReady() {
+			const state = UT.checkUserTokenExpierd() // 检查老用户的token是否过期，如果过期则跳转登录，并返回true；没过期返回false
+			if(state) return
+			// console.log("用户token没过期，继续执行下面的逻辑");
 			this.getUserInfo()
 		},
 		onShow() {
 			// 判断用户是否登录，如果未登录 则跳转到登录页
 			const {uid} = uniCloud.getCurrentUserInfo()
 			if (!uid) {
-				uni.navigateTo({
+				uni.redirectTo({
 					url: "/uni_modules/uni-id-pages/pages/login/login-withoutpwd"
 				})
 				return

@@ -9,9 +9,7 @@
 				<u-grid-item v-for="item in categoryList">
 					<view class="content">
 						<view class="grid-item">
-							<view class="icon">
-								<u-icon :name="item.name" size="48rpx"></u-icon>
-							</view>
+							<mj-icon-with-background :type="item.type" size="48rpx" customPrefix="miaoji" ></mj-icon-with-background>
 							<view class="grid-text">{{item.title}}</view>
 						</view>
 					</view>
@@ -37,28 +35,76 @@
 					name: '转账'
 				}],
 				categoryList: [{
-						name: 'list-dot',
+						type: 'mj-wucan',
 						title: '餐饮'
 					},
 					{
-						name: 'rmb-circle',
+						type: 'mj-duogouwu',
 						title: '购物'
 					},
 					{
-						name: 'order',
+						type: 'mj-jiaotong',
 						title: '交通'
 					},
 					{
-						name: 'order',
+						type: 'mj-zhusu',
 						title: '住宿'
 					},
 					{
-						name: 'order',
+						type: 'mj-fuzhi',
 						title: '日常'
 					},
 					{
-						name: 'order',
+						type: 'mj-youji',
 						title: '学习'
+					},
+					{
+						type: 'mj-yule',
+						title: '娱乐'
+					},
+					{
+						type: 'mj-meizhuang',
+						title: '美妆'
+					},
+					{
+						type: 'mj-ziranfengguang',
+						title: '旅游'
+					},
+					{
+						type: 'mj-yiliao',
+						title: '医疗'
+					},
+					{
+						type: 'mj-huiyuan',
+						title: '会员租用'
+					},
+					{
+						type: 'mj-shouji',
+						title: '通讯'
+					},
+					{
+						type: 'mj-renwen',
+						title: '人情'
+					},
+					{
+						type: 'mj-huobiduihuan',
+						title: '投资'
+					},
+					{
+						type: 'mj-qinzi',
+						title: '母婴'
+					},
+					{
+						type: 'mj-xiedaichongwu',
+						title: '宠物'
+					},
+					{
+						type: 'mj-dianpuzhuangxiu',
+						title: '装修'
+					},
+					{
+						type: 'mj-qita',
+						title: '其他'
 					}
 				]
 			};
@@ -80,16 +126,21 @@
 <style lang="scss" scoped>
 	.keep-accounts {
 		.header-tabs {
+			position: fixed;
+			top: 0;
+			width: 100%;
 			height: 80rpx;
 			background-color: $mj-theme-color;
 			display: flex;
 			justify-content: center;
+			z-index: 99;
 		}
 
 		.icon-grid {
 			box-sizing: border-box;
 			padding: 48rpx;
-
+			margin-top: 80rpx;
+			margin-bottom: 568rpx;
 			.content {
 				padding-bottom: 14px;
 

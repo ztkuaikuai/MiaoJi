@@ -3,16 +3,18 @@
 		<u--form :model="assetInfo" :borderBottom="false" ref="uForm" errorType="toast">
 			<mj-card title="资产类型">
 				<u-cell-group :border="false">
-					<u-cell :icon="asset.icon" :title="asset.title" :border="false"></u-cell>
+					<u-cell :title="asset.title" :border="false">
+						<uni-icons slot="icon" :type="asset.icon" size="36rpx" custom-prefix="miaoji" :color="asset.color"></uni-icons>
+					</u-cell>
 				</u-cell-group>
 			</mj-card>
 			<mj-card title="基本信息">
-				<u-form-item prop="assetName" :borderBottom="false">
-					<u--input v-model="assetInfo.assetName" placeholder="资产名(可选)" type="text" border="surround"
+				<u-form-item prop="asset_name" :borderBottom="false">
+					<u--input v-model="assetInfo.asset_name" placeholder="资产名(可选)" type="text" border="surround"
 						clearable shape="circle" fontSize="13px"></u--input>
 				</u-form-item>
-				<u-form-item prop="balance" :borderBottom="false">
-					<u--input v-model="assetInfo.balance" placeholder="账户余额" type="digit" border="surround" clearable
+				<u-form-item prop="asset_balance" :borderBottom="false">
+					<u--input v-model="assetInfo.asset_balance" placeholder="账户余额" type="digit" border="surround" clearable
 						shape="circle" maxlength="10" fontSize="13px" suffixIcon="rmb-circle"
 						suffixIconStyle="color: #909399"></u--input>
 				</u-form-item>
@@ -28,7 +30,7 @@
 						</view>
 					</view>
 					<u-form-item :borderBottom="false">
-						<u-switch v-model="assetInfo.isHideInAssetPage" activeColor="#9fcba7"></u-switch>
+						<u-switch v-model="assetInfo.hide_in_interface" activeColor="#9fcba7"></u-switch>
 					</u-form-item>
 				</view>
 				<view class="other" :style="isHideTotalAssetsBox ? 'display: none;' : '' ">
@@ -41,7 +43,7 @@
 						</view>
 					</view>
 					<u-form-item :borderBottom="false">
-						<u-switch v-model="assetInfo.isIncludedInTotalAssets" activeColor="#9fcba7"></u-switch>
+						<u-switch v-model="assetInfo.include_in_total_assets" activeColor="#9fcba7"></u-switch>
 					</u-form-item>
 				</view>
 			</mj-card>
@@ -55,38 +57,33 @@
 
 <script>
 	import colorGradient from '../../uni_modules/uview-ui/libs/function/colorGradient';
+	import ICONCONFIG from "@/utils/icon-config.js";
+	const db = uniCloud.database()
+
 	export default {
 		data() {
 			return {
 				type: '',
+				// 表单信息
 				assetInfo: {
-					assetName: '',
-					balance: 123,
-					isHideInAssetPage: false,
-					isIncludedInTotalAssets: true
+					asset_name: '',
+					asset_balance: '',
+					hide_in_interface: false,
+					include_in_total_assets: true,
+					asset_type: '',
 				},
-				assets: [{
-					icon: 'zhifubao',
-					title: '支付宝',
-					type: 'zhifubao'
-				}, {
-					icon: 'weixin-fill',
-					title: '微信钱包',
-					type: 'wx'
-				}, {
-					icon: 'rmb-circle',
-					title: '零元购',
-					type: 'lyg'
-				}],
+				// 所有资产的数据  从本地缓存中获取，如果获取不到，向工具库中ICONCONFIG获取
+				assetsStyle: [],
+				// 用户选择的资产，渲染页面用的数据
 				asset: {},
 				isHideTotalAssetsBox: false,
 				rules: {
-					'assetName': {
+					'asset_name': {
 						type: 'string',
 						required: false,
 						trigger: ['blur']
 					},
-					'balance': [
+					'asset_balance': [
 						{
 							type: 'float',
 							required: true,
@@ -97,21 +94,31 @@
 							validator: (rule, value, callback) => {
 								return uni.$u.test.amount(value)
 							},
-							message: '最多填写两位小数'
+							message: '最多填写两位小数。如果金额设置为0，请填入0.00'
 						},
 					]
 				},
+				assetInfoFromStorage: {}
 			};
 		},
-		onLoad({
-			type
-		}) {
+		onLoad( {type} ) {
 			this.type = type
-			const arr = this.assets.filter(item => {
+			this.getAssetsStyle()
+			const arr = this.assetsStyle.filter(item => {
 				return item.type == type
 			})
 			this.asset = arr[0]
-			console.log('asset', this.asset);
+			this.assetInfo.asset_type = arr[0].type
+			// console.log('asset', this.asset);
+			// 如果有缓存,则赋值，并且说明是点击了编辑进入此页面，则在点击保存按钮时数据库操作是更新
+			if(uni.getStorageSync('mj-asset-edit')) {
+				this.assetInfo = uni.getStorageSync('mj-asset-edit')
+				console.log(this.assetInfo);
+				uni.removeStorage({
+					key: 'mj-asset-edit',
+					success: () => {}
+				})
+			}
 		},
 		onReady() {
 			this.$refs.uForm.setRules(this.rules)
@@ -119,27 +126,60 @@
 		methods: {
 			clickBottomBtn() {
 				// 1 验证表单  用户名可选， 金额必填，不能为空，可有两位小数num 类型。
-				// 2 获取表单数据 即assetInfo中的数据
-				// 3 整合账户数据 上传至数据库  （资产类型、资产金额、用户id、是否隐藏、是否计入总资产、资产名（可选）
-				console.log("点击了btn", this.assetInfo);
-				this.$refs.uForm.validate().then(res => {
-					uni.$u.toast('校验通过')
+				// 2 如果校验通过，获取表单数据 即assetInfo中的数据，通过数据中有无_id判断是新增还是编辑资产
+				// 3 整合账户数据  上传至数据库  （资产类型、资产金额：单位为分、是否隐藏、是否计入总资产、资产名（可选））
+				this.$refs.uForm.validate().then(async () => {
+					let userAsset = Object.assign({},this.assetInfo)
+					userAsset.asset_balance = Math.round(userAsset.asset_balance * 100)  // 单位改为分，由于计算精度问题，使用四舍五入
+					if(!userAsset._id) {
+						// 新增资产
+						await db.collection("mj-user-assets").add({
+							"asset_type": userAsset.asset_type,
+							"asset_balance": userAsset.asset_balance,
+							"hide_in_interface": userAsset.hide_in_interface,
+							"include_in_total_assets": userAsset.include_in_total_assets,
+							"asset_name": userAsset.asset_name
+						})
+					} else {
+						// 编辑资产
+						await db.collection("mj-user-assets").doc(userAsset._id).update({
+							"asset_balance": userAsset.asset_balance,
+							"hide_in_interface": userAsset.hide_in_interface,
+							"include_in_total_assets": userAsset.include_in_total_assets,
+							"asset_name": userAsset.asset_name
+						})
+					}
+					uni.$emit('updateAssetsList')
+					uni.navigateBack({delta: 2})
 				}).catch(errors => {
-					uni.$u.toast(errors)
+					console.log(errors);
+					uni.$u.toast(errors[0].message)
 				})
 
-			}
+			},
+			getAssetsStyle() {
+				// 缓存中是否有资产样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
+				if(uni.getStorageSync('mj-assets-style')) {
+					this.assetsStyle = uni.getStorageSync('mj-assets-style')
+				} else {
+					this.assetsStyle = ICONCONFIG.assetIconList()
+					uni.setStorage({
+						key:'mj-assets-style',
+						data: this.assetsStyle
+					})
+				}
+			},
 		},
 		watch: {
 			// 监听账单信息中 是否隐藏资产 的switch布尔值
 			assetInfo: {
 				handler: function({
-					isHideInAssetPage
+					hide_in_interface
 				}) {
 					// 如果为true，则隐藏计入总资产一行，并修改 计入总资产的switch为false
-					if (isHideInAssetPage) {
+					if (hide_in_interface) {
 						this.isHideTotalAssetsBox = true
-						this.assetInfo.isIncludedInTotalAssets = false
+						this.assetInfo.include_in_total_assets = false
 					} else {
 						this.isHideTotalAssetsBox = false
 					}

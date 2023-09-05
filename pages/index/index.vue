@@ -10,8 +10,8 @@
 					<!-- 如果钱超出一定范围，会导致布局有误 -->
 					<u--text mode="price" text="7212.32" size="72rpx" color="#000"></u--text>
 					<view class="eye" @tap="tapEye">
-						<u-icon v-if="isEyeShow" name="eye-fill" size="56rpx" color="rgba(0,0,0, 0.4)"></u-icon>
-						<u-icon v-else name="eye-off" size="56rpx" color="rgba(0,0,0, 0.4)"></u-icon>
+						<uni-icons v-if="isEyeShow" type="eye" size="56rpx" color="rgba(0,0,0, 0.6)"></uni-icons>
+						<uni-icons v-else type="eye-slash" size="56rpx" color="rgba(0,0,0, 0.6)"></uni-icons>
 					</view>
 				</view>
 				<view class="footer">
@@ -26,14 +26,14 @@
 					净资产(元)
 				</view>
 				<view class="moneyContent">
-					<u--text mode="price" text="998.32" size="72rpx" color="#000"></u--text>
+					<u--text mode="price" :text="totalAssets" size="72rpx" color="#000"></u--text>
 					<view class="eye" @tap="tapEye">
-						<u-icon v-if="isEyeShow" name="eye-fill" size="56rpx" color="rgba(0,0,0, 0.4)"></u-icon>
-						<u-icon v-else name="eye-off" size="56rpx" color="rgba(0,0,0, 0.4)"></u-icon>
+						<uni-icons v-if="isEyeShow" type="eye" size="56rpx" color="rgba(0,0,0, 0.6)"></uni-icons>
+						<uni-icons v-else type="eye-slash" size="56rpx" color="rgba(0,0,0, 0.6)"></uni-icons>
 					</view>
 				</view>
 				<view class="footer">
-					<text>总资产<text class="bold">2,134.84</text></text>
+					<text>总资产<text class="bold">{{totalAssets.toFixed(2)}}</text></text>
 				</view>
 				<!-- 占位 -->
 				<view class="bottom"></view>
@@ -41,7 +41,7 @@
 		</swiper>
 		<view class="bills" v-show="!isIndexShow">
 			<view class="header">
-				<u-icon name="order" size="48rpx" color="#212121"></u-icon>
+				<uni-icons type="list" size="48rpx" color="#212121"></uni-icons>
 				<text>近三日账单</text>
 			</view>
 			<!-- 组件：账单卡片 -->
@@ -50,10 +50,10 @@
 		
 		<view class="asset" v-if="isIndexShow">
 			<view class="header">
-				<u-icon name="rmb-circle" size="48rpx" color="#212121"></u-icon>
+				<uni-icons type="wallet" size="48rpx" color="#212121"></uni-icons>
 				<text>我的资产</text>
 			</view>
-			<mj-asset-card></mj-asset-card>
+			<mj-asset-card :userAssetsFromDB="userAssets"></mj-asset-card>
 		</view>
 		<!-- 固定定位，最底下 -->
 		<view class="bottom-btn" >
@@ -63,19 +63,33 @@
 </template>
 
 <script>
+	import UT from '@/utils/user-state.js'
+	const db = uniCloud.database()
 	export default {
 		data() {
 			return {
 				isEyeShow: true,
 				isIndexShow: 0,  // 0 展示首页  1 展示资产页
-				bottomBtnText: '点我记账'
+				bottomBtnText: '点我记账',
+				userAssets: [],
+				
 			}
 		},
-		onLoad() {
-			
+		computed: {
+			// 计算总资产
+			totalAssets() {
+				// 筛选出计入总资产的资产项
+				let userAssetsIncludeInTotalAssets = this.userAssets.filter(item => item.include_in_total_assets == true)
+				return userAssetsIncludeInTotalAssets.reduce((lastValue, currentArr) => lastValue + currentArr.asset_balance , 0)
+			}
 		},
 		onReady() {
-			this.checkUserTokenExpierd()
+			const state = UT.checkUserTokenExpierd() // 检查老用户的token是否过期，如果过期则跳转登录，并返回true；没过期返回false
+			if(state) return
+			// console.log("用户token没过期，继续执行下面的逻辑");
+			// 获取用户资产列表
+			this.getUserAssets()
+			uni.$on('updateAssetsList',this.getUserAssets)
 		},
 		methods: {
 			tapEye() {
@@ -90,7 +104,7 @@
 				// 判断用户是否登录，如果未登录 则跳转到登录页
 				const {uid} = uniCloud.getCurrentUserInfo()
 				if (!uid) {
-					uni.navigateTo({
+					uni.redirectTo({
 						url: "/uni_modules/uni-id-pages/pages/login/login-withoutpwd"
 					})
 					return
@@ -101,17 +115,17 @@
 					url
 				})
 			},
-			// 检查老用户的token是否过期，如果过期则跳转登录
-			checkUserTokenExpierd() {
-				const tokenExpierd = uni.getStorageSync('uni_id_token_expired')
-				if(tokenExpierd != 0 && tokenExpierd <= Date.now()) {
-					console.log("检查到token过期");
-					uni.navigateTo({
-						url: "/uni_modules/uni-id-pages/pages/login/login-withoutpwd"
-					})
-				}
+			async getUserAssets() {
+				// console.log("getUserAssets");
+				const res = await db.collection("mj-user-assets").where(" auth.uid == doc.user_id ").get()
+				this.userAssets = []
+				this.userAssets = res.result.data
+				// 统一修改金额
+				this.userAssets.forEach(item => item.asset_balance = item.asset_balance / 100)
 			}
-			
+		},
+		onUnload(){
+			uni.$off('updateAssetsList')
 		}
 	}
 </script>

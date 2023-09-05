@@ -3,15 +3,15 @@
 		<view class="fixed">
 			<view class="tags">
 				<view class="item">
-					<view><u-icon name="rmb-circle"></u-icon></view>
+					<view><uni-icons type="eye" size="32rpx"></uni-icons></view>
 					<view>微信钱包</view>
 				</view>
 				<view class="item">
-					<view><u-icon name="rmb-circle"></u-icon></view>
+					<view><uni-icons type="eye" size="32rpx"></uni-icons></view>
 					<view>8月31日</view>
 				</view>
 				<view class="item">
-					<view><u-icon name="rmb-circle"></u-icon></view>
+					<view><uni-icons type="eye" size="32rpx"></uni-icons></view>
 					<view>模板</view>
 				</view>
 			</view>
@@ -71,6 +71,8 @@
 		.tags {
 			display: flex;
 			justify-content: start;
+			background-color: $mj-bg-color;
+			padding: 4px 0;
 			.item {
 				margin-right: 20rpx;
 				display: flex;
@@ -90,7 +92,7 @@
 		.bgc {
 			background-color: #fff;
 			border-top: 1px solid #f3f3f3;
-			margin-top: 8rpx;
+			// margin-top: 8rpx;
 			.header {
 				display: flex;
 				justify-content: space-between;
