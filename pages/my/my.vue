@@ -29,7 +29,7 @@
 				<u-grid-item v-for="item in optionList">
 					<view class="content">
 						<view class="grid-item">
-							<u-icon :name="item.name" size="48rpx"></u-icon>
+							<uni-icons :type="item.type" size="48rpx"></uni-icons>
 							<view class="grid-text">{{item.title}}</view>
 						</view>
 					</view>
@@ -42,7 +42,7 @@
 				<u-grid-item v-for="item in likeList">
 					<view class="content">
 						<view class="grid-item">
-							<u-icon :name="item.name" size="48rpx"></u-icon>
+							<uni-icons :type="item.type" size="48rpx"></uni-icons>
 							<view class="grid-text">{{item.title}}</view>
 						</view>
 					</view>
@@ -53,11 +53,21 @@
 			<uni-section class="section" title="其他" type="line" titleFontSize="28rpx"
 				titleColor="#212121"></uni-section>
 			<u-cell-group :border="false">
-				<u-cell icon="file-text" title="反馈问题" :isLink="true" @click="clickFeedback"></u-cell>
-				<u-cell icon="weixin-fill" title="联系作者" :isLink="true"></u-cell>
-				<u-cell icon="info-circle" title="关于" :isLink="true"></u-cell>
-				<u-cell icon="question" title="退出登录" :isLink="true" @click="logout"></u-cell>
-				<u-cell icon="warning" title="注销账号" :isLink="true" @click="deactivate"></u-cell>
+				<u-cell title="反馈问题" :isLink="true" @click="clickFeedback">
+					<uni-icons slot="icon" type="compose" size="36rpx"></uni-icons>
+				</u-cell>
+				<u-cell title="联系作者" :isLink="true">
+					<uni-icons slot="icon" type="personadd" size="36rpx"></uni-icons>
+				</u-cell>
+				<u-cell title="关于" :isLink="true">
+					<uni-icons slot="icon" type="info" size="36rpx"></uni-icons>
+				</u-cell>
+				<u-cell title="退出登录" :isLink="true" @click="logout">
+					<uni-icons slot="icon" type="map" size="36rpx"></uni-icons>
+				</u-cell>
+				<u-cell title="注销账号" :isLink="true" @click="deactivate">
+					<uni-icons slot="icon" type="map" size="36rpx"></uni-icons>
+				</u-cell>
 			</u-cell-group>
 		</view>
 	</view>
@@ -76,33 +86,25 @@
 					nickname: '',
 				},
 				optionList: [{
-						name: 'list-dot',
-						title: '收支分类'
-					},
-					{
-						name: 'rmb-circle',
+						type: 'wallet',
 						title: '我的资产'
 					},
 					{
-						name: 'order',
-						title: '多账本'
+						type: 'settings',
+						title: '模板管理'
 					},
 					{
-						name: 'order',
-						title: '多账本'
+						type: 'settings',
+						title: '定时记账'
 					},
 					{
-						name: 'order',
-						title: '多账本'
+						type: 'settings',
+						title: '预算设置'
 					}
 				],
 				likeList: [{
-						name: 'list-dot',
-						title: '收支分类'
-					},
-					{
-						name: 'rmb-circle',
-						title: '我的资产'
+						type: 'color',
+						title: '个性化'
 					}
 				]
 			};

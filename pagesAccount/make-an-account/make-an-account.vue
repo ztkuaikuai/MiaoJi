@@ -9,9 +9,7 @@
 				<u-grid-item v-for="item in categoryList">
 					<view class="content">
 						<view class="grid-item">
-							<view class="icon">
-								<u-icon :name="item.name" size="48rpx"></u-icon>
-							</view>
+							<mj-icon-with-background :type="item.type" size="48rpx"></mj-icon-with-background>
 							<view class="grid-text">{{item.title}}</view>
 						</view>
 					</view>
@@ -37,28 +35,76 @@
 					name: '转账'
 				}],
 				categoryList: [{
-						name: 'list-dot',
+						type: 'cloud-download',
 						title: '餐饮'
 					},
 					{
-						name: 'rmb-circle',
+						type: 'checkbox',
 						title: '购物'
 					},
 					{
-						name: 'order',
+						type: 'cloud-download',
 						title: '交通'
 					},
 					{
-						name: 'order',
+						type: 'mail-open-filled',
 						title: '住宿'
 					},
 					{
-						name: 'order',
+						type: 'cloud-download',
 						title: '日常'
 					},
 					{
-						name: 'order',
+						type: 'redo',
 						title: '学习'
+					},
+					{
+						type: 'redo',
+						title: '娱乐'
+					},
+					{
+						type: 'redo',
+						title: '美妆'
+					},
+					{
+						type: 'redo',
+						title: '旅游'
+					},
+					{
+						type: 'redo',
+						title: '医疗'
+					},
+					{
+						type: 'redo',
+						title: '会员租用'
+					},
+					{
+						type: 'redo',
+						title: '通讯'
+					},
+					{
+						type: 'redo',
+						title: '人情'
+					},
+					{
+						type: 'redo',
+						title: '投资'
+					},
+					{
+						type: 'redo',
+						title: '母婴'
+					},
+					{
+						type: 'redo',
+						title: '宠物'
+					},
+					{
+						type: 'redo',
+						title: '装修'
+					},
+					{
+						type: 'redo',
+						title: '其他'
 					}
 				]
 			};
@@ -80,16 +126,21 @@
 <style lang="scss" scoped>
 	.keep-accounts {
 		.header-tabs {
+			position: fixed;
+			top: 0;
+			width: 100%;
 			height: 80rpx;
 			background-color: $mj-theme-color;
 			display: flex;
 			justify-content: center;
+			z-index: 99;
 		}
 
 		.icon-grid {
 			box-sizing: border-box;
 			padding: 48rpx;
-
+			margin-top: 80rpx;
+			margin-bottom: 568rpx;
 			.content {
 				padding-bottom: 14px;
 

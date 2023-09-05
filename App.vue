@@ -19,6 +19,8 @@ export default {
 /*每个页面公共css */
 // 引入uView基础样式
 @import "@/uni_modules/uview-ui/index.scss";
+// 引入自定义图标库
+@import "@/static/iconfont.css";
 
 // 为每个页面设置公共样式
 page {

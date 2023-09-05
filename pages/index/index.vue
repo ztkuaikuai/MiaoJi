@@ -10,8 +10,8 @@
 					<!-- 如果钱超出一定范围，会导致布局有误 -->
 					<u--text mode="price" text="7212.32" size="72rpx" color="#000"></u--text>
 					<view class="eye" @tap="tapEye">
-						<u-icon v-if="isEyeShow" name="eye-fill" size="56rpx" color="rgba(0,0,0, 0.4)"></u-icon>
-						<u-icon v-else name="eye-off" size="56rpx" color="rgba(0,0,0, 0.4)"></u-icon>
+						<uni-icons v-if="isEyeShow" type="eye" size="56rpx" color="rgba(0,0,0, 0.6)"></uni-icons>
+						<uni-icons v-else type="eye-slash" size="56rpx" color="rgba(0,0,0, 0.6)"></uni-icons>
 					</view>
 				</view>
 				<view class="footer">
@@ -28,8 +28,8 @@
 				<view class="moneyContent">
 					<u--text mode="price" :text="totalAssets" size="72rpx" color="#000"></u--text>
 					<view class="eye" @tap="tapEye">
-						<u-icon v-if="isEyeShow" name="eye-fill" size="56rpx" color="rgba(0,0,0, 0.4)"></u-icon>
-						<u-icon v-else name="eye-off" size="56rpx" color="rgba(0,0,0, 0.4)"></u-icon>
+						<uni-icons v-if="isEyeShow" type="eye" size="56rpx" color="rgba(0,0,0, 0.6)"></uni-icons>
+						<uni-icons v-else type="eye-slash" size="56rpx" color="rgba(0,0,0, 0.6)"></uni-icons>
 					</view>
 				</view>
 				<view class="footer">
@@ -41,7 +41,7 @@
 		</swiper>
 		<view class="bills" v-show="!isIndexShow">
 			<view class="header">
-				<u-icon name="order" size="48rpx" color="#212121"></u-icon>
+				<uni-icons type="list" size="48rpx" color="#212121"></uni-icons>
 				<text>近三日账单</text>
 			</view>
 			<!-- 组件：账单卡片 -->
@@ -50,7 +50,7 @@
 		
 		<view class="asset" v-if="isIndexShow">
 			<view class="header">
-				<u-icon name="rmb-circle" size="48rpx" color="#212121"></u-icon>
+				<uni-icons type="wallet" size="48rpx" color="#212121"></uni-icons>
 				<text>我的资产</text>
 			</view>
 			<mj-asset-card :userAssetsFromDB="userAssets"></mj-asset-card>
@@ -71,7 +71,8 @@
 				isEyeShow: true,
 				isIndexShow: 0,  // 0 展示首页  1 展示资产页
 				bottomBtnText: '点我记账',
-				userAssets: []
+				userAssets: [],
+				
 			}
 		},
 		computed: {
@@ -88,6 +89,7 @@
 			// console.log("用户token没过期，继续执行下面的逻辑");
 			// 获取用户资产列表
 			this.getUserAssets()
+			uni.$on('updateAssetsList',this.getUserAssets)
 		},
 		methods: {
 			tapEye() {
@@ -114,12 +116,18 @@
 				})
 			},
 			async getUserAssets() {
+				// 这里需要优化，什么时候资产变动了再去获取新用户资产，如果没变动，则读取缓存
+				console.log("getUserAssets");
 				const res = await db.collection("mj-user-assets").where(" auth.uid == doc.user_id ").get()
+				this.userAssets = []
 				this.userAssets = res.result.data
 				// 统一修改金额
 				this.userAssets.forEach(item => item.asset_balance = item.asset_balance / 100)
 			}
 			
+		},
+		onUnload(){
+			uni.$off('updateAssetsList')
 		}
 	}
 </script>

@@ -182,6 +182,14 @@
 					"description": "小程序主题配色"
 				}
 			}
+		},
+		"last_login_ip": {
+			"bsonType": "string",
+			"description": "最后登录时 IP 地址",
+			"permission": {
+				"read": "doc._id == auth.uid || 'READ_UNI_ID_USERS' in auth.permission",
+				"write": "'CREATE_UNI_ID_USERS' in auth.permission || 'UPDATE_UNI_ID_USERS' in auth.permission"
+			}
 		}
 	},
 	"required": []

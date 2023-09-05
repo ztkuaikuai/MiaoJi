@@ -14,6 +14,7 @@
 					class="quickLoginBtn"></image>
 				<button v-else type="primary" open-type="getPhoneNumber" @getphonenumber="quickLogin"
 					class="uni-btn">微信授权手机号登录</button>
+				<!-- 按钮底部同意单选框 -->
 				<uni-id-pages-agreements scope="register" ref="agreements"></uni-id-pages-agreements>
 			</view>
 		</template>

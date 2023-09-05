@@ -1,0 +1,29 @@
+@font-face {
+  font-family: "miaoji"; /* Project id 4238310 */
+  src: url('/static/iconfont.ttf') format('truetype');
+}
+
+.miaoji {
+  font-family: "miaoji" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.mj-weixinzhifu:before {
+  content: "\e607";
+}
+
+.mj-zhifubao:before {
+  content: "\e60a";
+}
+
+.mj-yinhangqia:before {
+  content: "\e60b";
+}
+
+.mj-yue:before {
+  content: "\e60c";
+}
+
