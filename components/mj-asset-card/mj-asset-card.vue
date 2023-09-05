@@ -53,8 +53,6 @@
 				</view>
 			</view>
 		</u-popup>
-		<!-- 是否确认删除模态框 -->
-		
 	</view>
 </template>
 
