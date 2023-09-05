@@ -63,6 +63,7 @@
 	export default {
 		name: "mj-asset-card",
 		props: ['userAssetsFromDB'],
+
 		data() {
 			return {
 				options: [{
