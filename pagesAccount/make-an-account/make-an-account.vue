@@ -104,7 +104,7 @@
 					},
 					{
 						type: 'mj-qita',
-						title: '其他'
+						title: '其他'	
 					}
 				]
 			};
