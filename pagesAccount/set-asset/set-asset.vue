@@ -127,11 +127,11 @@
 		methods: {
 			clickBottomBtn() {
 				// 1 验证表单  用户名可选， 金额必填，不能为空，可有两位小数num 类型。
-				// 2 如果校验通过 ， 获取表单数据 即assetInfo中的数据，通过数据中有无_id判断是新增还是编辑资产
+				// 2 如果校验通过，获取表单数据 即assetInfo中的数据，通过数据中有无_id判断是新增还是编辑资产
 				// 3 整合账户数据  上传至数据库  （资产类型、资产金额：单位为分、是否隐藏、是否计入总资产、资产名（可选））
 				this.$refs.uForm.validate().then(async () => {
 					let userAsset = Object.assign({},this.assetInfo)
-					userAsset.asset_balance = userAsset.asset_balance * 100  // 单位改为分
+					userAsset.asset_balance = Math.round(userAsset.asset_balance * 100)  // 单位改为分，由于计算精度问题，使用四舍五入
 					if(!userAsset._id) {
 						// 新增资产
 						await db.collection("mj-user-assets").add({

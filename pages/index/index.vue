@@ -33,7 +33,7 @@
 					</view>
 				</view>
 				<view class="footer">
-					<text>总资产<text class="bold">{{totalAssets}}</text></text>
+					<text>总资产<text class="bold">{{totalAssets.toFixed(2)}}</text></text>
 				</view>
 				<!-- 占位 -->
 				<view class="bottom"></view>
@@ -116,15 +116,13 @@
 				})
 			},
 			async getUserAssets() {
-				// 这里需要优化，什么时候资产变动了再去获取新用户资产，如果没变动，则读取缓存
-				console.log("getUserAssets");
+				// console.log("getUserAssets");
 				const res = await db.collection("mj-user-assets").where(" auth.uid == doc.user_id ").get()
 				this.userAssets = []
 				this.userAssets = res.result.data
 				// 统一修改金额
 				this.userAssets.forEach(item => item.asset_balance = item.asset_balance / 100)
 			}
-			
 		},
 		onUnload(){
 			uni.$off('updateAssetsList')

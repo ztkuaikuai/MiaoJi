@@ -9,7 +9,7 @@
 				<u-grid-item v-for="item in categoryList">
 					<view class="content">
 						<view class="grid-item">
-							<mj-icon-with-background :type="item.type" size="48rpx"></mj-icon-with-background>
+							<mj-icon-with-background :type="item.type" size="48rpx" customPrefix="miaoji" ></mj-icon-with-background>
 							<view class="grid-text">{{item.title}}</view>
 						</view>
 					</view>
@@ -35,75 +35,75 @@
 					name: '转账'
 				}],
 				categoryList: [{
-						type: 'cloud-download',
+						type: 'mj-wucan',
 						title: '餐饮'
 					},
 					{
-						type: 'checkbox',
+						type: 'mj-duogouwu',
 						title: '购物'
 					},
 					{
-						type: 'cloud-download',
+						type: 'mj-jiaotong',
 						title: '交通'
 					},
 					{
-						type: 'mail-open-filled',
+						type: 'mj-zhusu',
 						title: '住宿'
 					},
 					{
-						type: 'cloud-download',
+						type: 'mj-fuzhi',
 						title: '日常'
 					},
 					{
-						type: 'redo',
+						type: 'mj-youji',
 						title: '学习'
 					},
 					{
-						type: 'redo',
+						type: 'mj-yule',
 						title: '娱乐'
 					},
 					{
-						type: 'redo',
+						type: 'mj-meizhuang',
 						title: '美妆'
 					},
 					{
-						type: 'redo',
+						type: 'mj-ziranfengguang',
 						title: '旅游'
 					},
 					{
-						type: 'redo',
+						type: 'mj-yiliao',
 						title: '医疗'
 					},
 					{
-						type: 'redo',
+						type: 'mj-huiyuan',
 						title: '会员租用'
 					},
 					{
-						type: 'redo',
+						type: 'mj-shouji',
 						title: '通讯'
 					},
 					{
-						type: 'redo',
+						type: 'mj-renwen',
 						title: '人情'
 					},
 					{
-						type: 'redo',
+						type: 'mj-huobiduihuan',
 						title: '投资'
 					},
 					{
-						type: 'redo',
+						type: 'mj-qinzi',
 						title: '母婴'
 					},
 					{
-						type: 'redo',
+						type: 'mj-xiedaichongwu',
 						title: '宠物'
 					},
 					{
-						type: 'redo',
+						type: 'mj-dianpuzhuangxiu',
 						title: '装修'
 					},
 					{
-						type: 'redo',
+						type: 'mj-qita',
 						title: '其他'
 					}
 				]

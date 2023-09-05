@@ -29,7 +29,7 @@
 				<u-grid-item v-for="item in optionList">
 					<view class="content">
 						<view class="grid-item">
-							<uni-icons :type="item.type" size="48rpx"></uni-icons>
+							<uni-icons :type="item.type" size="48rpx" :customPrefix="item.customPrefix"></uni-icons>
 							<view class="grid-text">{{item.title}}</view>
 						</view>
 					</view>
@@ -42,7 +42,7 @@
 				<u-grid-item v-for="item in likeList">
 					<view class="content">
 						<view class="grid-item">
-							<uni-icons :type="item.type" size="48rpx"></uni-icons>
+							<uni-icons :type="item.type" size="48rpx" :customPrefix="item.customPrefix"></uni-icons>
 							<view class="grid-text">{{item.title}}</view>
 						</view>
 					</view>
@@ -63,10 +63,10 @@
 					<uni-icons slot="icon" type="info" size="36rpx"></uni-icons>
 				</u-cell>
 				<u-cell title="退出登录" :isLink="true" @click="logout">
-					<uni-icons slot="icon" type="map" size="36rpx"></uni-icons>
+					<uni-icons slot="icon" type="mj-logout" size="32rpx" customPrefix="miaoji"></uni-icons>
 				</u-cell>
 				<u-cell title="注销账号" :isLink="true" @click="deactivate">
-					<uni-icons slot="icon" type="map" size="36rpx"></uni-icons>
+					<uni-icons slot="icon" type="mj-stop" size="32rpx" customPrefix="miaoji"></uni-icons>
 				</u-cell>
 			</u-cell-group>
 		</view>
@@ -90,16 +90,19 @@
 						title: '我的资产'
 					},
 					{
-						type: 'settings',
-						title: '模板管理'
+						type: 'mj-layout',
+						title: '模板管理',
+						customPrefix: "miaoji"
 					},
 					{
-						type: 'settings',
-						title: '定时记账'
+						type: 'mj-reloadtime',
+						title: '定时记账',
+						customPrefix: "miaoji"
 					},
 					{
-						type: 'settings',
-						title: '预算设置'
+						type: 'mj-YUAN',
+						title: '预算设置',
+						customPrefix: "miaoji"
 					}
 				],
 				likeList: [{
