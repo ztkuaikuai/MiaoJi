@@ -4,6 +4,7 @@
 	    :closeOnClickOverlay="closeOnClickOverlay"
 	    mode="bottom"
 	    :popup="false"
+		duration="0"
 	    :show="show"
 	    :safeAreaInsetBottom="safeAreaInsetBottom"
 	    @close="popupClose"

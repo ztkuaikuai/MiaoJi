@@ -21,8 +21,7 @@
 		},
 		"asset_type": {
 			"bsonType": "string",
-			"description": "资产类型，如none不计入资产，计入收支；wx 微信钱包",
-			"defaultValue": "none"
+			"description": "资产类型，如weixin 微信钱包"
 		},
 		"asset_creation_date": {
 			"bsonType": "timestamp",

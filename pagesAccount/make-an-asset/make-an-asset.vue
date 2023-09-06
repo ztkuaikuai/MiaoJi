@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<u-cell-group :border="false" >
-			<u-cell :title="asset.title" :isLink="true" @click="clickAsset(index)" v-for="asset,index in assetsStyle">
+			<u-cell :title="asset.title" :isLink="true" @click="clickAsset(index)" v-for="asset,index in assetsStyle" :key="index" >
 				<uni-icons slot="icon" :type="asset.icon" size="36rpx" custom-prefix="miaoji" :color="asset.color"></uni-icons>
 			</u-cell>
 		</u-cell-group>

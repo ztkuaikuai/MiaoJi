@@ -4,26 +4,137 @@
 			<view class="tabs"><u-tabs :list="tabList" @click="clickTab" lineColor="#2e3548" :itemStyle="{ height: '76rpx' }"></u-tabs></view>
 		</view>
 		<view class="icon-grid">
-			<!-- grid组件 -->
-			<u-grid :border="false" @click="clickCategory" col="5">
-				<u-grid-item v-for="item in categoryList">
-					<view class="content">
-						<view class="grid-item">
-							<mj-icon-with-background :type="item.type" size="48rpx" customPrefix="miaoji" ></mj-icon-with-background>
-							<view class="grid-text">{{item.title}}</view>
+			<view class="icon-expend" v-show="showExpend">
+				<!-- 支出icon -->
+				<u-grid :border="false" @click="clickCategoryExpend" col="5">
+					<u-grid-item v-for="item,index in categoryIconListForExpend" :key="item.type">
+						<view class="content">
+							<view class="grid-item">
+								<mj-icon-with-background v-if="index !== currentExpendIndex" :type="item.icon" size="48rpx" customPrefix="miaoji"></mj-icon-with-background>
+								<mj-icon-with-background v-if="index === currentExpendIndex" :type="item.icon" size="48rpx" customPrefix="miaoji" color="#65915b" bgcColor="#efea9b"></mj-icon-with-background>
+								<view class="grid-text">{{item.title}}</view>
+							</view>
+						</view>
+					</u-grid-item>
+				</u-grid>
+			</view>
+			<!-- 收入icon -->
+			<view class="icon-income" v-show="showIncome">
+				<u-grid :border="false" @click="clickCategoryIncome" col="5">
+					<u-grid-item v-for="item,index in categoryIconListForIncome" :key="item.type">
+						<view class="content">
+							<view class="grid-item">
+								<mj-icon-with-background v-if="index !== currentIncomeIndex" :type="item.icon" size="48rpx" customPrefix="miaoji" ></mj-icon-with-background>
+								<mj-icon-with-background v-if="index === currentIncomeIndex" :type="item.icon" size="48rpx" customPrefix="miaoji" color="#65915b" bgcColor="#efea9b"></mj-icon-with-background>
+								<view class="grid-text">{{item.title}}</view>
+							</view>
+						</view>
+					</u-grid-item>
+				</u-grid>
+			</view>
+			<view class="transfer-accounts" v-if="showTransferAccounts">
+				<!-- 转入账户 -->
+				<view class="asset-card" >
+					<view class="left">
+						<view class="left-icon">
+							<uni-icons type="wallet" color="#6d6d6d" size="40rpx"></uni-icons>
+						</view>
+						<view class="asset-type" :style="assetName ? '' : 'color: #6d6d6d;'" >
+							{{assetName  || '转出账户'}}
 						</view>
 					</view>
-				</u-grid-item>
-			</u-grid>
+					<view class="asset-icon">
+						<uni-icons type="mj-weixinzhifu" color="#6bcc03" customPrefix="miaoji"></uni-icons>
+					</view>
+				</view>
+				<!-- 转出账户 -->
+				<view class="asset-card" >
+					<view class="left">
+						<view class="left-icon">
+							<uni-icons type="wallet" color="#6d6d6d" size="40rpx"></uni-icons>
+						</view>
+						<view class="asset-type" :style="assetName ? '' : 'color: #6d6d6d;'" >
+							{{destinationAssetName || '转入账户'}}
+						</view>
+					</view>
+					<view class="asset-icon">
+						<uni-icons type="mj-weixinzhifu" color="#6bcc03" customPrefix="miaoji"></uni-icons>
+					</view>
+				</view>
+				
+				<view style="color: #6d6d6d;padding-left: 8rpx;font-size: 24rpx;">
+					手续费——从转出账户转出的钱=转出金额+手续费
+				</view>
+				<u--form :model="transferAccountInfo" :borderBottom="false" ref="uForm" errorType="toast">
+					<u-form-item prop="bill_amount" :borderBottom="false">
+						<u--input v-model="transferAccountInfo.bill_amount" placeholder="手续费" placeholderStyle="color: #6d6d6d" type="digit" border="surround" clearable
+							shape="circle" maxlength="10" fontSize="13px" :customStyle="inputStyle" prefixIcon="rmb-circle"
+							prefixIconStyle="color: #6d6d6d"></u--input>
+					</u-form-item>
+				</u--form>
+				<button @click="test">点我验证</button>
+			</view>
 		</view>
 		<view class="mj-keyboard">
-			<!-- 组件为固定定位 -->
-			<mj-keyboard></mj-keyboard>
+			<view class="fixed">
+				<view class="tags">
+					<view class="item" @click="chooseAsset" v-if="!showTransferAccounts">
+						<view><uni-icons type="wallet" size="28rpx"></uni-icons></view>
+						<view>{{currentAssetTitle}}</view>
+					</view>
+					<view class="item">
+						<view><uni-icons type="calendar" size="28rpx"></uni-icons></view>
+						<view>8月31日</view>
+					</view>
+					<view class="item">
+						<view><uni-icons type="mj-layout" size="28rpx" customPrefix="miaoji"></uni-icons></view>
+						<view>模板</view>
+					</view>
+				</view>
+				<view class="bgc">
+					<view class="header">
+						<view class="textarea">
+							<u--textarea v-model="model.message" placeholder="备注信息(最多输入60字)" autoHeight border="none" :fixed="true" maxlength="60"></u--textarea>
+						</view>
+						<view class="num">
+							<u--text mode="price" text="96222224.32" color="#dd524d" bold size="36rpx"></u--text>
+						</view>
+					</view>
+				</view>
+				<!-- 安全区适配 配置底部安全区 -->
+				<u-safe-bottom></u-safe-bottom>
+			</view>
+			<view class="keyboard">
+				<!-- 修改了u-number-keyboard中的样式,逻辑 -->
+				<u-keyboard mode="number" zIndex="1" :show="true" :tooltip="false" :overlay="false" @change="tapKeyboard" @backspace="tapBackspace"></u-keyboard>
+			</view>
 		</view>
+		
+		<!-- 展示资产页的popup -->
+		<u-popup :show="showUserAssetsList" @close="showUserAssetsList = false" round="20px" zIndex="10076">
+			<view class="user-assets-list">
+				<view class="top">
+					<view class="add">
+						添加
+					</view>
+				</view>
+				<view class="content">
+					<u-cell-group :border="false" >
+						<u-cell :title="asset.assetStyle.title" :clickable="true" @click="clickOneAsset(asset)" v-for="asset in userAssets" :key="asset._id" >
+							<uni-icons slot="icon" :type="asset.assetStyle.icon" size="36rpx" custom-prefix="miaoji" :color="asset.assetStyle.color"></uni-icons>
+							<view slot="value">
+								<u--text mode="price" :text="asset.asset_balance" color="#219a6d" size="28rpx" bold></u--text>
+							</view>
+						</u-cell>
+					</u-cell-group>
+				</view>
+			</view>
+		</u-popup>
 	</view>
 </template>
 
 <script>
+	import ICONCONFIG from "@/utils/icon-config.js";
 	export default {
 		data() {
 			return {
@@ -34,92 +145,201 @@
 				}, {
 					name: '转账'
 				}],
-				categoryList: [{
-						type: 'mj-wucan',
-						title: '餐饮'
-					},
-					{
-						type: 'mj-duogouwu',
-						title: '购物'
-					},
-					{
-						type: 'mj-jiaotong',
-						title: '交通'
-					},
-					{
-						type: 'mj-zhusu',
-						title: '住宿'
-					},
-					{
-						type: 'mj-fuzhi',
-						title: '日常'
-					},
-					{
-						type: 'mj-youji',
-						title: '学习'
-					},
-					{
-						type: 'mj-yule',
-						title: '娱乐'
-					},
-					{
-						type: 'mj-meizhuang',
-						title: '美妆'
-					},
-					{
-						type: 'mj-ziranfengguang',
-						title: '旅游'
-					},
-					{
-						type: 'mj-yiliao',
-						title: '医疗'
-					},
-					{
-						type: 'mj-huiyuan',
-						title: '会员租用'
-					},
-					{
-						type: 'mj-shouji',
-						title: '通讯'
-					},
-					{
-						type: 'mj-renwen',
-						title: '人情'
-					},
-					{
-						type: 'mj-huobiduihuan',
-						title: '投资'
-					},
-					{
-						type: 'mj-qinzi',
-						title: '母婴'
-					},
-					{
-						type: 'mj-xiedaichongwu',
-						title: '宠物'
-					},
-					{
-						type: 'mj-dianpuzhuangxiu',
-						title: '装修'
-					},
-					{
-						type: 'mj-qita',
-						title: '其他'	
-					}
-				]
+				categoryIconListForExpend: [],
+				categoryIconListForIncome: [],
+				showExpend: true,
+				showIncome: false,
+				showTransferAccounts: false,
+				// 用户资产列表
+				userAssets: [],
+				assetsStyle: [],
+				showUserAssetsList: false,
+				assetName: '',
+				destinationAssetName: '',
+				rules: {
+					'bill_amount': [
+						{
+							validator: (rule, value, callback) => {
+								return uni.$u.test.amount(value)
+							},
+							message: '最多填写两位小数'
+						},
+					]
+				},
+				inputStyle: {
+					'background-color': '#f1f1f1',
+					'border-radius': '20px',
+					'border': 'none',
+					'height': '80rpx',
+					'padding-left': '20px',
+					'padding-right': '20px',
+				},
+				// 支出页||收入页表单信息
+				expendOrIncomeInfo: {
+					category_type: 'dining',
+					bill_type: 0,
+					bill_amount: 0.00,
+					asset_id: '',
+					bill_date: '',
+					bill_notes: ''
+				},
+				// 转账页表单信息
+				transferAccountInfo: {
+					category_type: 'transfer',
+					bill_type: 2,
+					bill_amount: 0.00,  // 手续费
+					asset_id: '',
+					bill_date: '',
+					bill_notes: '',
+					transfer_amount: 0.00,  //转账金额
+					destination_asset_id: ''  // 转入资产id
+				},
+				//  keyboard相关数据
+				model: {
+					message: ''
+				},
+				// 分类index
+				currentExpendIndex: 0,
+				currentIncomeIndex: 0,
+				currentTabIndex: 0,
+				currentAssetTitle: '交通银行'  // 默认为用户默认资产
 			};
 		},
 		methods: {
-			clickTab({
-				name
-			}) {
-				console.log(name);
+			clickTab({index}) {  // 0 支出  1 收入  2 转账
+				// 如果点击的不是当前所在tab
+				if(this.currentTabIndex === index) return
+				const tabs = [
+					{ showExpend: true, showIncome: false, showTransferAccounts: false, bill_type : 0, category_type : 'dining', currentIncomeIndex: 0},
+					{ showExpend: false, showIncome: true, showTransferAccounts: false, bill_type : 1, category_type : 'primary-income', currentExpendIndex: 0},
+					{ showExpend: false, showIncome: false, showTransferAccounts: true},
+				];
+				Object.assign(this, tabs[index] || {});
+				this.currentTabIndex = index
+				// console.log(this.expendOrIncomeInfo);
 			},
-			// 点击分类icon触发
-			clickCategory(index) {
-				console.log(index);
+			// 点击分类-支出icon触发
+			clickCategoryExpend(index) {
+				if(this.currentExpendIndex === index) return
+				// 高亮并给表单的 分类类型 赋值
+				this.currentExpendIndex = index
+				this.expendOrIncomeInfo.category_type = this.categoryIconListForExpend[index].type
+			},
+			// 点击分类-收入icon触发
+			clickCategoryIncome(index) {
+				if(this.currentIncomeIndex === index) return
+				this.currentIncomeIndex = index
+				this.expendOrIncomeInfo.category_type = this.categoryIconListForIncome[index].type
+			},
+			// 点击设置资产popup中的某一个资产
+			clickOneAsset(asset) {
+				// console.log('点击了资产列表',asset);
+				// 1 隐藏pop框
+				// 2 拿到资产id赋值给表单的 asset_id； 拿到assetStyle中title 渲染
+				this.showUserAssetsList = false
+				this.expendOrIncomeInfo.asset_id = asset._id
+				this.currentAssetTitle = asset.assetStyle.title
+				// console.log(this.expendOrIncomeInfo);
+			},
+			test() {
+				this.$refs.uForm.setRules(this.rules)
+				this.$refs.uForm.validate().then( res => {
+					console.log(res)
+				}).catch(errors => {
+					console.log(errors)
+				})
+			},
+			
+			
+			
+			// keyboard 相关方法
+			
+			chooseAsset() {
+				this.showUserAssetsList = true
+			},
+			// keyboard被点击（不包含退格键）
+			tapKeyboard(e) {
+				console.log(e);
+			},
+			// 退格键被点击
+			tapBackspace() {
+				console.log("退格键");
+			},
+			
+			
+			
+			
+			// 初始化相关方法
+			// 获取分类icon列表
+			getCategoryIconList() {
+				// 缓存中是否有分类-支出样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
+				if(uni.getStorageSync('mj-category-style-for-expend')) {
+					this.categoryIconListForExpend = uni.getStorageSync('mj-category-style-for-expend')
+				} else {
+					this.categoryIconListForExpend = ICONCONFIG.categoryIconListForExpend()
+					uni.setStorage({
+						key:'mj-category-style-for-expend',
+						data: this.categoryIconListForExpend
+					})
+				}
+				// 缓存中是否有分类-收入样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
+				if(uni.getStorageSync('mj-category-style-for-income')) {
+					this.categoryIconListForIncome = uni.getStorageSync('mj-category-style-for-income')
+				} else {
+					this.categoryIconListForIncome = ICONCONFIG.categoryIconListForIncome()
+					uni.setStorage({
+						key:'mj-category-style-for-income',
+						data: this.categoryIconListForIncome
+					})
+				}
+			},
+			getAssetsStyle() {
+				// 缓存中是否有资产样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
+				if(uni.getStorageSync('mj-assets-style')) {
+					this.assetsStyle = uni.getStorageSync('mj-assets-style')
+				} else {
+					this.assetsStyle = ICONCONFIG.assetIconList()
+					uni.setStorage({
+						key:'mj-assets-style',
+						data: this.assetsStyle
+					})
+				}
+			},
+			// 给userAssets添加type值对应的assetStyle
+			addAssetStyle() {
+				this.userAssets.forEach(asset => {
+					asset.assetStyle = this.assetsStyle.find(item => item.type == asset.asset_type)
+				})
+				// console.log('addAssetStyle',this.assets);
+			}
+		},
+		onLoad() {
+			// 获取分类列表，该用户所有资产信息，将用户资产信息添加对应资产icon样式
+			this.getCategoryIconList()
+			this.userAssets = uni.getStorageSync('mj-user-assets')
+			this.getAssetsStyle()
+			this.addAssetStyle()
+			console.log(this.userAssets);
+		},
+		computed: {
+			bill_type: {
+				get() {
+					return this.expendOrIncomeInfo.bill_type
+				},
+				set(value) {
+					this.expendOrIncomeInfo.bill_type = value
+				}
+			},
+			category_type: {
+				get() {
+					return this.expendOrIncomeInfo.category_type
+				},
+				set(value) {
+					this.expendOrIncomeInfo.category_type = value
+				}
 			}
 		}
+		
 	}
 </script>
 
@@ -166,9 +386,95 @@
 					}
 				}
 			}
+			.transfer-accounts {
+				.asset-card {
+					display: flex;
+					justify-content: space-between;
+					align-items: center;
+					background-color: #f1f1f1;
+					border-radius: 20px;
+					height: 80rpx;
+					box-sizing: border-box;
+					padding: 0 20px;
+					margin-bottom: 32rpx;
+					.left {
+						display: flex;
+						justify-content: start;
+						align-items: center;
+						.left-icon {
+							margin-right: 10px;
+						}
+					}
+				}
+			}
+		}
+		.user-assets-list {
+			min-height: 750rpx;
+			max-height: 1200rpx;
+			box-sizing: border-box;
+			padding: 10px;
+			background-color: $mj-bg-color;
+			overflow: hidden;
+			border-radius: 20px;
+			.top {
+				display: flex;
+				justify-content: flex-end;
+				align-items: center;
+				.add {
+					color: #fff;
+					background-color: #2e3548;
+					font-size: 24rpx;
+					box-sizing: border-box;
+					padding: 4px 8px;
+					border-radius: 12px;
+				}
+			}
 		}
 		.mj-keyboard {
-			
+			.fixed {
+				position: fixed;
+				bottom: 424rpx;
+				left: 0;
+				right: 0;
+				.tags {
+					display: flex;
+					justify-content: start;
+					background-color: $mj-bg-color;
+					padding: 4px 0;
+					.item {
+						margin-right: 20rpx;
+						display: flex;
+						justify-content: start;
+						align-items: center;
+						box-sizing: border-box;
+						padding: 12rpx;
+						border-radius: 36rpx;
+						background-color: #f1f1f1;
+						font-size: 24rpx;
+					}
+					// 父级选择器 & 可以选中当前的父元素
+					&:first-child {
+						margin-left: 20rpx;
+					}
+				}
+				.bgc {
+					background-color: #fff;
+					border-top: 1px solid #f3f3f3;
+					// margin-top: 8rpx;
+					.header {
+						display: flex;
+						justify-content: space-between;
+						align-items: center;
+						.textarea {
+							min-width: 430rpx;
+						}
+						.num {
+							max-width: 320rpx;
+							text-align: right;
+						}
+					}
+				}
+			}
 		}
 	}
 </style>

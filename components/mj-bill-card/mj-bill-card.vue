@@ -5,11 +5,11 @@
 			<text>支出:40.00 收:40.00</text>
 		</view>
 		<!-- 这里需要循环 -->
-		<view class="content" >
+		<view class="content">
 			<!-- 滑动单元格 -->
 			<u-swipe-action>
-				<u-swipe-action-item :options="options"  v-for="item in 3" :threshold="80">
-					<view class="swipe-action-item" >
+				<u-swipe-action-item :options="options" v-for="item in 3" :threshold="80" @click="clickSwipeActionItemBtn($event)">
+					<view class="swipe-action-item">
 						<view class="left">
 							<mj-icon-with-background type="heart" size="48rpx"></mj-icon-with-background>
 							<view class="info">
@@ -18,7 +18,8 @@
 							</view>
 						</view>
 						<view class="right">
-							<view class="money"><u--text mode="price" text="250.02" color="#dd524d" size="32rpx" bold></u--text></view>
+							<view class="money"><u--text mode="price" text="250.02" color="#dd524d" size="32rpx"
+									bold></u--text></view>
 							<view class="minor">微信钱包</view>
 						</view>
 					</view>
@@ -37,6 +38,12 @@
 		data() {
 			return {
 				options: [{
+					text: "修改",
+					style: {
+						backgroundColor: '#9fcba7',
+						padding: '0 40rpx'
+					}
+				}, {
 					text: "删除",
 					style: {
 						backgroundColor: '#e94459',
@@ -44,6 +51,11 @@
 					}
 				}]
 			};
+		},
+		methods: {
+			clickSwipeActionItemBtn({index}) {  // 0 修改  1 删除
+				console.log("点击了滑动选择器btn",index);
+			}
 		}
 	}
 </script>
@@ -52,6 +64,7 @@
 	.bill-card {
 		padding-right: 24rpx;
 		margin-bottom: 36rpx;
+
 		.header {
 			padding-left: 24rpx;
 			display: flex;
@@ -59,6 +72,7 @@
 			color: $mj-text-color-grey;
 			font-size: 28rpx;
 		}
+
 		.content {
 			.swipe-action-item {
 				background-color: $mj-bg-color;
@@ -68,11 +82,13 @@
 				color: $mj-text-color;
 				font-size: 32rpx;
 				padding: 8rpx 0;
+
 				.left {
 					padding-left: 24rpx;
 					display: flex;
 					justify-content: right;
 					align-items: center;
+
 					.info {
 						display: flex;
 						flex-direction: column;
@@ -80,6 +96,7 @@
 						padding-left: 24rpx;
 					}
 				}
+
 				.right {
 					display: flex;
 					flex-direction: column;
@@ -87,17 +104,19 @@
 					align-items: flex-end;
 					padding-right: 20rpx;
 				}
+
 				.minor {
 					color: $mj-text-color-grey;
 					font-size: 24rpx;
 				}
 			}
+
 			.line {
 				display: flex;
 				justify-content: center;
 			}
-		
-			
+
+
 		}
 	}
 </style>

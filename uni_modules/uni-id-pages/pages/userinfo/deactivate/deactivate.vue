@@ -34,6 +34,8 @@
 			nextStep() {
 				uni.showModal({
 					content: '已经仔细阅读注销提示，知晓可能带来的后果，并确认要注销',
+					cancelColor: "rgba(0,0,0,0.6)",
+					confirmColor:"#9fcba7",
 					complete: (e) => {
 						if (e.confirm) {
 							const uniIdco = uniCloud.importObject("uni-id-co");

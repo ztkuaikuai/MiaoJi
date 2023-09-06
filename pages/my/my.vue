@@ -26,10 +26,10 @@
 				titleColor="#212121"></uni-section>
 			<!-- grid组件 -->
 			<u-grid :border="false" @click="clickOption" col="4">
-				<u-grid-item v-for="item in optionList">
+				<u-grid-item v-for="item,index in optionList" :key="index" >
 					<view class="content">
 						<view class="grid-item">
-							<uni-icons :type="item.type" size="48rpx" :customPrefix="item.customPrefix"></uni-icons>
+							<uni-icons :type="item.icon" size="48rpx" :customPrefix="item.customPrefix"></uni-icons>
 							<view class="grid-text">{{item.title}}</view>
 						</view>
 					</view>
@@ -39,10 +39,10 @@
 			<uni-section class="section" title="偏好" type="line" titleFontSize="28rpx"
 				titleColor="#212121"></uni-section>
 			<u-grid :border="false" @click="clickLike" col="4">
-				<u-grid-item v-for="item in likeList">
+				<u-grid-item v-for="item,index in likeList" :key="index" >
 					<view class="content">
 						<view class="grid-item">
-							<uni-icons :type="item.type" size="48rpx" :customPrefix="item.customPrefix"></uni-icons>
+							<uni-icons :type="item.icon" size="48rpx" :customPrefix="item.customPrefix"></uni-icons>
 							<view class="grid-text">{{item.title}}</view>
 						</view>
 					</view>
@@ -86,27 +86,27 @@
 					nickname: '',
 				},
 				optionList: [{
-						type: 'wallet',
+						icon: 'wallet',
 						title: '我的资产'
 					},
 					{
-						type: 'mj-layout',
+						icon: 'mj-layout',
 						title: '模板管理',
 						customPrefix: "miaoji"
 					},
 					{
-						type: 'mj-reloadtime',
+						icon: 'mj-reloadtime',
 						title: '定时记账',
 						customPrefix: "miaoji"
 					},
 					{
-						type: 'mj-YUAN',
+						icon: 'mj-YUAN',
 						title: '预算设置',
 						customPrefix: "miaoji"
 					}
 				],
 				likeList: [{
-						type: 'color',
+						icon: 'color',
 						title: '个性化'
 					}
 				]

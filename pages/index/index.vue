@@ -87,6 +87,9 @@
 			const state = UT.checkUserTokenExpierd() // 检查老用户的token是否过期，如果过期则跳转登录，并返回true；没过期返回false
 			if(state) return
 			// console.log("用户token没过期，继续执行下面的逻辑");
+			
+			
+			
 			// 获取用户资产列表
 			this.getUserAssets()
 			uni.$on('updateAssetsList',this.getUserAssets)
@@ -122,6 +125,11 @@
 				this.userAssets = res.result.data
 				// 统一修改金额
 				this.userAssets.forEach(item => item.asset_balance = item.asset_balance / 100)
+				// 保存在缓存中
+				uni.setStorage({
+					key:'mj-user-assets',
+					data: this.userAssets
+				})
 			}
 		},
 		onUnload(){

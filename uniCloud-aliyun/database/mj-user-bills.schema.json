@@ -1,6 +1,6 @@
 {
 	"bsonType": "object",
-	"required": ["user_id","category_code","bill_type","bill_amount","asset_id","bill_date"],
+	"required": ["user_id","category_type","bill_type","bill_amount","asset_id","bill_date"],
 	"permission": {
 		"read": "doc.user_id == auth.uid",
 		"create": " 'USER' in auth.role",
@@ -19,10 +19,10 @@
 			},
 			"foreignKey": "uni-id-users._id"
 		},
-		"category_code": {
-			"bsonType": "int",
-			"description": "分类编号，默认为0 餐饮",
-			"defaultValue": 0
+		"category_type": {
+			"bsonType": "string",
+			"description": "分类类型，默认为dining 餐饮",
+			"defaultValue": "dining"
 		},
 		"bill_type": {
 			"bsonType": "int",
@@ -42,7 +42,7 @@
 		"bill_date": {
 			"bsonType": "timestamp",
 			"description": "记账时间戳",
-			"forceDefaultValue": {
+			"defaultValue": {
 				"$env": "now"
 			}
 		},
@@ -52,11 +52,11 @@
 		},
 		"transfer_amount": {
 			"bsonType": "int",
-			"description": "转出金额，以分为单位。如果类型为2 转账，使用。"
+			"description": "如果类型为2 转账，使用。转出金额，以分为单位。"
 		},
 		"destination_asset_id": {
 			"bsonType": "string",
-			"description": "转入资产id。如果类型为2 转账，使用。",
+			"description": "如果类型为2 转账，使用。转入资产id。",
 			"foreignKey": "mj-user-assets._id"
 		}
 	}
