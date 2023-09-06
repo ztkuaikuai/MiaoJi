@@ -82,9 +82,9 @@
 						<view><uni-icons type="wallet" size="28rpx"></uni-icons></view>
 						<view>{{currentAssetTitle}}</view>
 					</view>
-					<view class="item">
+					<view class="item" @click="chooseDate">
 						<view><uni-icons type="calendar" size="28rpx"></uni-icons></view>
-						<view>8月31日</view>
+						<view>{{userChooseDate}}</view>
 					</view>
 					<view class="item">
 						<view><uni-icons type="mj-layout" size="28rpx" customPrefix="miaoji"></uni-icons></view>
@@ -94,10 +94,11 @@
 				<view class="bgc">
 					<view class="header">
 						<view class="textarea">
-							<u--textarea v-model="model.message" placeholder="备注信息(最多输入60字)" autoHeight border="none" :fixed="true" maxlength="60"></u--textarea>
+							<u--textarea v-model="keyboardInfo.notes" placeholder="备注信息(最多输入60字)" autoHeight border="none" :fixed="true" maxlength="60"></u--textarea>
 						</view>
 						<view class="num">
-							<u--text mode="price" text="96222224.32" color="#dd524d" bold size="36rpx"></u--text>
+							<!-- <u--text mode="price" :text="keyboardInfo.balance" color="#dd524d" bold size="36rpx"></u--text> -->
+							￥{{keyboardInfo.balance}}
 						</view>
 					</view>
 				</view>
@@ -130,11 +131,25 @@
 				</view>
 			</view>
 		</u-popup>
+		
+		<!-- 展示日期选择器的组件 -->
+		<u-datetime-picker
+		                :show="showDatetimePicker"
+		                v-model="currentDate"
+		                mode="datetime"
+						:maxDate="Date.now()"
+						confirmColor="#9fcba7"
+						closeOnClickOverlay="true"
+						@close="showDatetimePicker = false"
+						@cancel="showDatetimePicker = false"
+						@confirm="getBillDate"
+		></u-datetime-picker>
 	</view>
 </template>
 
 <script>
 	import ICONCONFIG from "@/utils/icon-config.js";
+	const db = uniCloud.database()
 	export default {
 		data() {
 			return {
@@ -154,6 +169,9 @@
 				userAssets: [],
 				assetsStyle: [],
 				showUserAssetsList: false,
+				showDatetimePicker: false,
+				currentDate: Date.now(),
+				userChooseDate: uni.$u.timeFormat(Date.now(), 'mm月dd日'),
 				assetName: '',
 				destinationAssetName: '',
 				rules: {
@@ -180,7 +198,7 @@
 					bill_type: 0,
 					bill_amount: 0.00,
 					asset_id: '',
-					bill_date: '',
+					bill_date: Date.now(),
 					bill_notes: ''
 				},
 				// 转账页表单信息
@@ -195,14 +213,15 @@
 					destination_asset_id: ''  // 转入资产id
 				},
 				//  keyboard相关数据
-				model: {
-					message: ''
+				keyboardInfo: {
+					notes: '',
+					balance: '0.00'
 				},
 				// 分类index
 				currentExpendIndex: 0,
 				currentIncomeIndex: 0,
 				currentTabIndex: 0,
-				currentAssetTitle: '交通银行'  // 默认为用户默认资产
+				currentAssetTitle: '未选择资产'  // 默认为用户第一个资产
 			};
 		},
 		methods: {
@@ -257,19 +276,95 @@
 			chooseAsset() {
 				this.showUserAssetsList = true
 			},
+			chooseDate() {
+				this.showDatetimePicker = true
+			},
+			// 用户选择的日期，返回值为时间戳（毫秒）
+			getBillDate({value}) {
+				this.showDatetimePicker = false
+				// 1 用户选择日期点击确定
+				// 2 时间戳赋值给表单的 bill_date ，格式化时间  x月x日，赋值给 userChooseDate
+				this.expendOrIncomeInfo.bill_date = value
+				this.userChooseDate = uni.$u.timeFormat(value, 'mm月dd日')
+				console.log(this.expendOrIncomeInfo);
+			},
 			// keyboard被点击（不包含退格键）
 			tapKeyboard(e) {
-				console.log(e);
+				// 允许最大8位整数
+				if(this.keyboardInfo.balance.length >= 9) {
+					uni.showToast({
+						title:"金额长度不能超过8位",
+						icon: "none"
+					})
+					return
+				}
+				let balance = this.keyboardInfo.balance
+				if(e === '保存') {
+					if(!uni.$u.test.amount(balance)) return
+					this.addOneBill()
+				} else if (e === '.') {
+					if(balance.indexOf('.') !== -1) return // 如果含有 .  return
+					balance += e
+				} else if (e === '再记' || e === '秒记1' || e === '秒记2') {  // 再记：保存数据，上传数据库，提示用户，并清空重置
+					uni.showToast({title:"正在开发中~",icon: 'none'})
+				} else {
+					// 用户输入0-9
+					if(balance === '0.00' || balance === '0') {
+						balance = e
+					}  else if (balance.endsWith('.',balance.length - 2)) {
+						// 如果是 .xx形式，不继续添加
+						return
+					} else {
+						balance += e
+					}
+				}
+				// console.log('更新后的balance',balance);
+				this.keyboardInfo.balance = balance.toString()
 			},
 			// 退格键被点击
 			tapBackspace() {
-				console.log("退格键");
+				let balance = this.keyboardInfo.balance
+				if(balance.length === 0) return 
+				// 删除最后一个字符
+				balance = balance.slice(0, -1)
+				// console.log('更新后的balance',balance)
+				this.keyboardInfo.balance = balance.toString()
+			},
+			
+			// 添加支出||收入账单
+			async addOneBill() {
+				this.expendOrIncomeInfo.bill_amount = Math.round(this.keyboardInfo.balance * 100)
+				this.expendOrIncomeInfo.bill_notes =this.keyboardInfo.notes
+				await db.collection("mj-user-bills").add({
+					...this.expendOrIncomeInfo
+				})
+				uni.switchTab({
+					url:"/pages/index/index"
+				})
+				this.upDateUserAssetBalance()
+			},
+			// 更新用户资产金额   0  支出    1  收入
+			async upDateUserAssetBalance() {
+				let assetBalance = this.userAssets.find(item => item._id === this.expendOrIncomeInfo.asset_id).asset_balance
+				assetBalance = Math.round(assetBalance * 100)  // 转换单位为分
+				// console.log(assetBalance);
+				if(this.expendOrIncomeInfo.bill_type === 0) {
+					const asset_balance = assetBalance - this.expendOrIncomeInfo.bill_amount
+					await db.collection("mj-user-assets").doc(this.expendOrIncomeInfo.asset_id).update({
+						asset_balance
+					})
+				} else {
+					const asset_balance = assetBalance + this.expendOrIncomeInfo.bill_amount
+					await db.collection("mj-user-assets").doc(this.expendOrIncomeInfo.asset_id).update({
+						asset_balance
+					})
+				}
+				uni.$emit('updateAssetsList')
 			},
 			
 			
 			
-			
-			// 初始化相关方法
+			// 初始化相关方法         （可以封装）
 			// 获取分类icon列表
 			getCategoryIconList() {
 				// 缓存中是否有分类-支出样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
@@ -317,6 +412,8 @@
 			// 获取分类列表，该用户所有资产信息，将用户资产信息添加对应资产icon样式
 			this.getCategoryIconList()
 			this.userAssets = uni.getStorageSync('mj-user-assets')
+			this.currentAssetTitle = this.userAssets[0].asset_name
+			this.expendOrIncomeInfo.asset_id = this.userAssets[0]._id
 			this.getAssetsStyle()
 			this.addAssetStyle()
 			console.log(this.userAssets);
@@ -471,6 +568,9 @@
 						.num {
 							max-width: 320rpx;
 							text-align: right;
+							color: #dd524d;
+							font-size: 36rpx;
+							font-weight: 700;
 						}
 					}
 				}

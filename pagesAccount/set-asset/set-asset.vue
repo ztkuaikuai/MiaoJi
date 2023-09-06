@@ -134,19 +134,19 @@
 					if(!userAsset._id) {
 						// 新增资产
 						await db.collection("mj-user-assets").add({
-							"asset_type": userAsset.asset_type,
-							"asset_balance": userAsset.asset_balance,
-							"hide_in_interface": userAsset.hide_in_interface,
-							"include_in_total_assets": userAsset.include_in_total_assets,
-							"asset_name": userAsset.asset_name
+							asset_type: userAsset.asset_type,
+							asset_balance: userAsset.asset_balance,
+							hide_in_interface: userAsset.hide_in_interface,
+							include_in_total_assets: userAsset.include_in_total_assets,
+							asset_name: userAsset.asset_name
 						})
 					} else {
 						// 编辑资产
 						await db.collection("mj-user-assets").doc(userAsset._id).update({
-							"asset_balance": userAsset.asset_balance,
-							"hide_in_interface": userAsset.hide_in_interface,
-							"include_in_total_assets": userAsset.include_in_total_assets,
-							"asset_name": userAsset.asset_name
+							asset_balance: userAsset.asset_balance,
+							hide_in_interface: userAsset.hide_in_interface,
+							include_in_total_assets: userAsset.include_in_total_assets,
+							asset_name: userAsset.asset_name
 						})
 					}
 					uni.$emit('updateAssetsList')

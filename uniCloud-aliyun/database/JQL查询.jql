@@ -9,4 +9,4 @@
 // 详细JQL语法，请参考：https://uniapp.dcloud.net.cn/uniCloud/jql.html
 
 // 下面示例查询uni-id-users表的所有数据
-db.collection("mj-user-assets").where(" auth.uid == doc.user_id ").get()
+db.collection("mj-user-bills").remove()

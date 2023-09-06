@@ -41,10 +41,7 @@
 		},
 		"bill_date": {
 			"bsonType": "timestamp",
-			"description": "记账时间戳",
-			"defaultValue": {
-				"$env": "now"
-			}
+			"description": "记账时间戳"
 		},
 		"bill_notes": {
 			"bsonType": "string",

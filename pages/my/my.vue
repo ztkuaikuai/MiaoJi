@@ -109,7 +109,8 @@
 						icon: 'color',
 						title: '个性化'
 					}
-				]
+				],
+				showUserAssetsList: false,
 			};
 		},
 		methods: {
@@ -138,6 +139,13 @@
 					url: "/uni_modules/uni-id-pages/pages/userinfo/deactivate/deactivate"
 				})
 			},
+			// 设置默认资产
+			setDefaultAsset() {
+				
+			},
+			
+			
+			
 			// 页面挂载时获取数据  1 如果有缓存，获取缓存进行渲染  2 若无缓存，获取db数据，并赋值+存入缓存 
 			async getUserInfo() {
 				try {
