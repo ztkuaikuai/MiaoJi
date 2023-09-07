@@ -59,7 +59,7 @@
 				<u-cell title="联系作者" :isLink="true">
 					<uni-icons slot="icon" type="personadd" size="36rpx"></uni-icons>
 				</u-cell>
-				<u-cell title="关于" :isLink="true">
+				<u-cell title="关于" :isLink="true" @click="clickAbout">
 					<uni-icons slot="icon" type="info" size="36rpx"></uni-icons>
 				</u-cell>
 				<u-cell title="退出登录" :isLink="true" @click="logout">
@@ -120,28 +120,37 @@
 				})
 			},
 			clickOption(name) {
-				console.log("点击了常用功能", name);
+				// console.log("点击了常用功能", name);
+				uni.showToast({
+					title:"正在开发中~",
+					icon: "none"
+				})
 			},
 			clickLike(name) {
-				console.log("点击了偏好", name);
+				// console.log("点击了偏好", name);
+				uni.showToast({
+					title:"正在开发中~",
+					icon: "none"
+				})
 			},
 			clickFeedback() {
 				uni.navigateTo({
 					url: "/pagesMy/feedback/feedback"
 				})
 			},
+			clickAbout(){
+				uni.navigateTo({
+					url:"/pagesMy/about/about"
+				})
+			},
 			logout() {
 				mutations.logout()
-				console.log("成功登出")
 			},
+			// 注销
 			deactivate() {
 				uni.navigateTo({
 					url: "/uni_modules/uni-id-pages/pages/userinfo/deactivate/deactivate"
 				})
-			},
-			// 设置默认资产
-			setDefaultAsset() {
-				
 			},
 			
 			

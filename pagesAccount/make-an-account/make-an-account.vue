@@ -443,8 +443,9 @@
 						asset_balance
 					})
 				}
-				uni.$emit('updateAssetsList')
 				uni.$emit('updateBillsList')
+				uni.$emit('updateMonthlyBillBalance')
+				uni.$emit('updateAssetsList')
 			},
 			// 更新用户 转出与转入 资产金额
 			async upDateUserTwoAssetBalance() {
@@ -463,8 +464,9 @@
 				await db.collection("mj-user-assets").doc(this.transferAccountInfo.destination_asset_id).update({
 					asset_balance: transferIntoAssetBalance
 				})
-				uni.$emit('updateAssetsList')
 				uni.$emit('updateBillsList')
+				uni.$emit('updateMonthlyBillBalance')
+				uni.$emit('updateAssetsList')
 			},
 			
 			

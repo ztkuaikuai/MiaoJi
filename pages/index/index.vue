@@ -18,7 +18,7 @@
 					</view>
 				</view>
 				<view class="footer">
-					<text>本月收入<text class="bold" v-if="isEyeShow">{{monthlyIncome}}</text><text class="bold" v-else>*****</text></text>
+					<text>本月收入<text class="bold" v-if="isEyeShow">{{monthlyIncome.toFixed(2)}}</text><text class="bold" v-else>*****</text></text>
 					<text>月结余<text class="bold" v-if="isEyeShow">{{(monthlyIncome - monthlyExpense).toFixed(2)}}</text><text class="bold" v-else>*****</text></text>
 				</view>
 				<!-- 占位 -->
@@ -153,10 +153,13 @@
 			async getUserMonthlyBillBalance() {
 				// 筛选条件 bill_date 日期格式化成 2023-09 的字段，按照账单类型进行分组，并计算每个分组的总价
 				const res = await db.collection("mj-user-bills").where(`user_id == $cloudEnv_uid && dateToString(add(new Date(0),bill_date),"%Y-%m","+0800") == "${this.currentDate}"`).groupBy('bill_type').groupField('sum(bill_amount) as bill_amount_total').orderBy('bill_type asc').get()
-				// console.log(res.result.data)
+				console.log(res.result.data)
+				const monthlyExpenseTemp = res.result.data.filter(item => item.bill_type === 0)[0]?.bill_amount_total / 100 || '0'
+				const transferBalanceTemp = res.result.data.filter(item => item.bill_type === 2)[0]?.bill_amount_total / 100 || '0'
+				const monthlyIncomeTemp = res.result.data.filter(item => item.bill_type === 1)[0]?.bill_amount_total / 100 || '0'
 				// 分别计算月支出和月收入	月支出 = 月支出 + 转账的手续费	月收入 = 月收入
-				this.monthlyExpense = ((res.result.data.filter(item => item.bill_type === 0)[0].bill_amount_total / 100) + (res.result.data.filter(item => item.bill_type === 2)[0].bill_amount_total / 100)).toFixed(2)
-				this.monthlyIncome = (res.result.data.filter(item => item.bill_type === 1)[0].bill_amount_total / 100).toFixed(2)
+				this.monthlyExpense = Number(monthlyExpenseTemp) + Number(transferBalanceTemp)
+				this.monthlyIncome = Number(monthlyIncomeTemp)
 			},
 			// 获取用户资产列表
 			async getUserAssets() {
@@ -186,6 +189,7 @@
 		onUnload(){
 			uni.$off('updateAssetsList')
 			uni.$off('updateBillsList')
+			uni.$off('updateMonthlyBillBalance')
 		}
 	}
 </script>
