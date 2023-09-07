@@ -88,8 +88,6 @@
 			if(state) return
 			// console.log("用户token没过期，继续执行下面的逻辑");
 			
-			
-			
 			// 获取用户资产列表
 			this.getUserAssets()
 			uni.$on('updateAssetsList',this.getUserAssets)
@@ -118,11 +116,22 @@
 					url
 				})
 			},
+			// 获取用户资产列表
 			async getUserAssets() {
 				// console.log("getUserAssets");
 				const res = await db.collection("mj-user-assets").where(" auth.uid == doc.user_id ").get()
 				this.userAssets = []
 				this.userAssets = res.result.data
+				// 如果用户资产列表为空，则创建默认资产
+				if(!this.userAssets.length) {
+					await db.collection("mj-user-assets").add({
+						asset_type: 'default',
+						asset_balance: 0
+					})
+					const defalutAsset = await db.collection("mj-user-assets").where(" auth.uid == doc.user_id ").get()
+					this.userAssets = []
+					this.userAssets = defalutAsset.result.data
+				}
 				// 统一修改金额
 				this.userAssets.forEach(item => item.asset_balance = item.asset_balance / 100)
 				// 保存在缓存中

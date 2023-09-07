@@ -103,7 +103,7 @@
 		},
 		onLoad( {type} ) {
 			this.type = type
-			this.getAssetsStyle()
+			this.assetsStyle = ICONCONFIG.getAssetsStyle()
 			const arr = this.assetsStyle.filter(item => {
 				return item.type == type
 			})
@@ -133,13 +133,7 @@
 					userAsset.asset_balance = Math.round(userAsset.asset_balance * 100)  // 单位改为分，由于计算精度问题，使用四舍五入
 					if(!userAsset._id) {
 						// 新增资产
-						await db.collection("mj-user-assets").add({
-							asset_type: userAsset.asset_type,
-							asset_balance: userAsset.asset_balance,
-							hide_in_interface: userAsset.hide_in_interface,
-							include_in_total_assets: userAsset.include_in_total_assets,
-							asset_name: userAsset.asset_name
-						})
+						await db.collection("mj-user-assets").add({...userAsset})
 					} else {
 						// 编辑资产
 						await db.collection("mj-user-assets").doc(userAsset._id).update({
@@ -156,18 +150,6 @@
 					uni.$u.toast(errors[0].message)
 				})
 
-			},
-			getAssetsStyle() {
-				// 缓存中是否有资产样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
-				if(uni.getStorageSync('mj-assets-style')) {
-					this.assetsStyle = uni.getStorageSync('mj-assets-style')
-				} else {
-					this.assetsStyle = ICONCONFIG.assetIconList()
-					uni.setStorage({
-						key:'mj-assets-style',
-						data: this.assetsStyle
-					})
-				}
 			},
 		},
 		watch: {

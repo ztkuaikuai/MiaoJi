@@ -19,6 +19,11 @@ function assetIconList() {
 		title: '余额',
 		type: 'yue',
 		color: '#fe9c01'
+	}, {
+		icon: 'mj-creditcard',
+		title: '默认账户',
+		type: 'default',
+		color: '#212121'
 	}]
 }
 
@@ -130,8 +135,51 @@ function categoryIconListForIncome() {
 	]
 }
 
+function getCategoryIconListForExpend() {
+	// 缓存中是否有分类-支出样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
+	if (uni.getStorageSync('mj-category-style-for-expend')) {
+		return uni.getStorageSync('mj-category-style-for-expend')
+	} else {
+		const iconListForExpend = categoryIconListForExpend()
+		uni.setStorage({
+			key: 'mj-category-style-for-expend',
+			data: iconListForExpend
+		})
+		return iconListForExpend
+	}
+}
+
+function getCategoryIconListForIncome() {
+	// 缓存中是否有分类-收入样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
+	if (uni.getStorageSync('mj-category-style-for-income')) {
+		return uni.getStorageSync('mj-category-style-for-income')
+	} else {
+		const iconListForIncome = categoryIconListForIncome()
+		uni.setStorage({
+			key: 'mj-category-style-for-income',
+			data: iconListForIncome
+		})
+		return iconListForIncome
+	}
+}
+
+
+function getAssetsStyle() {
+	// 缓存中是否有资产样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
+	if (uni.getStorageSync('mj-assets-style')) {
+		return uni.getStorageSync('mj-assets-style')
+	} else {
+		const assetsStyle = assetIconList()
+		uni.setStorage({
+			key: 'mj-assets-style',
+			data: assetsStyle
+		})
+		return assetsStyle
+	}
+}
+
 export default {
-	assetIconList,
-	categoryIconListForExpend,
-	categoryIconListForIncome
+	getCategoryIconListForExpend,
+	getCategoryIconListForIncome,
+	getAssetsStyle
 }

@@ -23,21 +23,9 @@
 					url: `/pagesAccount/set-asset/set-asset?type=${this.assetsStyle[index].type}`,
 				})
 			},
-			getAssetsStyle() {
-				// 缓存中是否有资产样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
-				if(uni.getStorageSync('mj-assets-style')) {
-					this.assetsStyle = uni.getStorageSync('mj-assets-style')
-				} else {
-					this.assetsStyle = ICONCONFIG.assetIconList()
-					uni.setStorage({
-						key:'mj-assets-style',
-						data: this.assetsStyle
-					})
-				}
-			},
 		},
 		onLoad() {
-			this.getAssetsStyle()
+			this.assetsStyle = ICONCONFIG.getAssetsStyle()
 		}
 	}
 </script>

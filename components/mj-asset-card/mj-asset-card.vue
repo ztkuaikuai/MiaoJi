@@ -117,18 +117,6 @@
 				this.showHideAsset = true
 				console.log(this.userAssetsHide);
 			},
-			getAssetsStyle() {
-				// 缓存中是否有资产样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
-				if(uni.getStorageSync('mj-assets-style')) {
-					this.assetsStyle = uni.getStorageSync('mj-assets-style')
-				} else {
-					this.assetsStyle = ICONCONFIG.assetIconList()
-					uni.setStorage({
-						key:'mj-assets-style',
-						data: this.assetsStyle
-					})
-				}
-			},
 			// 给userAssetsFromDB赋值为assets（首先，不可以直接修改props，其次将对象内容变成响应式的，可以被computed监测到），并添加type值对应的assetStyle
 			addAssetStyle() {
 				this.assets = this.userAssetsFromDB
@@ -149,7 +137,7 @@
 		},
 		onReady() {
 			console.log('onReady',this.userAssetsFromDB);
-			this.getAssetsStyle()
+			this.assetsStyle = ICONCONFIG.getAssetsStyle()
 			this.addAssetStyle()
 		},
 		watch: {
