@@ -13,7 +13,12 @@
 							</view>
 						</view>
 						<view class="right">
-							<view class="money"><u--text mode="price" :text="asset.asset_balance" color="rgba(0,0,0, 0.8)" size="32rpx" bold></u--text></view>
+							<view class="money">
+								<u--text v-if="isEyeShow" mode="price" :text="asset.asset_balance" color="rgba(0,0,0, 0.8)" size="32rpx" bold></u--text>
+								<view v-else>
+									￥*****
+								</view>
+							</view>
 						</view>
 					</view>
 					<view class="line" v-if="item != 2">
@@ -39,7 +44,12 @@
 									</view>
 								</view>
 								<view class="right">
-									<view class="money"><u--text mode="price" :text="asset.asset_balance" color="rgba(0,0,0, 0.8)" size="32rpx" bold></u--text></view>
+									<view class="money">
+										<u--text v-if="isEyeShow" mode="price" :text="asset.asset_balance" color="rgba(0,0,0, 0.8)" size="32rpx" bold></u--text>
+										<view v-else>
+											￥*****
+										</view>
+									</view>
 								</view>
 							</view>
 							<view class="line" v-if="item != 2">
@@ -62,7 +72,7 @@
 	
 	export default {
 		name: "mj-asset-card",
-		props: ['userAssetsFromDB'],
+		props: ['userAssetsFromDB','isEyeShow'],
 
 		data() {
 			return {
@@ -82,6 +92,7 @@
 				assets: [],
 				assetsStyle: [],
 				showHideAsset: false,
+				showBalance: true,
 			};
 		},
 		methods: {

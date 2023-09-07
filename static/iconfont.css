@@ -11,6 +11,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.mj-zhuanzhang:before {
+  content: "\e6a1";
+}
+
 .mj-creditcard:before {
   content: "\e7de";
 }

@@ -444,6 +444,7 @@
 					})
 				}
 				uni.$emit('updateAssetsList')
+				uni.$emit('updateBillsList')
 			},
 			// 更新用户 转出与转入 资产金额
 			async upDateUserTwoAssetBalance() {
@@ -463,6 +464,7 @@
 					asset_balance: transferIntoAssetBalance
 				})
 				uni.$emit('updateAssetsList')
+				uni.$emit('updateBillsList')
 			},
 			
 			
