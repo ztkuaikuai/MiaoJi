@@ -48,12 +48,13 @@
 		<view class="bills" v-show="!isIndexShow">
 			<view class="header">
 				<uni-icons type="list" size="48rpx" color="#212121"></uni-icons>
-				<text>近三日账单(72h)</text>
+				<text>近三日账单</text>
 			</view>
 			<!-- 组件：账单卡片 -->
-			<mj-bill-card pageType="index" :userBillsFromDB="userBills" :userBillsCount="userBillsCount" :userAssetsFromDB="userAssets" ></mj-bill-card>
+			<mj-bill-card :userBillsFromDB="userBills[0].data" :userAssetsFromDB="userAssets" indexTemp="0"></mj-bill-card>
+			<mj-bill-card :userBillsFromDB="userBills[1].data" :userAssetsFromDB="userAssets" indexTemp="1"></mj-bill-card>
+			<mj-bill-card :userBillsFromDB="userBills[2].data" :userAssetsFromDB="userAssets" indexTemp="2"></mj-bill-card>
 		</view>
-		
 		<view class="asset" v-if="isIndexShow">
 			<view class="header">
 				<uni-icons type="wallet" size="48rpx" color="#212121"></uni-icons>
@@ -79,10 +80,9 @@
 				bottomBtnText: '点我记账',
 				userAssets: [],
 				userBills: [],
-				userBillsCount: 0,
 				currentDate: uni.$u.timeFormat(Date.now(), 'yyyy-mm'),
 				monthlyExpense: 0,
-				monthlyIncome: 0
+				monthlyIncome: 0,
 			}
 		},
 		computed: {
@@ -131,19 +131,29 @@
 					url
 				})
 			},
-			// 获取用户近3日账单列表
+			// 获取用户3日账单列表
 			async getUserBills() {
-				// 3天时间戳  259200000
-				const userBills = db.collection("mj-user-bills").where(`user_id == $cloudEnv_uid && bill_date > (new Date().getTime() - 259200000)`).orderBy('bill_date desc').getTemp()
+				const today = uni.$u.timeFormat(Date.now(), 'yyyy-mm-dd')
+				const yesterday = uni.$u.timeFormat(Date.now() - 86400000, 'yyyy-mm-dd')
+				const theDaybeforeYesterday = uni.$u.timeFormat(Date.now() - 172800000, 'yyyy-mm-dd')
+				// 分别获取今天，昨天，前天的账单列表
+				const day1 = db.collection("mj-user-bills").where(`user_id == $cloudEnv_uid && bill_date > (new Date().getTime() - 259200000) && dateToString(add(new Date(0),bill_date),"%Y-%m-%d","+0800") == "${today}"`).orderBy('bill_date desc').getTemp()
+				const day2 = db.collection("mj-user-bills").where(`user_id == $cloudEnv_uid && bill_date > (new Date().getTime() - 259200000) && dateToString(add(new Date(0),bill_date),"%Y-%m-%d","+0800") == "${yesterday}"`).orderBy('bill_date desc').getTemp()
+				const day3 = db.collection("mj-user-bills").where(`user_id == $cloudEnv_uid && bill_date > (new Date().getTime() - 259200000) && dateToString(add(new Date(0),bill_date),"%Y-%m-%d","+0800") == "${theDaybeforeYesterday}"`).orderBy('bill_date desc').getTemp()
+				// 使用联表查询，将资产id对应的资产添加到bill里
 				const userAssets = db.collection("mj-user-assets").where('user_id == $cloudEnv_uid').field('_id,asset_type,user_id').getTemp()
-				const res = await db.collection(userBills,userAssets).get()
+				const res1 = db.collection(day1,userAssets).getTemp()
+				const res2 = db.collection(day2,userAssets).getTemp()
+				const res3 = db.collection(day3,userAssets).getTemp()
+				const resAll = await db.multiSend(res1,res2,res3)
+				
 				this.userBills = []
-				this.userBills = res.result.data
-				// 获取账单的数量
-				this.userBillsCount = res.result.data.length
+				this.userBills = resAll.result.dataList
 				// 统一修改金额
-				this.userBills.forEach(item => item.bill_amount = item.bill_amount / 100)
-				// 保存在缓存中
+				this.userBills.forEach(item => {
+					item.data.forEach(bill => bill.bill_amount = bill.bill_amount / 100)
+				})
+				console.log('userBills',this.userBills)
 				uni.setStorage({
 					key:'mj-user-bills',
 					data: this.userBills

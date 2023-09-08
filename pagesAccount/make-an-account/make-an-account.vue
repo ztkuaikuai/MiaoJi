@@ -328,10 +328,9 @@
 					if(!uni.$u.test.amount(balance)) return
 					if(this.isEdit) {
 						// 如果是编辑账单
-						console.log("编辑账单点击保存");
-						console.log('editInitBill',this.editInitBill);
-						console.log('transferAccountInfo',this.transferAccountInfo);
-						console.log('expendOrIncomeInfo',this.expendOrIncomeInfo);
+						// console.log('editInitBill',this.editInitBill);
+						// console.log('transferAccountInfo',this.transferAccountInfo);
+						// console.log('expendOrIncomeInfo',this.expendOrIncomeInfo);
 						this.updateUserBill()
 						return
 					}
@@ -389,6 +388,7 @@
 				})
 				this.upDateUserAssetBalance()
 			},
+			
 			// 添加转账账单
 			// 1 验证手续费格式
 			// 2 验证转出转入账户是否都存在，并且不相同
@@ -400,8 +400,14 @@
 				this.transferAccountInfo.bill_amount = Math.round(this.transferAccountInfo.bill_amount * 100)
 				this.transferAccountInfo.bill_notes = this.keyboardInfo.notes
 				this.transferAccountInfo.transfer_amount = Math.round(this.keyboardInfo.balance * 100)
+				// 组合备注
+				const transferOutTitle = this.userAssets.find(item => item._id === this.transferAccountInfo.asset_id).assetStyle.title
+				const transferInTitle = this.userAssets.find(item => item._id === this.transferAccountInfo.destination_asset_id).assetStyle.title
 				// console.log('数据整理完毕，准备存入数据库',this.transferAccountInfo);
-				await db.collection("mj-user-bills").add({...this.transferAccountInfo})
+				await db.collection("mj-user-bills").add({
+					...this.transferAccountInfo,
+					bill_notes: `${this.transferAccountInfo.bill_notes + '-'}${transferOutTitle}转出至${transferInTitle},手续费${this.transferAccountInfo.bill_amount / 100}`
+					})
 				uni.switchTab({
 					url:"/pages/index/index"
 				})
@@ -495,13 +501,22 @@
 			
 			
 			// 编辑账单相关方法
-			// 更新用户账单
+			// 更新用户账单bill
 			async updateUserBill() {
 				// 1 判断用户支出||收入||转账
 				// 2 进行表单验证
 				// 3 验证通过，更新bill，并更新资产
 				if(this.showTransferAccounts) {
 					// 类型为转账
+					// 验证资产id对应的资产是否存在（未被用户删除）
+					const hasAsset = this.userAssets.find(item => item._id === this.transferAccountInfo.asset_id) ?? 'none'
+					if(hasAsset === 'none') {
+						uni.showToast({
+							title:"请更新资产",
+							icon:"none"
+						})
+						return
+					}
 					// 表单验证失败返回false，成功返回true
 					const flag = await this.validatorTransferInfo()
 					if(!flag) return
@@ -519,13 +534,22 @@
 						destination_asset_id: this.transferAccountInfo.destination_asset_id,
 						transfer_amount: this.transferAccountInfo.transfer_amount
 					})
-					// console.log("更新账单成功");
+					// 返还资金模块
+					console.log('返还资金模块');
 					await this.updateInitAssetsBalance()
-					// console.log("返还成功，开始更新资产");
+					// 更新金额模块
 					await this.upDateUserTwoAssetBalance()
-					// console.log("更新成功");
 				} else {
 					// 类型为支出 || 收入
+					// 验证资产id对应的资产是否存在（未被用户删除）
+					const hasAsset = this.userAssets.find(item => item._id === this.expendOrIncomeInfo.asset_id) ?? 'none'
+					if(hasAsset === 'none') {
+						uni.showToast({
+							title:"请更新资产",
+							icon:"none"
+						})
+						return
+					}
 					// 金额不能为0
 					if(Number(this.keyboardInfo.balance) === 0) {
 						uni.showToast({
@@ -543,9 +567,13 @@
 						bill_notes: this.expendOrIncomeInfo.bill_notes,
 						bill_type: this.expendOrIncomeInfo.bill_type,
 						category_type: this.expendOrIncomeInfo.category_type,
+						transfer_amount: 0
 					})
-					// console.log("更新账单成功");
+					
+					// 返还资产金额模块
+					console.log('返还资金模块');
 					await this.updateInitAssetsBalance()
+					// 更新资产金额模块
 					await this.upDateUserAssetBalance()
 				}
 				uni.switchTab({
@@ -556,33 +584,43 @@
 			async updateInitAssetsBalance() {
 				if(this.editInitBill.bill_type == 2) {
 					// 返还 转入转出账户的余额
-					let transferOutAssetBalance = this.userAssets.find(item => item._id === this.editInitBill.asset_id).asset_balance
-					let transferIntoAssetBalance = this.userAssets.find(item => item._id === this.editInitBill.destination_asset_id).asset_balance
+					let transferOutAssetBalance = this.userAssets.find(item => item._id === this.editInitBill.asset_id)?.asset_balance ?? 'none'
+					let transferIntoAssetBalance = this.userAssets.find(item => item._id === this.editInitBill.destination_asset_id)?.asset_balance ?? 'none'
+					console.log('transferIntoAssetBalance',transferIntoAssetBalance);
 					// 转换单位为分
-					transferOutAssetBalance = Math.round(transferOutAssetBalance * 100)
-					transferIntoAssetBalance = Math.round(transferIntoAssetBalance * 100)
 					const bill_amount = Math.round(this.editInitBill.bill_amount * 100)
 					const transfer_amount = Math.round(this.editInitBill.transfer_amount * 100)
-					// 返还转出资产余额 = 转出资产余额 + 手续费 + 转账金额  注意单位为分
-					transferOutAssetBalance = transferOutAssetBalance +bill_amount + transfer_amount
-					// 返还转入资产余额 = 转入资产余额 - 转账金额
-					transferIntoAssetBalance = transferIntoAssetBalance - transfer_amount
-					// 更新
-					console.log(transferOutAssetBalance,transferIntoAssetBalance,this.editInitBill);
-					await db.collection("mj-user-assets").doc(this.editInitBill.asset_id).update({
-						asset_balance: transferOutAssetBalance
-					})
-					await db.collection("mj-user-assets").doc(this.editInitBill.destination_asset_id).update({
-						asset_balance: transferIntoAssetBalance
-					})
-					// console.log('更新金额前userAssets转出账户的asset_balance',this.userAssets.find(item => item._id === this.editInitBill.asset_id).asset_balance);
-					// 单位为元  更新用户资产列表的对应资产金额，以便后续 更新用户资产计算金额使用
-					this.userAssets.find(item => item._id === this.editInitBill.asset_id).asset_balance +=this.editInitBill.bill_amount + this.editInitBill.transfer_amount
-					this.userAssets.find(item => item._id === this.editInitBill.destination_asset_id).asset_balance -= this.editInitBill.transfer_amount
-					// console.log('更新金额后userAssets',this.userAssets);
+					
+					// 返还规则：用户账单对应资产没有被用户删除时，进行返还，如果删除了，不返还
+					if(transferOutAssetBalance !== 'none') {
+						transferOutAssetBalance = Math.round(transferOutAssetBalance * 100)
+						// 返还转出资产余额 = 转出资产余额 + 手续费 + 转账金额  注意单位为分
+						transferOutAssetBalance = transferOutAssetBalance +bill_amount + transfer_amount
+						// 更新
+						await db.collection("mj-user-assets").doc(this.editInitBill.asset_id).update({
+							asset_balance: transferOutAssetBalance
+						})
+						console.log("返还转出账户");
+						// 单位为元  更新用户资产列表的对应资产金额，以便后续 更新用户资产计算金额使用
+						this.userAssets.find(item => item._id === this.editInitBill.asset_id).asset_balance += this.editInitBill.bill_amount + this.editInitBill.transfer_amount
+					}
+					if(transferIntoAssetBalance !== 'none') {
+						transferIntoAssetBalance = Math.round(transferIntoAssetBalance * 100)
+						// 返还转入资产余额 = 转入资产余额 - 转账金额
+						transferIntoAssetBalance = transferIntoAssetBalance - transfer_amount
+						await db.collection("mj-user-assets").doc(this.editInitBill.destination_asset_id).update({
+							asset_balance: transferIntoAssetBalance
+						})
+						console.log("返还转入账户");
+						this.userAssets.find(item => item._id === this.editInitBill.destination_asset_id).asset_balance -= this.editInitBill.transfer_amount
+					}
+					
 				} else {
 					// 返还 账户的余额
-					let assetBalance = this.userAssets.find(item => item._id === this.editInitBill.asset_id).asset_balance
+					// 如果初始bill中资产id找不到 为none，则不用返还
+					let assetBalance = this.userAssets.find(item => item._id === this.editInitBill.asset_id)?.asset_balance ?? 'none'
+					if(assetBalance === 'none') return
+					console.log("返还");
 					assetBalance = Math.round(assetBalance * 100)  // 转换单位为分
 					const bill_amount = Math.round(this.editInitBill.bill_amount * 100)
 					if(this.editInitBill.bill_type == 0) {
@@ -625,55 +663,59 @@
 					asset.assetStyle = this.assetsStyle.find(item => item.type == asset.asset_type)
 				})
 				// console.log('addAssetStyle',this.assets);
-			}
+			},
+			// 编辑账单 初始化
+			initEditPage(type,tab) {
+				if(type === 'edit') {
+					// 赋值账单初始数据
+					this.editInitBill = uni.getStorageSync('mj-bill-edit')
+					this.isEdit = true
+					uni.removeStorage({
+						key: 'mj-bill-edit',
+						success: () => {}
+					})
+					// 触发clickTab事件，index为tab
+					this.$refs.tabs.clickHandler({},tab)
+					// 清洗editInitBill的asset_id和destination_asset_id，使其从array => string
+					this.editInitBill.asset_id = this.editInitBill.asset_id[0]?._id ?? ''
+					this.editInitBill.destination_asset_id = this.editInitBill.destination_asset_id[0]?._id ?? ''
+					// 修改transfer_amount的单位
+					this.editInitBill.transfer_amount ? this.editInitBill.transfer_amount = this.editInitBill.transfer_amount / 100 : ''
+					console.log('editInitBill',this.editInitBill);
+					// 修改keyboard的数据
+					// 修改日期事件
+					this.userChooseDate = uni.$u.timeFormat(this.editInitBill.bill_date, 'mm月dd日')
+					// 修改备注
+					this.keyboardInfo.notes = this.editInitBill.bill_notes
+					if(tab != 2) {
+						// 如果是支出 和 收入 ，存入支出||收入表单信息
+						this.expendOrIncomeInfo = uni.$u.deepClone(this.editInitBill)
+						// 修改keyboard金额
+						this.keyboardInfo.balance = this.editInitBill.bill_amount.toFixed(2)
+						// 修改左下资产标题
+						this.currentAssetTitle = this.editInitBill?.assetStyle?.title ?? '未选择资产'
+						// 高亮选择的icon
+						if(tab == 0) {
+							this.currentExpendIndex = this.categoryIconListForExpend.findIndex(item => item.type === this.editInitBill.billStyle.type)
+						} else {
+							this.currentIncomeIndex = this.categoryIconListForIncome.findIndex(item => item.type === this.editInitBill.billStyle.type)
+						}
+					} else {
+						// 如果是转账，存入转账表单信息
+						this.transferAccountInfo = uni.$u.deepClone(this.editInitBill)
+						this.keyboardInfo.balance = this.editInitBill.transfer_amount.toFixed(2)
+						// 修改转账信息，只拿到了转出的资产信息
+						this.transferOutAssetStyle = this.editInitBill.assetStyle
+						// 将表单中转入账户id清空
+						this.transferAccountInfo.destination_asset_id = ''
+					}
+				}
+			},
+			
 		},
 		onLoad({type,tab}) {
 			this.initPage()
-			if(type === 'edit') {
-				// 赋值账单初始数据
-				this.editInitBill = uni.getStorageSync('mj-bill-edit')
-				this.isEdit = true
-				uni.removeStorage({
-					key: 'mj-bill-edit',
-					success: () => {}
-				})
-				// 触发clickTab事件，index为tab
-				this.$refs.tabs.clickHandler({},tab)
-				// 清洗editInitBill的asset_id和destination_asset_id，使其从array => string
-				this.editInitBill.asset_id = this.editInitBill.asset_id[0]?._id ?? ''
-				this.editInitBill.destination_asset_id = this.editInitBill.destination_asset_id[0]?._id ?? ''
-				// 修改transfer_amount的单位
-				this.editInitBill.transfer_amount ? this.editInitBill.transfer_amount = this.editInitBill.transfer_amount / 100 : ''
-				console.log('editInitBill',this.editInitBill);
-				// 修改keyboard的数据
-				// 修改日期事件
-				this.userChooseDate = uni.$u.timeFormat(this.editInitBill.bill_date, 'mm月dd日')
-				// 修改备注
-				this.keyboardInfo.notes = this.editInitBill.bill_notes
-				if(tab != 2) {
-					// 如果是支出 和 收入 ，存入支出||收入表单信息
-					this.expendOrIncomeInfo = uni.$u.deepClone(this.editInitBill)
-					// 修改keyboard金额
-					this.keyboardInfo.balance = this.editInitBill.bill_amount.toFixed(2)
-					// 修改左下资产标题
-					this.currentAssetTitle = this.editInitBill.assetStyle.title
-					// 高亮选择的icon
-					if(tab == 0) {
-						this.currentExpendIndex = this.categoryIconListForExpend.findIndex(item => item.type === this.editInitBill.billStyle.type)
-					} else {
-						this.currentIncomeIndex = this.categoryIconListForIncome.findIndex(item => item.type === this.editInitBill.billStyle.type)
-					}
-				} else {
-					// 如果是转账，存入转账表单信息
-					this.transferAccountInfo = uni.$u.deepClone(this.editInitBill)
-					this.keyboardInfo.balance = this.editInitBill.transfer_amount.toFixed(2)
-					// 修改转账信息，只拿到了转出的资产信息
-					this.transferOutAssetStyle = this.editInitBill.assetStyle
-					// 将表单中转入账户id清空
-					this.transferAccountInfo.destination_asset_id = ''
-				}
-				
-			}
+			this.initEditPage(type,tab)
 		},
 		computed: {
 			bill_type: {

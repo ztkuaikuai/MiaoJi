@@ -1,12 +1,8 @@
 <template>
-	<view class="bill-card">
-		<view class="header" v-if="pageType == 'index'">
-			<text>一共记了{{userBillsCount}}笔账单</text>
+	<view class="bill-card" v-if="userBills.length !== 0">
+		<view class="header">
+			<text>{{today}}</text>
 			<text>支出:{{totalExpenditure}} 收:{{totalIncome}}</text>
-		</view>
-		<view class="header" v-else>
-			<text>8月29日 今天</text>
-			<text>支出:40.00 收:40.00</text>
 		</view>
 		<!-- 这里需要循环 -->
 		<view class="content">
@@ -29,7 +25,7 @@
 								<u--text mode="price" :text="bill.bill_amount" color="#219a6d" size="32rpx"bold></u--text>
 							</view>
 							<view class="money" v-if="bill.bill_type === 2">
-								<u--text mode="price" :text="bill.bill_amount" color="#212121" size="32rpx"bold></u--text>
+								<u--text mode="price" :text="(bill.transfer_amount / 100)" color="#212121" size="32rpx"bold></u--text>
 							</view>
 							<view class="minor">{{bill.assetStyle.title}}</view>
 						</view>
@@ -48,7 +44,7 @@
 	const db = uniCloud.database()
 	export default {
 		name: "mj-bill-card",
-		props: ['pageType','userBillsFromDB','userBillsCount','userAssetsFromDB'],
+		props: ['userBillsFromDB','userBillsCount','userAssetsFromDB','indexTemp'],
 		data() {
 			return {
 				options: [{
@@ -67,7 +63,8 @@
 				userBills: [],
 				userAssets: [],
 				iconGather: [],
-				assetsStyle: []
+				assetsStyle: [],
+				today: uni.$u.timeFormat(Date.now(), 'mm月dd日') + ' 今天'
 			};
 		},
 		methods: {
@@ -163,24 +160,28 @@
 			this.iconGather.push(transfer)
 			// 获取资产样式
 			this.assetsStyle = ICONCONFIG.getAssetsStyle()
+			if(this.indexTemp == 1) this.today = uni.$u.timeFormat(Date.now() - 86400000, 'mm月dd日') + ' 昨天'
+			if(this.indexTemp == 2) this.today = uni.$u.timeFormat(Date.now() - 172800000, 'mm月dd日') + ' 前天'
 		},
 		watch: {
-			userBillsFromDB(newValue) {
-				this.userBills = newValue
-				// console.log('userBillsFromDB',this.userBills);
-				// 通过type给每一条添加对应billStyle
-				this.userBills.forEach(bill => {
-					bill.billStyle = this.iconGather.find(item => item.type === bill.category_type)
-				})
-				// 通过asset_id.asset_type给每一条添加对应的assetStyle
-				this.userBills.forEach(bill => {
-					bill.assetStyle = this.assetsStyle.find(item => item.type === bill.asset_id[0]?.asset_type)  // 如果账单对应的资产被用户删除，则不赋值
-				})
-				console.log('userBills',this.userBills);
+			userBillsFromDB: {
+				deep:true,
+				handler(newValue) {
+					this.userBills = newValue
+					// 通过type给每一条添加对应billStyle
+					this.userBills.forEach(bill => {
+						bill.billStyle = this.iconGather.find(item => item.type === bill.category_type)
+					})
+					// 通过asset_id.asset_type给每一条添加对应的assetStyle
+					this.userBills.forEach(bill => {
+						bill.assetStyle = this.assetsStyle.find(item => item.type === bill.asset_id[0]?.asset_type)  // 如果账单对应的资产被用户删除，则不赋值
+					})
+					// console.log('userBills',this.userBills);
+				}
 			},
 			userAssetsFromDB: {
 				deep:true,
-				handler: function(newValue) {
+				handler(newValue) {
 					this.userAssets = newValue
 				}
 			}
@@ -205,7 +206,7 @@
 <style lang="scss" scoped>
 	.bill-card {
 		padding-right: 24rpx;
-		margin-bottom: 36rpx;
+		margin-bottom: 12rpx;
 
 		.header {
 			padding-left: 24rpx;
