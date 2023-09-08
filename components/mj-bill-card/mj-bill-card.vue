@@ -12,7 +12,7 @@
 		<view class="content">
 			<!-- 滑动单元格 -->
 			<u-swipe-action>
-				<u-swipe-action-item :options="options" v-for="bill,index in userBills" :threshold="80" @click="clickSwipeActionItemBtn($event)">
+				<u-swipe-action-item :options="options" v-for="bill,index in userBills" :threshold="80" @click="clickSwipeActionItemBtn($event,bill)">
 					<view class="swipe-action-item">
 						<view class="left">
 							<mj-icon-with-background :type="bill.billStyle.icon" size="48rpx" customPrefix="miaoji"></mj-icon-with-background>
@@ -45,9 +45,10 @@
 
 <script>
 	import ICONCONFIG from "@/utils/icon-config.js";
+	const db = uniCloud.database()
 	export default {
 		name: "mj-bill-card",
-		props: ['pageType','userBillsFromDB','userBillsCount'],
+		props: ['pageType','userBillsFromDB','userBillsCount','userAssetsFromDB'],
 		data() {
 			return {
 				options: [{
@@ -64,13 +65,89 @@
 					}
 				}],
 				userBills: [],
+				userAssets: [],
 				iconGather: [],
 				assetsStyle: []
 			};
 		},
 		methods: {
-			clickSwipeActionItemBtn({index}) {  // 0 修改  1 删除
-				console.log("点击了滑动选择器btn",index);
+			clickSwipeActionItemBtn({index},bill) {  // 0 修改  1 删除
+				if(index === 1) {
+					uni.showModal({
+						content: "你确定删除该账单吗？（删除之后不可恢复哦）",
+						cancelColor: "rgba(0,0,0,0.6)",
+						confirmColor:"#9fcba7",
+						success:async res =>  {
+							if(res.confirm) {
+								await db.collection("mj-user-bills").doc(bill._id).remove()
+								console.log('删除账单成功');
+								uni.$emit('updateBillsList')
+								uni.$emit('updateMonthlyBillBalance')
+								await this.updateAssetBalance(bill)
+								console.log('更新资产成功');
+								uni.$emit('updateAssetsList')
+								uni.showToast({
+									title: "删除成功",
+									icon: "success"
+								})
+							}
+						}
+					})
+				} else {
+					// 修改账单  存入缓存，在记一笔页面读取
+					uni.setStorageSync('mj-bill-edit',bill)
+					// 传递参数，挑战到记一笔页面
+					uni.navigateTo({
+						url:`/pagesAccount/make-an-account/make-an-account?type=edit&tab=${bill.bill_type}`
+					})
+				}
+			},
+			// 更新资产金额
+			async updateAssetBalance(bill) {
+				// 所选账单的金额  单位换为分
+				const bill_amount = Math.round(bill.bill_amount * 100)
+				if(bill.bill_type === 0 || bill.bill_type === 1) {
+					// 找出该账单使用资产对应的资产余额
+					let assetBalance = this.userAssets.find(item => item._id === bill.asset_id[0]?._id)?.asset_balance ?? 'none'
+					// 如果取不到资产余额，即用户账单对应的资产以及被删除了，则return
+					if(assetBalance === 'none') return
+					assetBalance = Math.round(assetBalance * 100)  // 转换单位为分
+					// console.log(assetBalance);
+					if(bill.bill_type === 0) {
+						const asset_balance = assetBalance + bill_amount
+						await db.collection("mj-user-assets").doc(bill.asset_id[0]._id).update({
+							asset_balance
+						})
+					} else {
+						const asset_balance = assetBalance - bill_amount
+						await db.collection("mj-user-assets").doc(bill.asset_id[0]._id).update({
+							asset_balance
+						})
+					}
+				} else {
+					// 转出账户 资产余额
+					let transferOutAssetBalance = this.userAssets.find(item => item._id === bill.asset_id[0]?._id)?.asset_balance ?? 'none'
+					// 转入账户 资产余额
+					let transferIntoAssetBalance = this.userAssets.find(item => item._id === bill.destination_asset_id[0]?._id)?.asset_balance ?? 'none'
+					// 如果取不到资产余额，即用户账单对应的资产以及被删除了，则不执行
+					if(transferOutAssetBalance != 'none') {
+						transferOutAssetBalance = Math.round(transferOutAssetBalance * 100)  // 转换单位为分
+						// 删除账单后转出资产余额 = 转出资产余额 + 手续费 + 转账金额  注意单位为分
+						transferOutAssetBalance = transferOutAssetBalance + bill_amount + bill.transfer_amount
+						// 更新
+						await db.collection("mj-user-assets").doc(bill.asset_id[0]._id).update({
+							asset_balance: transferOutAssetBalance
+						})
+					}
+					if(transferIntoAssetBalance != 'none') {
+						transferIntoAssetBalance = Math.round(transferIntoAssetBalance * 100)  // 转换单位为分
+						// 删除账单后转入资产余额 = 转入资产余额 - 转账金额
+						transferIntoAssetBalance = transferIntoAssetBalance - bill.transfer_amount
+						await db.collection("mj-user-assets").doc(bill.destination_asset_id[0]._id).update({
+							asset_balance: transferIntoAssetBalance
+						})
+					}
+				}
 			}
 		},
 		onReady() {
@@ -88,19 +165,23 @@
 			this.assetsStyle = ICONCONFIG.getAssetsStyle()
 		},
 		watch: {
-			userBillsFromDB: {
-				handler(newValue) {
-					this.userBills = newValue
-					// console.log('userBillsFromDB',this.userBills);
-					// 通过type给每一条添加对应billStyle
-					this.userBills.forEach(bill => {
-						bill.billStyle = this.iconGather.find(item => item.type === bill.category_type)
-					})
-					// 通过asset_id.asset_type给每一条添加对应的assetStyle
-					this.userBills.forEach(bill => {
-						bill.assetStyle = this.assetsStyle.find(item => item.type === bill.asset_id[0].asset_type)
-					})
-					console.log('userBills',this.userBills);
+			userBillsFromDB(newValue) {
+				this.userBills = newValue
+				// console.log('userBillsFromDB',this.userBills);
+				// 通过type给每一条添加对应billStyle
+				this.userBills.forEach(bill => {
+					bill.billStyle = this.iconGather.find(item => item.type === bill.category_type)
+				})
+				// 通过asset_id.asset_type给每一条添加对应的assetStyle
+				this.userBills.forEach(bill => {
+					bill.assetStyle = this.assetsStyle.find(item => item.type === bill.asset_id[0]?.asset_type)  // 如果账单对应的资产被用户删除，则不赋值
+				})
+				console.log('userBills',this.userBills);
+			},
+			userAssetsFromDB: {
+				deep:true,
+				handler: function(newValue) {
+					this.userAssets = newValue
 				}
 			}
 		},

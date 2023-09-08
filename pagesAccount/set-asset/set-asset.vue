@@ -113,7 +113,7 @@
 			// 如果有缓存,则赋值，并且说明是点击了编辑进入此页面，则在点击保存按钮时数据库操作是更新
 			if(uni.getStorageSync('mj-asset-edit')) {
 				this.assetInfo = uni.getStorageSync('mj-asset-edit')
-				console.log(this.assetInfo);
+				console.log('点了编辑进入,assetInfo',this.assetInfo)
 				uni.removeStorage({
 					key: 'mj-asset-edit',
 					success: () => {}

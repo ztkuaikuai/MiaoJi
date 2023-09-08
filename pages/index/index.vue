@@ -51,7 +51,7 @@
 				<text>近三日账单(72h)</text>
 			</view>
 			<!-- 组件：账单卡片 -->
-			<mj-bill-card pageType="index" :userBillsFromDB="userBills" :userBillsCount="userBillsCount"></mj-bill-card>
+			<mj-bill-card pageType="index" :userBillsFromDB="userBills" :userBillsCount="userBillsCount" :userAssetsFromDB="userAssets" ></mj-bill-card>
 		</view>
 		
 		<view class="asset" v-if="isIndexShow">
@@ -153,7 +153,7 @@
 			async getUserMonthlyBillBalance() {
 				// 筛选条件 bill_date 日期格式化成 2023-09 的字段，按照账单类型进行分组，并计算每个分组的总价
 				const res = await db.collection("mj-user-bills").where(`user_id == $cloudEnv_uid && dateToString(add(new Date(0),bill_date),"%Y-%m","+0800") == "${this.currentDate}"`).groupBy('bill_type').groupField('sum(bill_amount) as bill_amount_total').orderBy('bill_type asc').get()
-				console.log(res.result.data)
+				// console.log(res.result.data)
 				const monthlyExpenseTemp = res.result.data.filter(item => item.bill_type === 0)[0]?.bill_amount_total / 100 || '0'
 				const transferBalanceTemp = res.result.data.filter(item => item.bill_type === 2)[0]?.bill_amount_total / 100 || '0'
 				const monthlyIncomeTemp = res.result.data.filter(item => item.bill_type === 1)[0]?.bill_amount_total / 100 || '0'
