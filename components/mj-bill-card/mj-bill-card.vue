@@ -2,13 +2,13 @@
 	<view class="bill-card" v-if="userBills.length !== 0">
 		<view class="header">
 			<text>{{today}}</text>
-			<text>支出:{{totalExpenditure}} 收:{{totalIncome}}</text>
+			<text>支:{{totalExpenditure}} 收:{{totalIncome}}</text>
 		</view>
 		<!-- 这里需要循环 -->
 		<view class="content">
 			<!-- 滑动单元格 -->
 			<u-swipe-action>
-				<u-swipe-action-item :options="options" v-for="bill,index in userBills" :threshold="80" @click="clickSwipeActionItemBtn($event,bill)">
+				<u-swipe-action-item :options="options" v-for="bill,index in userBills" :key="bill._id" :threshold="80" @click="clickSwipeActionItemBtn($event,bill)">
 					<view class="swipe-action-item">
 						<view class="left">
 							<mj-icon-with-background :type="bill.billStyle.icon" size="48rpx" customPrefix="miaoji"></mj-icon-with-background>
@@ -44,7 +44,8 @@
 	const db = uniCloud.database()
 	export default {
 		name: "mj-bill-card",
-		props: ['userBillsFromDB','userBillsCount','userAssetsFromDB','indexTemp'],
+		props: ['userBillsFromDB','userAssetsFromDB','indexTemp'],
+		// userBillsFromDB 中金额单位为元
 		data() {
 			return {
 				options: [{
@@ -64,7 +65,7 @@
 				userAssets: [],
 				iconGather: [],
 				assetsStyle: [],
-				today: uni.$u.timeFormat(Date.now(), 'mm月dd日') + ' 今天'
+				today: '',
 			};
 		},
 		methods: {
@@ -77,11 +78,11 @@
 						success:async res =>  {
 							if(res.confirm) {
 								await db.collection("mj-user-bills").doc(bill._id).remove()
-								console.log('删除账单成功');
+								// console.log('删除账单成功');
 								uni.$emit('updateBillsList')
 								uni.$emit('updateMonthlyBillBalance')
 								await this.updateAssetBalance(bill)
-								console.log('更新资产成功');
+								// console.log('更新资产成功');
 								uni.$emit('updateAssetsList')
 								uni.showToast({
 									title: "删除成功",
@@ -145,6 +146,13 @@
 						})
 					}
 				}
+			},
+			setToday() {
+				// 赋值日期
+				if(this.indexTemp == 0) this.today = uni.$u.timeFormat(Date.now(), 'mm月dd日') + ' 今天'
+				if(this.indexTemp == 1) this.today = uni.$u.timeFormat(Date.now() - 86400000, 'mm月dd日') + ' 昨天'
+				if(this.indexTemp == 2) this.today = uni.$u.timeFormat(Date.now() - 172800000, 'mm月dd日') + ' 前天'
+				if(this.indexTemp != 0 && this.indexTemp != 1 && this.indexTemp != 2) this.today = uni.$u.timeFormat(this.userBills[0]?.bill_date, 'mm月dd日')
 			}
 		},
 		onReady() {
@@ -160,8 +168,6 @@
 			this.iconGather.push(transfer)
 			// 获取资产样式
 			this.assetsStyle = ICONCONFIG.getAssetsStyle()
-			if(this.indexTemp == 1) this.today = uni.$u.timeFormat(Date.now() - 86400000, 'mm月dd日') + ' 昨天'
-			if(this.indexTemp == 2) this.today = uni.$u.timeFormat(Date.now() - 172800000, 'mm月dd日') + ' 前天'
 		},
 		watch: {
 			userBillsFromDB: {
@@ -177,6 +183,7 @@
 						bill.assetStyle = this.assetsStyle.find(item => item.type === bill.asset_id[0]?.asset_type)  // 如果账单对应的资产被用户删除，则不赋值
 					})
 					// console.log('userBills',this.userBills);
+					this.setToday()
 				}
 			},
 			userAssetsFromDB: {

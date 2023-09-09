@@ -680,7 +680,7 @@
 					this.editInitBill.asset_id = this.editInitBill.asset_id[0]?._id ?? ''
 					this.editInitBill.destination_asset_id = this.editInitBill.destination_asset_id[0]?._id ?? ''
 					// 修改transfer_amount的单位
-					this.editInitBill.transfer_amount ? this.editInitBill.transfer_amount = this.editInitBill.transfer_amount / 100 : ''
+					this.editInitBill.transfer_amount ? this.editInitBill.transfer_amount /= 100 : ''
 					console.log('editInitBill',this.editInitBill);
 					// 修改keyboard的数据
 					// 修改日期事件
