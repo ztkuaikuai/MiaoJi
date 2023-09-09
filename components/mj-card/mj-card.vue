@@ -1,6 +1,6 @@
 <template>
 	<view class="card">
-		<uni-section class="section" :title="title" type="line" titleFontSize="28rpx" titleColor="#212121" :white="true"></uni-section>
+		<uni-section class="section" :title="title" type="line" titleFontSize="28rpx" titleColor="#212121" white="true"></uni-section>
 		<view class="slot">
 			<slot></slot>
 		</view>

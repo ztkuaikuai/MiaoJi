@@ -78,8 +78,6 @@
 				dot: '.', // 点
 				timer: null, // 长按多次删除的事件监听
 				cardX: 'X' ,// 身份证的X符号
-				minus: '-',
-				plus: '+'
 			};
 		},
 		computed: {
@@ -94,7 +92,7 @@
 					}
 				} else if (!this.dotDisabled && this.mode == 'number') {
 					if (!this.random) {
-						return [1, 2, 3, this.backspace, 4, 5, 6, this.minus, 7, 8, 9, this.plus, '再记', 0, this.dot, '保存'];
+						return [1, 2, 3, this.backspace, 4, 5, 6, '秒记1', 7, 8, 9, '秒记2', '再记', 0, this.dot, '保存'];
 					} else {
 						return uni.$u.randomArray([1, 2, 3, 4, 5, 6, 7, 8, 9, this.dot, 0]);
 					}
@@ -159,7 +157,7 @@
 	$u-number-keyboard-button-height: 90rpx!default;
 	$u-number-keyboard-button-background-color:#9fcba7 !default;
 	$u-number-keyboard-button-box-shadow: none !default;
-	$u-number-keyboard-text-font-size:40rpx !default;
+	$u-number-keyboard-text-font-size:36rpx !default;
 	$u-number-keyboard-text-font-weight:500 !default;
 	$u-number-keyboard-text-color:$u-main-color !default;
 	$u-number-keyboard-gray-background-color:#9fcba7 !default;

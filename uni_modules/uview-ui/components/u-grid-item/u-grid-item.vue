@@ -42,7 +42,7 @@
 		data() {
 			return {
 				parentData: {
-					col: 3, // 父组件划分的宫格数
+					col: 5, // 父组件划分的宫格数
 					border: true, // 是否显示边框，根据父组件决定
 				},
 				// #ifdef APP-NVUE

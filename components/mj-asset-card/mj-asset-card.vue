@@ -4,7 +4,7 @@
 		<view class="content">
 			<!-- 滑动单元格 -->
 			<u-swipe-action>
-				<u-swipe-action-item :options="options" v-for="asset in userAssetsShow" :threshold="80" @click="clickBtn($event,asset)" >
+				<u-swipe-action-item :options="options" v-for="asset in userAssetsShow" :key="asset._id" :threshold="80" @click="clickSwipeActionItemBtn($event,asset)" >
 					<view class="swipe-action-item">
 						<view class="left">
 							<mj-icon-with-background :type="asset.assetStyle.icon" size="48rpx" customPrefix="miaoji" :color="asset.assetStyle.color"></mj-icon-with-background>
@@ -13,7 +13,12 @@
 							</view>
 						</view>
 						<view class="right">
-							<view class="money"><u--text mode="price" :text="asset.asset_balance" color="rgba(0,0,0, 0.8)" size="32rpx" bold></u--text></view>
+							<view class="money">
+								<u--text v-if="isEyeShow" mode="price" :text="asset.asset_balance" color="rgba(0,0,0, 0.8)" size="32rpx" bold></u--text>
+								<view v-else>
+									￥*****
+								</view>
+							</view>
 						</view>
 					</view>
 					<view class="line" v-if="item != 2">
@@ -30,7 +35,7 @@
 				<view class="top">小金库</view>
 				<view v-if="userAssetsHide.length">
 					<u-swipe-action>
-						<u-swipe-action-item :options="options" v-for="asset in userAssetsHide" :threshold="80" @click="clickBtn($event,asset)" >
+						<u-swipe-action-item :options="options" v-for="asset in userAssetsHide" :key="asset._id" :threshold="80" @click="clickSwipeActionItemBtn($event,asset)" >
 							<view class="swipe-action-item">
 								<view class="left">
 									<mj-icon-with-background :type="asset.assetStyle.icon" size="48rpx" customPrefix="miaoji" :color="asset.assetStyle.color"></mj-icon-with-background>
@@ -39,7 +44,12 @@
 									</view>
 								</view>
 								<view class="right">
-									<view class="money"><u--text mode="price" :text="asset.asset_balance" color="rgba(0,0,0, 0.8)" size="32rpx" bold></u--text></view>
+									<view class="money">
+										<u--text v-if="isEyeShow" mode="price" :text="asset.asset_balance" color="rgba(0,0,0, 0.8)" size="32rpx" bold></u--text>
+										<view v-else>
+											￥*****
+										</view>
+									</view>
 								</view>
 							</view>
 							<view class="line" v-if="item != 2">
@@ -62,14 +72,14 @@
 	
 	export default {
 		name: "mj-asset-card",
-		props: ['userAssetsFromDB'],
+		props: ['userAssetsFromDB','isEyeShow'],
 
 		data() {
 			return {
 				options: [{
-					text: "编辑",
+					text: "修改",
 					style: {
-						backgroundColor: '#c5c5c5',
+						backgroundColor: '#9fcba7',
 						padding: '0 40rpx'
 					}
 				}, {
@@ -82,11 +92,12 @@
 				assets: [],
 				assetsStyle: [],
 				showHideAsset: false,
+				showBalance: true,
 			};
 		},
 		methods: {
-			clickBtn({index},asset) { // 0 点击了编辑  1 点击了删除
-				// 获取资产信息 ，如果点击了编辑，则先缓存，后跳转到编辑页拿到缓存渲染页面，后删除缓存；如果点击了删除，先提示弹框，后通过id删除
+			clickSwipeActionItemBtn({index},asset) { // 0 点击了修改  1 点击了删除
+				// 获取资产信息 ，如果点击了修改，则先缓存，后跳转到修改页拿到缓存渲染页面，后删除缓存；如果点击了删除，先提示弹框，后通过id删除
 				console.log(index,asset);
 				if(index == 0) {
 					uni.setStorageSync('mj-asset-edit',asset)
@@ -117,19 +128,7 @@
 				this.showHideAsset = true
 				console.log(this.userAssetsHide);
 			},
-			getAssetsStyle() {
-				// 缓存中是否有资产样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
-				if(uni.getStorageSync('mj-assets-style')) {
-					this.assetsStyle = uni.getStorageSync('mj-assets-style')
-				} else {
-					this.assetsStyle = ICONCONFIG.assetIconList()
-					uni.setStorage({
-						key:'mj-assets-style',
-						data: this.assetsStyle
-					})
-				}
-			},
-			// 给userAssetsFromDB赋值为assets（首先，不可以直接修改props，其次将对象内容变成响应式的，可以被computed监测到），并添加对应的assetStyle
+			// 给userAssetsFromDB赋值为assets（首先，不可以直接修改props，其次将对象内容变成响应式的，可以被computed监测到），并添加type值对应的assetStyle
 			addAssetStyle() {
 				this.assets = this.userAssetsFromDB
 				this.assets.forEach(asset => {
@@ -149,7 +148,7 @@
 		},
 		onReady() {
 			console.log('onReady',this.userAssetsFromDB);
-			this.getAssetsStyle()
+			this.assetsStyle = ICONCONFIG.getAssetsStyle()
 			this.addAssetStyle()
 		},
 		watch: {

@@ -78,17 +78,21 @@
 				this.showPicker = true
 			},
 			// 获得用户选择的日期筛选类型  0 月账单  1 年账单    dateType
-			getDateType(res) { 
-				this.showPicker = false
+			getDateType(res) {
 				// 根据类型展示对应的picker
 				this.showDatePicker(res.indexs[0])
 			},
 			showDatePicker(type) {
 				if(type == 0) {
+					this.showPicker = false
 					this.showMonthPicker = true
 				} else {
 					console.log("查询年账单");
-					this.showYearPicker = true
+					uni.showToast({
+						title:"功能开发中~",
+						icon:"none"
+					})
+					// this.showYearPicker = true
 					
 				} 
 				// else {

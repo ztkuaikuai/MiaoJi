@@ -26,10 +26,10 @@
 				titleColor="#212121"></uni-section>
 			<!-- grid组件 -->
 			<u-grid :border="false" @click="clickOption" col="4">
-				<u-grid-item v-for="item in optionList">
+				<u-grid-item v-for="item,index in optionList" :key="index" >
 					<view class="content">
 						<view class="grid-item">
-							<uni-icons :type="item.type" size="48rpx" :customPrefix="item.customPrefix"></uni-icons>
+							<uni-icons :type="item.icon" size="48rpx" :customPrefix="item.customPrefix"></uni-icons>
 							<view class="grid-text">{{item.title}}</view>
 						</view>
 					</view>
@@ -39,10 +39,10 @@
 			<uni-section class="section" title="偏好" type="line" titleFontSize="28rpx"
 				titleColor="#212121"></uni-section>
 			<u-grid :border="false" @click="clickLike" col="4">
-				<u-grid-item v-for="item in likeList">
+				<u-grid-item v-for="item,index in likeList" :key="index" >
 					<view class="content">
 						<view class="grid-item">
-							<uni-icons :type="item.type" size="48rpx" :customPrefix="item.customPrefix"></uni-icons>
+							<uni-icons :type="item.icon" size="48rpx" :customPrefix="item.customPrefix"></uni-icons>
 							<view class="grid-text">{{item.title}}</view>
 						</view>
 					</view>
@@ -59,7 +59,7 @@
 				<u-cell title="联系作者" :isLink="true">
 					<uni-icons slot="icon" type="personadd" size="36rpx"></uni-icons>
 				</u-cell>
-				<u-cell title="关于" :isLink="true">
+				<u-cell title="关于" :isLink="true" @click="clickAbout">
 					<uni-icons slot="icon" type="info" size="36rpx"></uni-icons>
 				</u-cell>
 				<u-cell title="退出登录" :isLink="true" @click="logout">
@@ -86,30 +86,31 @@
 					nickname: '',
 				},
 				optionList: [{
-						type: 'wallet',
+						icon: 'wallet',
 						title: '我的资产'
 					},
 					{
-						type: 'mj-layout',
+						icon: 'mj-layout',
 						title: '模板管理',
 						customPrefix: "miaoji"
 					},
 					{
-						type: 'mj-reloadtime',
+						icon: 'mj-reloadtime',
 						title: '定时记账',
 						customPrefix: "miaoji"
 					},
 					{
-						type: 'mj-YUAN',
+						icon: 'mj-YUAN',
 						title: '预算设置',
 						customPrefix: "miaoji"
 					}
 				],
 				likeList: [{
-						type: 'color',
+						icon: 'color',
 						title: '个性化'
 					}
-				]
+				],
+				showUserAssetsList: false,
 			};
 		},
 		methods: {
@@ -119,25 +120,41 @@
 				})
 			},
 			clickOption(name) {
-				console.log("点击了常用功能", name);
+				// console.log("点击了常用功能", name);
+				uni.showToast({
+					title:"正在开发中~",
+					icon: "none"
+				})
 			},
 			clickLike(name) {
-				console.log("点击了偏好", name);
+				// console.log("点击了偏好", name);
+				uni.showToast({
+					title:"正在开发中~",
+					icon: "none"
+				})
 			},
 			clickFeedback() {
 				uni.navigateTo({
 					url: "/pagesMy/feedback/feedback"
 				})
 			},
+			clickAbout(){
+				uni.navigateTo({
+					url:"/pagesMy/about/about"
+				})
+			},
 			logout() {
 				mutations.logout()
-				console.log("成功登出")
 			},
+			// 注销
 			deactivate() {
 				uni.navigateTo({
 					url: "/uni_modules/uni-id-pages/pages/userinfo/deactivate/deactivate"
 				})
 			},
+			
+			
+			
 			// 页面挂载时获取数据  1 如果有缓存，获取缓存进行渲染  2 若无缓存，获取db数据，并赋值+存入缓存 
 			async getUserInfo() {
 				try {

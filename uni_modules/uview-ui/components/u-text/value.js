@@ -12,7 +12,7 @@ export default {
             if (mode === 'price') {
                 // 如果text不为金额进行提示
                 if (!/^\d+(\.\d+)?$/.test(text)) {
-                    uni.$u.error('金额模式下，text参数需要为金额格式');
+                    // uni.$u.error('金额模式下，text参数需要为金额格式');
                 }
                 // 进行格式化，判断用户传入的format参数为正则，或者函数，如果没有传入format，则使用默认的金额格式化处理
                 if (uni.$u.test.func(format)) {
