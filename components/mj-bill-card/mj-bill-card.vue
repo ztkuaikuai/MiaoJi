@@ -174,6 +174,7 @@
 				deep:true,
 				handler(newValue) {
 					this.userBills = newValue
+					console.log('监听userBillsFromDB',this.userBills );
 					// 通过type给每一条添加对应billStyle
 					this.userBills.forEach(bill => {
 						bill.billStyle = this.iconGather.find(item => item.type === bill.category_type)

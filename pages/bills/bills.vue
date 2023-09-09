@@ -2,8 +2,8 @@
 	<view class="bills">
 		<view class="header-fixed">
 			<!-- 日期类型选择器 需要输出选择类型和时间戳，之后数据库进行筛选，拿到数据进行渲染 -->
-			<mj-datetype-picker></mj-datetype-picker>
-			<view class="filter" @tap="toFilterBills">
+			<mj-datetype-picker @pickDate="pickDate"></mj-datetype-picker>
+			<view class="filter" @click="toFilterBills">
 				<!-- 当有筛选条件时，加粗 -->
 				筛选
 			</view>
@@ -17,14 +17,8 @@
 			<view class="left">
 				月支出：<u--text mode="price" :text="monthlyBalance.monthlyExpend" color="#219a6d" size="24rpx" bold></u--text>
 			</view>
-			<view v-if="false" class="left">
-				年支出：<u--text mode="price" text="2150.02" color="#219a6d" size="24rpx" bold></u--text>
-			</view>
 			<view class="right">
 				月收入：<u--text mode="price" :text="monthlyBalance.monthlyIncome" color="#dd524d" size="24rpx" bold></u--text>
-			</view>
-			<view v-if="false" class="right">
-				年收入：<u--text mode="price" text="250.02" color="#dd524d" size="24rpx" bold></u--text>
 			</view>
 		</view>
 		<view class="bill-list">
@@ -33,7 +27,7 @@
 				<text>账单明细</text>
 			</view>
 			<!-- 需要 到达底部钩子，按需加载 -->
-			<view v-for="index in Number(dayForBillCard)" :key="index">
+			<view v-for="index in 31" :key="index">
 				<mj-bill-card :userBillsFromDB="userBillsByDay[index]" :userAssetsFromDB="userAssets" :indexTemp="index"></mj-bill-card>
 			</view>
 		</view>
@@ -48,14 +42,13 @@
 			return {
 				// 图表数据
 				chartsDataColumn: {},
-				
 				// 图表配置
 				opts: {
 					dataLabel: false,
 					enableScroll: true,
 					fontSize: 10,
 					enableMarkLine: true,
-					color: ['#fa424e','#16a168'],
+					color: ['#dd524d','#009c63'],
 					yAxis: {
 						disabled: true,
 						disableGrid: true
@@ -94,8 +87,7 @@
 				monthlyBalance: {
 					monthlyExpend: 0,
 					monthlyIncome: 0
-				},
-				dayForBillCard: uni.$u.timeFormat(Date.now(), 'dd'),
+				}
 			};
 		},
 		async onReady() {
@@ -121,6 +113,11 @@
 		},
 		methods: {
 			toFilterBills() {
+				uni.showToast({
+					title:"功能开发中~",
+					icon:"none"
+				})
+				return
 				uni.navigateTo({
 					url:"/pagesFilter/filter-bills/filter-bills"
 				})
@@ -134,7 +131,7 @@
 				}
 			},
 			async getMonthBills(month) {
-				// 按月份获取账单
+				// 按月份获取账单 记账日期降序排列
 				const userMonthBills = db.collection("mj-user-bills").where(`user_id == $cloudEnv_uid && dateToString(add(new Date(0),bill_date),"%Y-%m","+0800") == "${month}"`).orderBy('bill_date desc').getTemp()
 				const userAssets = db.collection("mj-user-assets").where('user_id == $cloudEnv_uid').field('_id,asset_type,user_id').getTemp()
 				const res = await db.collection(userMonthBills,userAssets).get()
@@ -156,32 +153,38 @@
 				this.monthlyBalance.monthlyExpend = categorizedBillsByBillType[0] + categorizedBillsByBillType[2]
 				this.monthlyBalance.monthlyIncome = categorizedBillsByBillType[1]
 				
-				
+				let numberOfDays = 31
 				// 按天对bill进行分类
 				if(this.initBillCard) {
 					// 如果是初始化
-					// 创建一个二维数组，按今天 9号创建9个
+					// 创建一个二维数组，元素个数按1号到今天 9号创建9个
 					const today = new Date();
-					const numberOfDays = today.getDate();
-					const twoDimensionalArray = [];
-					for (let i = 0; i < numberOfDays; i++) {
-						twoDimensionalArray.push([]);
-					}
-					// 判断 每个bill中的bill_date的记账日  09  08  07
-					// 用今天 09 日 减去 bill_date得到索引
-					// 根据索引 push 此bill 进入对应的数组 arr[index].push(bill)
-					this.userBills.forEach(bill => {
-						let billDay = uni.$u.timeFormat(bill.bill_date, 'dd')
-						const index = numberOfDays - billDay
-						twoDimensionalArray[index].push(bill)
-					})
-					// console.log(twoDimensionalArray);
-					this.userBillsByDay = twoDimensionalArray
-					// [[今天的账单],[昨天的账单],[前天账单],[9月6日账单]……[9月1日账单]]
+					numberOfDays = today.getDate();
 				} else {
-					// 如果用户点击了按月筛选
+					// 如果用户点击了按月筛选，创建一个二维数组，元素个数为当月天数
+					numberOfDays = this.getTotalDaysInMonth(this.month)
 				}
+				const twoDimensionalArray = [];
+				for (let i = 0; i < numberOfDays; i++) {
+					twoDimensionalArray.push([]);
+				}
+				// 判断 每个bill中的bill_date的记账日 例如 09  08  07
+				// 用numberOfDays 减去 bill_date得到索引
+				// 根据索引 push 此bill 进入对应的数组 arr[index].push(bill)
+				this.userBills.forEach(bill => {
+					let billDay = uni.$u.timeFormat(bill.bill_date, 'dd')
+					const index = numberOfDays - billDay
+					twoDimensionalArray[index].push(bill)
+				})
+				// console.log('更新后userBillsByDay',twoDimensionalArray);
+				this.userBillsByDay = twoDimensionalArray
+				// 倒序排列
+				// [[今天的账单],[昨天的账单],[前天账单],[9月6日账单]……[9月1日账单]]
+				// [[月末的账单],…………[月初的账单]]
 				
+				
+				// 非初始化，重新渲染账单和图表
+				if(!this.initBillCard) this.getServerData()
 			},
 			getUserAssets() {
 				this.userAssets = uni.getStorageSync('mj-user-assets')
@@ -232,6 +235,28 @@
 				}
 				
 				this.chartsDataColumn=result
+			},
+			// 触发日期选择器
+			pickDate(res) {
+				// 1 格式化日期，获得月份 如2023-09
+				// 2 initBillCard为false，告知getMonthBills用户触发日期选择器
+				const {value} = res
+				this.month = uni.$u.timeFormat(value, 'yyyy-mm')
+				this.initBillCard = false
+				this.getMonthBills(this.month)
+				
+			},
+			// 获取当月的总天数
+			getTotalDaysInMonth(yearmonth) {
+				const [year,month] = yearmonth.split('-')
+				console.log(year,month);
+				// 创建一个日期对象，将月份设置为所输入的月份，日期设置为1号
+				const date = new Date(year, month - 1, 1);
+				// 将日期设置为下个月的第0天（即本月的最后一天）
+				date.setMonth(date.getMonth() + 1, 0);
+				// 获取日期对象中的日期部分，即本月的总天数
+				const totalDays = date.getDate();
+				return totalDays;
 			},
 		},
 		computed: {

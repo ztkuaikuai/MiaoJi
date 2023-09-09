@@ -5,7 +5,7 @@
 			<mj-datetype-picker></mj-datetype-picker>
 			<!-- 先只考虑饼图 -->
 			<!-- <view class="tabs"><u-tabs :list="[{name:'饼图'},{name: '日历'}]" @click="clickTab" lineColor="#2e3548"></u-tabs></view> -->
-			<view class="filter" @tap="toFilterBills">
+			<view class="filter" @click="toFilterBills">
 				筛选
 			</view>
 		</view>
@@ -136,13 +136,18 @@
 				}, 500);
 			},
 			toFilterBills() {
+				uni.showToast({
+					title:"功能开发中~",
+					icon:"none"
+				})
+				return
 				uni.navigateTo({
 					url:"/pagesFilter/filter-bills/filter-bills"
 				})
 			},
 			// 点击了月支出下方金额的文字
 			tapExpend() {
-				this.type = '月支出'
+				this.type = '月支出' 
 			},
 			tapIncome() {
 				this.type = '月收入'

@@ -3,7 +3,7 @@
 	<view class="datetype-picker">
 		<!-- 选择器 + 日期选择器DatetimePicker  -->
 		<view class="item" @tap="tapDateBtn">
-			2023年7月<u-icon name="arrow-down" size="24rpx" color="#212121" bold top="4rpx"></u-icon>
+			{{today}}<u-icon name="arrow-down" size="24rpx" color="#212121" bold top="4rpx"></u-icon>
 		</view>
 		<u-picker @confirm="getDateType" @cancel="showPicker = false" @close="showPicker = false" :show="showPicker" :columns="columns" confirmColor="#9fcba7" :closeOnClickOverlay="true" ></u-picker>
 		
@@ -64,12 +64,14 @@
 				showPicker: false,
 				showMonthPicker: false,
 				showYearPicker: false,
+				today: uni.$u.timeFormat(Date.now(), 'yyyy年mm月'),
 				columns: [['月账单','年账单']],
 				// columns: [['月账单','年账单','自选日期']],
 				years: [[2020,2021,2022,2023]],
 				now: Date.now(),
 				// showCustom: false,
 				// showCustomPicker: false
+				
 			};
 		},
 		methods: {
@@ -103,7 +105,8 @@
 			},
 			// 点击月份选择器确认按钮
 			getMonth(res) {
-				console.log(res);
+				this.today = uni.$u.timeFormat(res.value, 'yyyy年mm月'),
+				this.$emit('pickDate',res)
 				this.showMonthPicker = false
 			},
 			getYear(res) {
