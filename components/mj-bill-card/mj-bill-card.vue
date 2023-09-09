@@ -84,6 +84,8 @@
 								await this.updateAssetBalance(bill)
 								// console.log('更新资产成功');
 								uni.$emit('updateAssetsList')
+								// 更新账单页面
+								uni.$emit('updateBillPage')
 								uni.showToast({
 									title: "删除成功",
 									icon: "success"
@@ -174,8 +176,9 @@
 				deep:true,
 				handler(newValue) {
 					this.userBills = newValue
-					console.log('监听userBillsFromDB',this.userBills );
+					// console.log('监听userBillsFromDB',this.userBills );
 					// 通过type给每一条添加对应billStyle
+					if(!this.userBills) this.userBills = []
 					this.userBills.forEach(bill => {
 						bill.billStyle = this.iconGather.find(item => item.type === bill.category_type)
 					})
