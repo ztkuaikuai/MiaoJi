@@ -151,23 +151,15 @@
 			},
 			setToday() {
 				// 赋值日期
-				if(this.indexTemp == 0) this.today = uni.$u.timeFormat(Date.now(), 'mm月dd日') + ' 今天'
-				if(this.indexTemp == 1) this.today = uni.$u.timeFormat(Date.now() - 86400000, 'mm月dd日') + ' 昨天'
-				if(this.indexTemp == 2) this.today = uni.$u.timeFormat(Date.now() - 172800000, 'mm月dd日') + ' 前天'
-				if(this.indexTemp != 0 && this.indexTemp != 1 && this.indexTemp != 2) this.today = uni.$u.timeFormat(this.userBills[0]?.bill_date, 'mm月dd日')
+				this.today = uni.$u.timeFormat(this.userBills[0]?.bill_date, 'mm月dd日')
+				if(this.today === uni.$u.timeFormat(Date.now(), 'mm月dd日')) this.today += ' 今天'
+				if(this.today === uni.$u.timeFormat(Date.now() - 86400000, 'mm月dd日')) this.today += ' 昨天'
+				if(this.today === uni.$u.timeFormat(Date.now() - 172800000, 'mm月dd日')) this.today += ' 前天'
 			}
 		},
 		onReady() {
-			// 获取icon样式，并且拼接到一起
-			const iconExpend = ICONCONFIG.getCategoryIconListForExpend()
-			const iconIncome = ICONCONFIG.getCategoryIconListForIncome()
-			this.iconGather = iconExpend.concat(iconIncome)
-			const transfer = {
-				icon: 'mj-zhuanzhang',
-				title: '内部转账',
-				type: 'transfer'
-			}
-			this.iconGather.push(transfer)
+			// 获取所有icon样式
+			this.iconGather = ICONCONFIG.getAllIconList()
 			// 获取资产样式
 			this.assetsStyle = ICONCONFIG.getAssetsStyle()
 		},

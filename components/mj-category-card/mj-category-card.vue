@@ -1,24 +1,24 @@
 <template>
 	<view>
-		<view v-for="item in 14">
+		<view v-for="category in categoryList">
 			<view class="category-card">
 				 <view class="left">
-					<mj-icon-with-background type="fire" size="48rpx"></mj-icon-with-background>
+					<mj-icon-with-background :type="category.category_icon" size="48rpx" customPrefix="miaoji"></mj-icon-with-background>
 					<view class="main">
 						<view class="font">
-							餐饮<text>42.38%</text>
+							{{category.category_title}}<text>{{(category.total_amount_percent * 100).toFixed(2)}}</text>
 						</view>
 						<view class="progress">
-							<u-line-progress :percentage="42.38" activeColor="#9fcba7" :showText="false" height="16rpx"></u-line-progress>
+							<u-line-progress :percentage="(category.total_amount_percent * 100).toFixed(2)" activeColor="#9fcba7" :showText="false" height="16rpx"></u-line-progress>
 						</view>
 					</view>
 				 </view>
 				 <view class="right">
 				 	<view class="money">
-				 		￥400.83
+				 		￥{{category.total_amount.toFixed(2)}}
 				 	</view>
 					<view class="num">
-						42笔
+						{{category.bill_count}}笔
 					</view>
 				 </view>
 			</view>
@@ -30,12 +30,25 @@
 </template>
 
 <script>
+	import ICONCONFIG from '@/utils/icon-config.js'
 	export default {
 		name:"mj-category-card",
+		props: ['categoryListFromChart'],
 		data() {
 			return {
-				imgSrc: '/static/icons/home.png'
 			};
+		},
+		computed: {
+			categoryList(){
+				const allIconList = ICONCONFIG.getAllIconList()
+				const categoryListFromC = uni.$u.deepClone(this.categoryListFromChart)
+				categoryListFromC.forEach(category => {
+					category['category_title'] = allIconList.filter(item => item.type === category.category_type)[0].title
+					category['category_icon'] = allIconList.filter(item => item.type === category.category_type)[0].icon
+				})
+				console.log('categoryList',categoryListFromC);
+				return categoryListFromC
+			},
 		}
 	}
 </script>

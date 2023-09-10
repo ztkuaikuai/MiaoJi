@@ -3,7 +3,7 @@
 		<view class="header-fixed">
 			<!-- 日期类型选择器 需要输出选择类型和时间戳，之后数据库进行筛选，拿到数据进行渲染 -->
 			<mj-datetype-picker @pickDate="pickDate"></mj-datetype-picker>
-			<view class="filter" @click="toFilterBills">
+			<view v-if="false" class="filter" @click="toFilterBills">
 				<!-- 当有筛选条件时，加粗 -->
 				筛选
 			</view>
@@ -101,7 +101,7 @@
 			// 获取用户资产列表
 			this.getUserAssets()
 			// 获取报表数据
-			this.getServerData()
+			this.getChartData()
 			uni.$on('updateBillPage',this.upDateMonthBills)
 		},
 		onShow() {
@@ -195,7 +195,7 @@
 				
 				
 				// 非初始化，重新渲染账单和图表
-				if(!this.initBillCard) this.getServerData()
+				if(!this.initBillCard) this.getChartData()
 			},
 			upDateMonthBills() {
 				// 用户点击确认删除账单触发
@@ -206,9 +206,9 @@
 			getUserAssets() {
 				this.userAssets = uni.getStorageSync('mj-user-assets')
 			},
-			getServerData() {
+			getChartData() {
 				// 处理userBills的数据
-				console.log('userBillsByDay',this.userBillsByDay)
+				// console.log('userBillsByDay',this.userBillsByDay)
 				const result = {
 				  categories: [], // 存储日期
 				  series: [
@@ -255,6 +255,7 @@
 			},
 			// 触发日期选择器
 			pickDate(res) {
+				// 用户选择了月账单
 				// 1 格式化日期，获得月份 如2023-09
 				// 2 initBillCard为false，告知getMonthBills 非初始化，更新图表
 				const {value} = res
@@ -266,7 +267,7 @@
 			// 获取当月的总天数
 			getTotalDaysInMonth(yearmonth) {
 				const [year,month] = yearmonth.split('-')
-				console.log(year,month);
+				// console.log(year,month);
 				// 创建一个日期对象，将月份设置为所输入的月份，日期设置为1号
 				const date = new Date(year, month - 1, 1);
 				// 将日期设置为下个月的第0天（即本月的最后一天）
