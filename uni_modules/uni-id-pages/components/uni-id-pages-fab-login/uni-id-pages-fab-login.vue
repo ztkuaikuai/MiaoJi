@@ -291,14 +291,18 @@
 					});
 				}
 
+				// 判断是否需要弹出隐私协议授权框 --- 微信小程序
+				// 在一键登录页面判断
+				
+
 				//判断是否需要弹出隐私协议授权框
-				let needAgreements = (config?.agreements?.scope || []).includes('register')
-				if (type != 'univerify' && needAgreements && !this.agree) {
-					let agreementsRef = this.getParentComponent().$refs.agreements
-					return agreementsRef.popup(() => {
-						this.login_before(type, navigateBack, options)
-					})
-				}
+				// let needAgreements = (config?.agreements?.scope || []).includes('register')
+				// if (type != 'univerify' && needAgreements && !this.agree) {
+				// 	let agreementsRef = this.getParentComponent().$refs.agreements
+				// 	return agreementsRef.popup(() => {
+				// 		this.login_before(type, navigateBack, options)
+				// 	})
+				// }
 
 				// #ifdef H5
 					if(type == 'weixin'){
