@@ -56,7 +56,7 @@
 				<u-cell title="反馈问题" :isLink="true" @click="clickFeedback">
 					<uni-icons slot="icon" type="compose" size="36rpx"></uni-icons>
 				</u-cell>
-				<u-cell title="联系作者" :isLink="true">
+				<u-cell title="联系作者" :isLink="true" @click="clickAuthor">
 					<uni-icons slot="icon" type="personadd" size="36rpx"></uni-icons>
 				</u-cell>
 				<u-cell title="关于" :isLink="true" @click="clickAbout">
@@ -136,6 +136,14 @@
 			clickFeedback() {
 				uni.navigateTo({
 					url: "/pagesMy/feedback/feedback"
+				})
+			},
+			clickAuthor() {
+				uni.showModal({
+					content: "微信：ztkuaikuai",
+					cancelColor: "rgba(0,0,0,0.6)",
+					confirmColor:"#9fcba7",
+					showCancel:false
 				})
 			},
 			clickAbout(){

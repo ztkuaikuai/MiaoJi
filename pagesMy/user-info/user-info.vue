@@ -18,13 +18,13 @@
 		</mj-card>
 		<mj-card title="个人信息">
 			<u-cell-group :border="false">
-				<u-cell title="会员编号" label="00000001" :border="false" clickable>
+				<u-cell title="会员编号" :label="userInfo.userLabel" :border="false" clickable>
 					<uni-icons type="vip" size="48rpx" slot="icon" class="userinfo-icon"></uni-icons>
 				</u-cell>
 				<u-cell @click="clickName" title="昵称" :label="userInfo.nickname || '点我设置昵称'" :border="false" clickable>
 					<uni-icons type="person" size="48rpx" slot="icon" class="userinfo-icon"></uni-icons>
 				</u-cell>
-				<u-cell title="加入时间" label="2022-04-21" :border="false">
+				<u-cell title="加入时间" :label="userInfo.registerDate" :border="false">
 					<uni-icons type="paperplane" size="48rpx" slot="icon" class="userinfo-icon"></uni-icons>
 				</u-cell>
 			</u-cell-group>
@@ -48,6 +48,8 @@
 				userInfo: {
 					avatarSrc: '',
 					nickname: '',
+					registerDate: 0,
+					userLabel: '00000001'
 				},
 				showNicaNamePop: false,
 				popStyle: {
@@ -90,20 +92,55 @@
 				})
 				this.showNicaNamePop = false
 			},
-			// 页面挂载时获取数据  1 如果有缓存，获取缓存进行渲染  2 若无缓存，获取db数据，并赋值+存入缓存
+			// 页面挂载时获取数据   1 如果有缓存，则给this.userInfo赋值   2 获取db数据  3 判断数据库数据和缓存中的数据有无区别，有区别覆盖缓存,并再次赋值
 			async getUserInfo() {
-				const storageUserInfo = uni.getStorageSync('mj-user-info')
-				if(storageUserInfo){
-					Object.assign(this.userInfo, storageUserInfo)
-				} else {
-					const res = await db.collection("uni-id-users").where("_id == $cloudEnv_uid").field("_id,nickname,avatar").get()
-					const {avatar: avatarSrc, nickname} = res.result.data[0]
-					Object.assign(this.userInfo, {avatarSrc, nickname})
+				const userInfoFromStorage = uni.getStorageSync('mj-user-info')
+				if(userInfoFromStorage) {
+					Object.assign(this.userInfo, userInfoFromStorage)
+				}
+				
+				const res = await db.collection("uni-id-users").where("_id == $cloudEnv_uid").field("_id,nickname,avatar,register_date").get()
+				let {avatar: avatarSrc, nickname, register_date: registerDate} = res.result.data[0]
+				// 使用注册日期计算出会员编号
+				const userLabel = Math.round(registerDate * 3 / 200000).toString()
+				// 注册日期格式化
+				registerDate = uni.$u.timeFormat(registerDate,'yyyy-mm-dd')
+				
+				const objTemp = {avatarSrc, nickname, registerDate, userLabel}
+				if(!this.compareObjects(userInfoFromStorage,objTemp)) {
+					// 如果数据库数据和缓存中的数据有区别，覆盖缓存，并再次赋值
+					Object.assign(this.userInfo, objTemp)
 					uni.setStorageSync('mj-user-info', this.userInfo)
 				}
+			},
+			// 比较两个对象的属性名和值是否相等
+			compareObjects(obj1, obj2) {
+			  // 获取对象的属性名数组
+			  const keys1 = Object.keys(obj1);
+			  const keys2 = Object.keys(obj2);
+			
+			  // 检查属性名数组长度是否相等
+			  if (keys1.length !== keys2.length) {
+			    return false;
+			  }
+			
+			  // 比较属性名和属性值
+			  for (let key of keys1) {
+			    // 检查属性名是否存在于第二个对象中
+			    if (!obj2.hasOwnProperty(key)) {
+			      return false;
+			    }
+			
+			    // 比较属性值
+			    if (obj1[key] !== obj2[key]) {
+			      return false;
+			    }
+			  }
+			
+			  return true;
 			}
 		},
-		mounted() {
+		onReady() {
 			this.getUserInfo()
 		}
 	}

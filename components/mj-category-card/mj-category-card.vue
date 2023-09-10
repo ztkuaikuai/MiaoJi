@@ -6,7 +6,7 @@
 					<mj-icon-with-background :type="category.category_icon" size="48rpx" customPrefix="miaoji"></mj-icon-with-background>
 					<view class="main">
 						<view class="font">
-							{{category.category_title}}<text>{{(category.total_amount_percent * 100).toFixed(2)}}</text>
+							{{category.category_title}}<text>{{(category.total_amount_percent * 100).toFixed(2)}}%</text>
 						</view>
 						<view class="progress">
 							<u-line-progress :percentage="(category.total_amount_percent * 100).toFixed(2)" activeColor="#9fcba7" :showText="false" height="16rpx"></u-line-progress>
@@ -77,6 +77,7 @@
 				color: $mj-text-color-grey;
 				font-size: 24rpx;
 				font-weight: normal;
+				margin-left: 4px;
 			}
 			.progress {
 				margin-top: 4px;
