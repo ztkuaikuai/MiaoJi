@@ -84,6 +84,8 @@
 								await this.updateAssetBalance(bill)
 								// console.log('更新资产成功');
 								uni.$emit('updateAssetsList')
+								// 更新账单页面
+								uni.$emit('updateBillPage')
 								uni.showToast({
 									title: "删除成功",
 									icon: "success"
@@ -149,23 +151,15 @@
 			},
 			setToday() {
 				// 赋值日期
-				if(this.indexTemp == 0) this.today = uni.$u.timeFormat(Date.now(), 'mm月dd日') + ' 今天'
-				if(this.indexTemp == 1) this.today = uni.$u.timeFormat(Date.now() - 86400000, 'mm月dd日') + ' 昨天'
-				if(this.indexTemp == 2) this.today = uni.$u.timeFormat(Date.now() - 172800000, 'mm月dd日') + ' 前天'
-				if(this.indexTemp != 0 && this.indexTemp != 1 && this.indexTemp != 2) this.today = uni.$u.timeFormat(this.userBills[0]?.bill_date, 'mm月dd日')
+				this.today = uni.$u.timeFormat(this.userBills[0]?.bill_date, 'mm月dd日')
+				if(this.today === uni.$u.timeFormat(Date.now(), 'mm月dd日')) this.today += ' 今天'
+				if(this.today === uni.$u.timeFormat(Date.now() - 86400000, 'mm月dd日')) this.today += ' 昨天'
+				if(this.today === uni.$u.timeFormat(Date.now() - 172800000, 'mm月dd日')) this.today += ' 前天'
 			}
 		},
 		onReady() {
-			// 获取icon样式，并且拼接到一起
-			const iconExpend = ICONCONFIG.getCategoryIconListForExpend()
-			const iconIncome = ICONCONFIG.getCategoryIconListForIncome()
-			this.iconGather = iconExpend.concat(iconIncome)
-			const transfer = {
-				icon: 'mj-zhuanzhang',
-				title: '内部转账',
-				type: 'transfer'
-			}
-			this.iconGather.push(transfer)
+			// 获取所有icon样式
+			this.iconGather = ICONCONFIG.getAllIconList()
 			// 获取资产样式
 			this.assetsStyle = ICONCONFIG.getAssetsStyle()
 		},
@@ -174,8 +168,9 @@
 				deep:true,
 				handler(newValue) {
 					this.userBills = newValue
-					console.log('监听userBillsFromDB',this.userBills );
+					// console.log('监听userBillsFromDB',this.userBills );
 					// 通过type给每一条添加对应billStyle
+					if(!this.userBills) this.userBills = []
 					this.userBills.forEach(bill => {
 						bill.billStyle = this.iconGather.find(item => item.type === bill.category_type)
 					})

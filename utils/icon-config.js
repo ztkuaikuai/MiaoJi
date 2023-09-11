@@ -135,6 +135,14 @@ function categoryIconListForIncome() {
 	]
 }
 
+function categoryIconListForOther() {
+	return [{
+		icon: 'mj-zhuanzhang',
+		title: '内部转账',
+		type: 'transfer'
+	}]
+}
+
 function getCategoryIconListForExpend() {
 	// 缓存中是否有分类-支出样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
 	if (uni.getStorageSync('mj-category-style-for-expend')) {
@@ -178,8 +186,40 @@ function getAssetsStyle() {
 	}
 }
 
+function getAllIconList() {
+	let allIconList = []
+	// 缓存中是否有分类-支出样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
+	if (uni.getStorageSync('mj-category-style-for-expend')) {
+		allIconList.push(...uni.getStorageSync('mj-category-style-for-expend')) 
+	} else {
+		const iconListForExpend = categoryIconListForExpend()
+		uni.setStorage({
+			key: 'mj-category-style-for-expend',
+			data: iconListForExpend
+		})
+		allIconList.push(...iconListForExpend)
+	}
+	// 缓存中是否有分类-收入样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
+	if (uni.getStorageSync('mj-category-style-for-income')) {
+		allIconList.push(...uni.getStorageSync('mj-category-style-for-income'))
+	} else {
+		const iconListForIncome = categoryIconListForIncome()
+		uni.setStorage({
+			key: 'mj-category-style-for-income',
+			data: iconListForIncome
+		})
+		allIconList.push(...iconListForIncome)
+	}
+	
+	// 加入其他icon样式
+	allIconList.push(...categoryIconListForOther())
+	
+	return allIconList
+}
+
 export default {
 	getCategoryIconListForExpend,
 	getCategoryIconListForIncome,
-	getAssetsStyle
+	getAssetsStyle,
+	getAllIconList
 }

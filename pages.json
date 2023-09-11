@@ -75,6 +75,15 @@
                 }
                 
                 }
+                ,{
+                    "path" : "my-assets/my-assets",
+                    "style" :                                                                                    
+                {
+                    "navigationBarTitleText": "我的资产",
+                    "enablePullDownRefresh": false
+                }
+                
+                }
             ]
 		}, {
 			"root": "pagesFilter",

@@ -3,7 +3,7 @@
 		<view class="logo">
 			<u--image src="/static/logo.png" width="72px" height="72px" radius="20px" ></u--image>
 			<view class="version">
-				版本号：0.5.5
+				版本号：0.7.3
 			</view>
 		</view>
 		<view class="main">

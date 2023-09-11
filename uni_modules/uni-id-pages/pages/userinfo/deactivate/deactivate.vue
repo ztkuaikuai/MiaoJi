@@ -45,7 +45,7 @@
 									duration: 3000
 								});
 								uni.removeStorageSync('uni_id_token');
-								uni.removeStorageSync('mj-user-info'); //清除用户头像，昵称
+								uni.removeStorageSync('mj-user-info'); //清除用户信息
 								uni.setStorageSync('uni_id_token_expired', 0)
 								uni.navigateTo({
 									url:"/uni_modules/uni-id-pages/pages/login/login-withoutpwd"

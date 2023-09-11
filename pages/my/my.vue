@@ -10,7 +10,7 @@
 							Hi {{userInfo.nickname || '朋友'}}
 						</view>
 						<view class="day">
-							今天是你记账的第168天
+							今天是你记账的第{{userInfo.useDate}}天
 						</view>
 					</view>
 				</view>
@@ -56,7 +56,7 @@
 				<u-cell title="反馈问题" :isLink="true" @click="clickFeedback">
 					<uni-icons slot="icon" type="compose" size="36rpx"></uni-icons>
 				</u-cell>
-				<u-cell title="联系作者" :isLink="true">
+				<u-cell title="联系作者" :isLink="true" @click="clickAuthor">
 					<uni-icons slot="icon" type="personadd" size="36rpx"></uni-icons>
 				</u-cell>
 				<u-cell title="关于" :isLink="true" @click="clickAbout">
@@ -84,6 +84,8 @@
 				userInfo: {
 					avatarSrc: '',
 					nickname: '',
+					registerDate: 0,
+					useDate: 0,
 				},
 				optionList: [{
 						icon: 'wallet',
@@ -119,12 +121,18 @@
 					url: "/pagesMy/user-info/user-info"
 				})
 			},
-			clickOption(name) {
-				// console.log("点击了常用功能", name);
-				uni.showToast({
-					title:"正在开发中~",
-					icon: "none"
-				})
+			clickOption(index) {
+				// console.log("点击了常用功能", index)
+				if(index === 0) {
+					uni.navigateTo({
+						url:"/pagesMy/my-assets/my-assets"
+					})
+				} else {
+					uni.showToast({
+						title:"正在开发中~",
+						icon: "none"
+					})
+				}
 			},
 			clickLike(name) {
 				// console.log("点击了偏好", name);
@@ -136,6 +144,14 @@
 			clickFeedback() {
 				uni.navigateTo({
 					url: "/pagesMy/feedback/feedback"
+				})
+			},
+			clickAuthor() {
+				uni.showModal({
+					content: "微信：ztkuaikuai",
+					cancelColor: "rgba(0,0,0,0.6)",
+					confirmColor:"#9fcba7",
+					showCancel:false
 				})
 			},
 			clickAbout(){
@@ -155,25 +171,31 @@
 			
 			
 			
-			// 页面挂载时获取数据  1 如果有缓存，获取缓存进行渲染  2 若无缓存，获取db数据，并赋值+存入缓存 
+			// 页面挂载时获取数据  1 如果有缓存，获取缓存进行渲染  2 若无缓存，获取db数据，并赋值，存入缓存  3 获取用户使用天数
 			async getUserInfo() {
 				try {
 					const storageUserInfo = uni.getStorageSync('mj-user-info')
 					if (storageUserInfo) {
-						Object.assign(this.userInfo, storageUserInfo)
+						Object.assign(this.userInfo, storageUserInfo)   // 里面的registerDate是yyyy-mm-dd格式
 					} else {
 						const res = await db.collection("uni-id-users").where("_id == $cloudEnv_uid").field(
-							"_id,nickname,avatar").get()
+							"_id,nickname,avatar,register_date").get()
 						const {
 							avatar: avatarSrc,
-							nickname
+							nickname,
+							register_date: registerDate
 						} = res.result.data[0]
+						
+						// 注册日期格式化
+						registerDate = uni.$u.timeFormat(registerDate,'yyyy-mm-dd')
+						
 						Object.assign(this.userInfo, {
 							avatarSrc,
-							nickname
+							nickname,
+							registerDate
 						})
-						uni.setStorageSync('mj-user-info', this.userInfo)
 					}
+					this.getUserDate()
 				} catch (err) {
 					// console.log(err);
 				}
@@ -181,8 +203,14 @@
 			resetUserInfo() {
 				const storageUserInfo = uni.getStorageSync('mj-user-info')
 				Object.assign(this.userInfo, storageUserInfo)
+				this.getUserDate()
+			},
+			// 获取使用妙记天数
+			getUserDate() {
+				const registerDateTimestamp = Date.parse(this.userInfo.registerDate)
+				let useDate = Date.now() - registerDateTimestamp
+				this.userInfo.useDate = Math.ceil(useDate / (1000 * 60 * 60 * 24))
 			}
-
 		},
 		onReady() {
 			const state = UT.checkUserTokenExpierd() // 检查老用户的token是否过期，如果过期则跳转登录，并返回true；没过期返回false

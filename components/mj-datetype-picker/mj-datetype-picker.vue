@@ -5,7 +5,7 @@
 		<view class="item" @tap="tapDateBtn">
 			{{today}}<u-icon name="arrow-down" size="24rpx" color="#212121" bold top="4rpx"></u-icon>
 		</view>
-		<u-picker @confirm="getDateType" @cancel="showPicker = false" @close="showPicker = false" :show="showPicker" :columns="columns" confirmColor="#9fcba7" :closeOnClickOverlay="true" ></u-picker>
+		<!-- <u-picker @confirm="getDateType" @cancel="showPicker = false" @close="showPicker = false" :show="showPicker" :columns="columns" confirmColor="#9fcba7" :closeOnClickOverlay="true" ></u-picker> -->
 		
 		<u-datetime-picker
 			@cancel="showMonthPicker = false"
@@ -19,7 +19,8 @@
 			confirmColor="#9fcba7"
 			:closeOnClickOverlay="true"
 		></u-datetime-picker>
-		<u-picker
+		<!-- 年份选择器 -->
+		<!-- <u-picker
 			@confirm="getYear"	
 			@cancel="showYearPicker = false"
 			@close="showYearPicker = false"
@@ -28,7 +29,7 @@
 			confirmColor="#9fcba7"
 			title="请选择要查询的年份"
 			:closeOnClickOverlay="true"
-		></u-picker>
+		></u-picker> -->
 		<!-- 自定义选择:暂时不用 -->
 		<!-- <u-popup :show="showCustom" @close="showCustom = false" :closeOnClickOverlay="false">
 			<u-toolbar
@@ -77,42 +78,37 @@
 		methods: {
 			// 触发了顶部日期按钮
 			tapDateBtn() {
-				this.showPicker = true
+				this.showMonthPicker = true
 			},
 			// 获得用户选择的日期筛选类型  0 月账单  1 年账单    dateType
-			getDateType(res) {
-				// 根据类型展示对应的picker
-				this.showDatePicker(res.indexs[0])
-			},
-			showDatePicker(type) {
-				if(type == 0) {
-					this.showPicker = false
-					this.showMonthPicker = true
-				} else {
-					console.log("查询年账单");
-					uni.showToast({
-						title:"功能开发中~",
-						icon:"none"
-					})
-					// this.showYearPicker = true
-					
-				} 
+			// getDateType(res) {
+			// 	// 根据类型展示对应的picker
+			// 	this.showDatePicker(res.indexs[0])
+			// },
+			// showDatePicker(type) {
+			// 	if(type == 0) {
+			// 		this.showPicker = false
+			// 		this.showMonthPicker = true
+			// 	} else {
+			// 		console.log("查询年账单");
+			// 		this.showYearPicker = true
+			// 	} 
 				// else {
 				// 	console.log("自定义查询");
 				// 	this.showCustom = true
 				// }
 				
-			},
+			// },
 			// 点击月份选择器确认按钮
 			getMonth(res) {
 				this.today = uni.$u.timeFormat(res.value, 'yyyy年mm月'),
 				this.$emit('pickDate',res)
 				this.showMonthPicker = false
 			},
-			getYear(res) {
-				console.log(res.value[0]);
-				this.showYearPicker = false
-			},
+			// getYear(res) {
+			// 	console.log(res.value[0]);
+			// 	this.showYearPicker = false
+			// },
 			// // 点击自定义 触发
 			// customPicker() {
 			// 	this.showCustomPicker = true
