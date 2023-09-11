@@ -30,7 +30,7 @@
 		<view class="hideAsset" @click="clickHideAsset">查看隐藏资产</view>
 		
 		<!-- 隐藏资产弹出框 -->
-		<u-popup :show="showHideAsset" @close="showHideAsset = false" round="20px"> 
+		<u-popup :show="showHideAsset" @close="showHideAsset = false" round="20px" :safeAreaInsetBottom="false" > 
 			<view>
 				<view class="top">小金库</view>
 				<view v-if="userAssetsHide.length">

@@ -103,6 +103,24 @@
 				initChart: true,
 			};
 		},
+		computed: {
+			monthlyExpend(){
+				return this.monthlyBalance.monthlyExpend
+			},
+			monthlyIncome(){
+				return this.monthlyBalance.monthlyIncome
+			}
+		},
+		watch: {
+			type(newValue){
+				if(newValue==="月收入") {
+					this.getChartData(this.incomeCategoryList)
+				}
+				if(newValue==="月支出") {
+					this.getChartData(this.expendCategoryList)
+				}
+			}
+		},
 		async onReady() {
 			const state = UT.checkUserTokenExpierd() // 检查老用户的token是否过期，如果过期则跳转登录，并返回true；没过期返回false
 			if (state) return
@@ -317,24 +335,6 @@
 					this.getChartData(this.expendCategoryList)
 				}
 			},
-		},
-		computed: {
-			monthlyExpend(){
-				return this.monthlyBalance.monthlyExpend
-			},
-			monthlyIncome(){
-				return this.monthlyBalance.monthlyIncome
-			}
-		},
-		watch: {
-			type(newValue){
-				if(newValue==="月收入") {
-					this.getChartData(this.incomeCategoryList)
-				}
-				if(newValue==="月支出") {
-					this.getChartData(this.expendCategoryList)
-				}
-			}
 		}
 	}
 </script>

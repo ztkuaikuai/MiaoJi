@@ -47,8 +47,10 @@
 		</swiper>
 		<view class="bills" v-show="!isIndexShow">
 			<view class="header">
-				<uni-icons type="list" size="48rpx" color="#212121"></uni-icons>
-				<text>近三日账单</text>
+				<view class="left">
+					<uni-icons type="list" size="48rpx" color="#212121"></uni-icons>
+					<text>近三日账单</text>
+				</view>
 			</view>
 			<!-- 组件：账单卡片 -->
 			<view v-for="index in 3" :key="index">
@@ -57,8 +59,13 @@
 		</view>
 		<view class="asset" v-if="isIndexShow">
 			<view class="header">
-				<uni-icons type="wallet" size="48rpx" color="#212121"></uni-icons>
-				<text>我的资产</text>
+				<view class="left">
+					<uni-icons type="wallet" size="48rpx" color="#212121"></uni-icons>
+					<text>我的资产</text>
+				</view>
+				<view class="right" @click="toMyAssets">
+					管理
+				</view>
 			</view>
 			<mj-asset-card :userAssetsFromDB="userAssets" :isEyeShow="isEyeShow" ></mj-asset-card>
 		</view>
@@ -111,6 +118,11 @@
 		methods: {
 			clickEye() {
 				this.isEyeShow = !this.isEyeShow
+			},
+			toMyAssets() {
+				uni.navigateTo({
+					url:"/pagesMy/my-assets/my-assets"
+				})
 			},
 			swiperChange(res) {
 				this.isIndexShow = res.detail.current
@@ -259,10 +271,26 @@
 				padding-left: 12rpx;
 				display: flex;
 				align-items: center;
-				color: #000;
+				justify-content: space-between;
+				color: $mj-text-color;
 				font-size: 32rpx;
 				text {
 					padding-left: 8rpx;
+				}
+				.left {
+					display: flex;
+					align-items: center;
+				}
+				.right {
+					display: flex;
+					align-items: center;
+					box-sizing: border-box;
+					padding: 4px 8px;
+					margin-right: 8px;
+					background-color: $mj-theme-color;
+					border-radius: 16px;
+					font-size: 28rpx;
+					color: $mj-bg-color;
 				}
 			}
 		}

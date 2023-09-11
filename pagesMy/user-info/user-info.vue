@@ -11,7 +11,7 @@
 						Hi {{userInfo.nickname || '朋友'}}
 					</view>
 					<view class="day">
-						2022年4月加入妙记
+						{{registerDateForTitle}}加入妙记
 					</view>
 				</view>
 			</view>
@@ -48,9 +48,10 @@
 				userInfo: {
 					avatarSrc: '',
 					nickname: '',
-					registerDate: 0,
+					registerDate: '',  //格式为 yyyy-mm-dd
 					userLabel: '00000001'
 				},
+				registerDateForTitle: '', //格式为 yyyy年mm
 				showNicaNamePop: false,
 				popStyle: {
 					'box-sizing': 'border-box',
@@ -104,7 +105,9 @@
 				// 使用注册日期计算出会员编号
 				const userLabel = Math.round(registerDate * 3 / 200000).toString()
 				// 注册日期格式化
+				this.registerDateForTitle = uni.$u.timeFormat(registerDate,'yyyy年mm月')
 				registerDate = uni.$u.timeFormat(registerDate,'yyyy-mm-dd')
+				
 				
 				const objTemp = {avatarSrc, nickname, registerDate, userLabel}
 				if(!this.compareObjects(userInfoFromStorage,objTemp)) {

@@ -105,7 +105,6 @@
 					} else {
 						this.showPrivacyAuthorize = true
 					}
-					console.log(res);
 				}
 			})
 		},
@@ -241,6 +240,7 @@
 			}
 		}
 		.btn {
+			margin-bottom: 10px;
 			box-sizing: border-box;
 			padding: 0 20rpx;
 			display: flex;

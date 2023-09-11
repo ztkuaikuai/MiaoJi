@@ -1,4 +1,0 @@
-{
-	// 开启分包优化
-	"optimization":{"subPackages":true}
-}
