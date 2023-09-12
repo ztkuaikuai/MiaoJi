@@ -4,7 +4,7 @@
 		<view class="content">
 			<!-- 滑动单元格 -->
 			<u-swipe-action>
-				<u-swipe-action-item :options="options" v-for="asset in userAssetsShow" :key="asset._id" :threshold="80" @click="clickSwipeActionItemBtn($event,asset)" >
+				<u-swipe-action-item :options="options" v-for="asset,index in userAssetsShow" :key="asset._id" :threshold="80" @click="clickSwipeActionItemBtn($event,asset)" >
 					<view class="swipe-action-item">
 						<view class="left">
 							<mj-icon-with-background :type="asset.assetStyle.icon" size="48rpx" customPrefix="miaoji" :color="asset.assetStyle.color"></mj-icon-with-background>
@@ -21,7 +21,7 @@
 							</view>
 						</view>
 					</view>
-					<view class="line" v-if="item != 2">
+					<view class="line" v-if="index != userAssetsShow.length - 1">
 						<u-line length="80%"></u-line>
 					</view>
 				</u-swipe-action-item>
@@ -30,7 +30,7 @@
 		<view class="hideAsset" @click="clickHideAsset">查看隐藏资产</view>
 		
 		<!-- 隐藏资产弹出框 -->
-		<u-popup :show="showHideAsset" @close="showHideAsset = false" round="20px" :safeAreaInsetBottom="false" > 
+		<u-popup :show="showHideAsset" @close="showHideAsset = false" round="20px" :safeAreaInsetBottom="safeAreaInsetBottom" > 
 			<view>
 				<view class="top">小金库</view>
 				<view v-if="userAssetsHide.length">
@@ -72,7 +72,7 @@
 	
 	export default {
 		name: "mj-asset-card",
-		props: ['userAssetsFromDB','isEyeShow'],
+		props: ['userAssetsFromDB','isEyeShow','safeAreaInsetBottom'],
 
 		data() {
 			return {
@@ -94,6 +94,20 @@
 				showHideAsset: false,
 				showBalance: true,
 			};
+		},
+		computed: {
+			userAssetsShow() {
+				return this.assets.filter(item => item.hide_in_interface == false)
+			},
+			// 隐藏资产，一定不计入总资产
+			userAssetsHide() {
+				return this.assets.filter(item => item.hide_in_interface == true)
+			}
+		},
+		onReady() {
+			// console.log('onReady',this.userAssetsFromDB);
+			this.assetsStyle = ICONCONFIG.getAssetsStyle()
+			this.addAssetStyle()
 		},
 		methods: {
 			clickSwipeActionItemBtn({index},asset) { // 0 点击了修改  1 点击了删除
@@ -136,20 +150,6 @@
 				})
 				// console.log('addAssetStyle',this.assets);
 			}
-		},
-		computed: {
-			userAssetsShow() {
-				return this.assets.filter(item => item.hide_in_interface == false)
-			},
-			// 隐藏资产，一定不计入总资产
-			userAssetsHide() {
-				return this.assets.filter(item => item.hide_in_interface == true)
-			}
-		},
-		onReady() {
-			console.log('onReady',this.userAssetsFromDB);
-			this.assetsStyle = ICONCONFIG.getAssetsStyle()
-			this.addAssetStyle()
 		},
 		watch: {
 			userAssetsFromDB: {

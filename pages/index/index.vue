@@ -56,6 +56,9 @@
 			<view v-for="index in 3" :key="index">
 				<mj-bill-card :userBillsFromDB="userBills[index].data" :userAssetsFromDB="userAssets" :indexTemp="index"></mj-bill-card>
 			</view>
+			<view v-show="userBillsCount === 0">
+				<u-empty mode="list" text="近日没有账单哦,快去记一笔吧"></u-empty>
+			</view>
 		</view>
 		<view class="asset" v-if="isIndexShow">
 			<view class="header">
@@ -67,7 +70,7 @@
 					管理
 				</view>
 			</view>
-			<mj-asset-card :userAssetsFromDB="userAssets" :isEyeShow="isEyeShow" ></mj-asset-card>
+			<mj-asset-card :userAssetsFromDB="userAssets" :isEyeShow="isEyeShow" :safeAreaInsetBottom="false"></mj-asset-card>
 		</view>
 		<!-- 固定定位，最底下 -->
 		<view class="bottom-btn" >
@@ -98,6 +101,17 @@
 				// 筛选出计入总资产的资产项
 				let userAssetsIncludeInTotalAssets = this.userAssets.filter(item => item.include_in_total_assets == true)
 				return userAssetsIncludeInTotalAssets.reduce((lastValue, currentArr) => lastValue + currentArr.asset_balance , 0)
+			},
+			// 计算近三日账单个数
+			userBillsCount() {
+				let count = 0
+				for (const bills of this.userBills) {
+					for(const data of bills.data) {
+						// 如果有账单，则count++
+						count ++
+					}
+				}
+				return count
 			}
 		},
 		onReady() {
@@ -192,11 +206,12 @@
 				const res = await db.collection("mj-user-assets").where(" user_id == $cloudEnv_uid ").get()
 				this.userAssets = []
 				this.userAssets = res.result.data
-				// 如果用户资产列表为空，则创建默认资产
+				// 如果用户资产列表为空，则创建默认资产，并且设置记账使用的默认资产
 				if(!this.userAssets.length) {
 					await db.collection("mj-user-assets").add({
 						asset_type: 'default',
-						asset_balance: 0
+						asset_balance: 0,
+						default_asset: true
 					})
 					const defalutAsset = await db.collection("mj-user-assets").where(" user_id == $cloudEnv_uid ").get()
 					this.userAssets = []

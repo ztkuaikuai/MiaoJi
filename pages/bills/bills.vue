@@ -30,6 +30,9 @@
 			<view v-for="index in 31" :key="index">
 				<mj-bill-card :userBillsFromDB="userBillsByDay[index]" :userAssetsFromDB="userAssets" :indexTemp="index"></mj-bill-card>
 			</view>
+			<view v-show="userBillsCount === 0">
+				<u-empty mode="list" text="没有找到符合条件的账单哦,快去记一笔吧"></u-empty>
+			</view>
 		</view>
 	</view>
 </template>
@@ -91,6 +94,18 @@
 				},
 				firstEntry: true
 			};
+		},
+		computed: {
+			// 计算账单个数
+			userBillsCount() {
+				let count = 0
+				console.log('userBills',this.userBills);
+				for (const bills of this.userBills) {
+					// 如果有账单，则count++
+					count ++
+				}
+				return count
+			}
 		},
 		async onReady() {
 			const state = UT.checkUserTokenExpierd() // 检查老用户的token是否过期，如果过期则跳转登录，并返回true；没过期返回false

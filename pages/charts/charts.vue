@@ -35,9 +35,15 @@
 		<!-- 组件放置位置，传递分类，分类支出，交易数量信息进去，渲染分类百分比卡片 -->
 		<view v-if="type === '月支出'" class="card-category">
 			<mj-category-card :categoryListFromChart="expendCategoryList" ></mj-category-card>
+			<view v-show="!expendCategoryList.length">
+				<u-empty mode="list" text="没有找到符合条件的账单哦,快去记一笔吧"></u-empty>
+			</view>
 		</view>
-		<view v-else class="card-category">
+		<view v-if="type === '月收入'" class="card-category">
 			<mj-category-card :categoryListFromChart="incomeCategoryList" ></mj-category-card>
+			<view v-show="!incomeCategoryList.length">
+				<u-empty mode="list" text="没有找到符合条件的账单哦,快去记一笔吧"></u-empty>
+			</view>
 		</view>
 	</view>
 </template>
@@ -268,14 +274,16 @@
 						groupedBills[groupName].sort((a, b) => b.total_amount - a.total_amount);
 					}
 				}
-				// 存入相应对象
-				this.expendCategoryList = groupedBills.group0
-				this.incomeCategoryList = groupedBills.group1
+				// 存入相应数组
+				this.expendCategoryList = groupedBills.group0 || []
+				this.incomeCategoryList = groupedBills.group1 || []
+				
+				
 			},
 			// 整理数据，渲染图表
 			getChartData(categoryData) {
 				let res = {}
-				if(categoryData) {
+				if(categoryData.length) {
 					// 如果传递过来的值不为空数组
 					const allIconList = ICONCONFIG.getAllIconList()
 					// 整理好的数据放入data内

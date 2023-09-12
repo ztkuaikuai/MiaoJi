@@ -378,6 +378,13 @@
 					})
 					return
 				}
+				if(!this.expendOrIncomeInfo.asset_id) {
+					uni.showToast({
+						title:"请选择资产",
+						icon:"none"
+					})
+					return
+				}
 				this.expendOrIncomeInfo.bill_amount = Math.round(this.keyboardInfo.balance * 100)
 				this.expendOrIncomeInfo.bill_notes =this.keyboardInfo.notes
 				await db.collection("mj-user-bills").add({
@@ -651,10 +658,10 @@
 				this.categoryIconListForExpend = ICONCONFIG.getCategoryIconListForExpend()
 				this.categoryIconListForIncome = ICONCONFIG.getCategoryIconListForIncome()
 				this.userAssets = uni.getStorageSync('mj-user-assets')
-				this.expendOrIncomeInfo.asset_id = this.userAssets[0]._id
+				this.expendOrIncomeInfo.asset_id = this.userAssets.filter(asset => asset.default_asset === true)[0]?._id ?? ''
 				this.assetsStyle = ICONCONFIG.getAssetsStyle()
 				this.addAssetStyle()
-				this.currentAssetTitle = this.userAssets[0].assetStyle.title
+				this.currentAssetTitle = this.userAssets.filter(asset => asset.default_asset === true)[0]?.assetStyle.title ?? '未选择资产'
 				// console.log('onLoad,initPage:用户资产列表',this.userAssets);
 			},
 			// 给userAssets添加type值对应的assetStyle

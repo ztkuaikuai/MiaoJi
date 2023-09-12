@@ -1,6 +1,6 @@
 {
 	"bsonType": "object",
-	"required": ["user_id","asset_type","asset_creation_date","asset_balance","hide_in_interface","include_in_total_assets"],
+	"required": ["user_id","asset_type","asset_creation_date","asset_balance","hide_in_interface","include_in_total_assets","default_asset"],
 	"permission": {
 		"read": "doc.user_id == auth.uid",
 		"create": " 'USER' in auth.role",
@@ -44,6 +44,11 @@
 			"bsonType": "bool",
 			"description": "是否计入总资产",
 			"defaultValue": true
+		},
+		"default_asset": {
+			"bsonType": "bool",
+			"description": "记账使用的默认资产",
+			"defaultValue": false
 		},
 		"asset_name": {
 			"bsonType": "string",
