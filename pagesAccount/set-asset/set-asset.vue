@@ -57,7 +57,7 @@
 
 <script>
 	import colorGradient from '../../uni_modules/uview-ui/libs/function/colorGradient';
-	import ICONCONFIG from "@/utils/icon-config.js";
+	import {getAssetsStyle} from "@/utils/icon-config.js";
 	const db = uniCloud.database()
 
 	export default {
@@ -72,7 +72,7 @@
 					include_in_total_assets: true,
 					asset_type: '',
 				},
-				// 所有资产的数据  从本地缓存中获取，如果获取不到，向工具库中ICONCONFIG获取
+				// 所有资产的数据  从本地缓存中获取，如果获取不到，向工具库中icon-config获取
 				assetsStyle: [],
 				// 用户选择的资产，渲染页面用的数据
 				asset: {},
@@ -103,7 +103,7 @@
 		},
 		onLoad( {type} ) {
 			this.type = type
-			this.assetsStyle = ICONCONFIG.getAssetsStyle()
+			this.assetsStyle = getAssetsStyle()
 			const arr = this.assetsStyle.filter(item => {
 				return item.type == type
 			})

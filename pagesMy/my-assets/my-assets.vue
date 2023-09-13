@@ -47,7 +47,7 @@
 </template>
 
 <script>
-	import ICONCONFIG from "@/utils/icon-config.js";
+	import {getAssetsStyle} from "@/utils/icon-config.js";
 	const db = uniCloud.database()
 	export default {
 		data() {
@@ -74,7 +74,7 @@
 		},
 		methods: {
 			addAssetStyle() {
-				const assetsStyle = ICONCONFIG.getAssetsStyle()
+				const assetsStyle = getAssetsStyle()
 				this.userAssets.forEach(asset => {
 					asset.assetStyle = assetsStyle.find(item => item.type === asset.asset_type)
 				})

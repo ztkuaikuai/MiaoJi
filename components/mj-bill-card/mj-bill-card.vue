@@ -40,7 +40,7 @@
 </template>
 
 <script>
-	import ICONCONFIG from "@/utils/icon-config.js";
+	import {getAllIconList, getAssetsStyle} from "@/utils/icon-config.js";
 	const db = uniCloud.database()
 	export default {
 		name: "mj-bill-card",
@@ -159,9 +159,9 @@
 		},
 		onReady() {
 			// 获取所有icon样式
-			this.iconGather = ICONCONFIG.getAllIconList()
+			this.iconGather = getAllIconList()
 			// 获取资产样式
-			this.assetsStyle = ICONCONFIG.getAssetsStyle()
+			this.assetsStyle = getAssetsStyle()
 		},
 		watch: {
 			userBillsFromDB: {

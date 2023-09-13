@@ -50,7 +50,7 @@
 
 <script>
 	import UT from '@/utils/user-state.js'
-	import ICONCONFIG from '@/utils/icon-config.js'
+	import {getAllIconList} from '@/utils/icon-config.js'
 	const db = uniCloud.database()
 	export default {
 		data() {
@@ -132,16 +132,17 @@
 			if (state) return
 			// console.log("用户token没过期，继续执行下面的逻辑");
 
-			// 初始化
-			// 获得用户当月账单
-			await this.getUserBills()
-			this.getChartData(this.expendCategoryList);
+			// 如果用户登录了，进行初始化
+			const {uid} = uniCloud.getCurrentUserInfo()
+			if (uid) {
+				// 获得用户当月账单
+				await this.getUserBills()
+				this.getChartData(this.expendCategoryList);
+			}
 		},
 		async onShow() {
 			// 判断用户是否登录，如果未登录 则跳转到登录页
-			const {
-				uid
-			} = uniCloud.getCurrentUserInfo()
+			const {uid} = uniCloud.getCurrentUserInfo()
 			if (!uid) {
 				uni.redirectTo({
 					url: "/uni_modules/uni-id-pages/pages/login/login-withoutpwd"
@@ -285,7 +286,7 @@
 				let res = {}
 				if(categoryData.length) {
 					// 如果传递过来的值不为空数组
-					const allIconList = ICONCONFIG.getAllIconList()
+					const allIconList = getAllIconList()
 					// 整理好的数据放入data内
 					let data = []
 					for (const categoryList of categoryData) {
@@ -343,6 +344,20 @@
 					this.getChartData(this.expendCategoryList)
 				}
 			},
+		},
+		// 分享功能
+		onShareAppMessage () {
+			return {
+				title: "妙记——记录你的生活",
+				path: "/pages/index/index",
+				imageUrl: "/static/share.png"
+			}
+		},
+		// 分享到朋友圈功能
+		onShareTimeline(){
+			return {
+				title: '妙记——记录你的生活'
+			}
 		}
 	}
 </script>

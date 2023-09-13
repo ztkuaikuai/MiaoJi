@@ -33,7 +33,33 @@
 					</view>
 				</view>
 			</mj-card>
+			<mj-card title="未来更新计划">
+				<view class="one-update">
+					<view class="row">
+						- 添加分享给朋友和朋友圈功能
+					</view>
+					<view class="row">
+						- 添加模板记账功能
+					</view>
+					<view class="row">
+						- 记一笔页面添加秒记和再记功能
+					</view>
+					<view class="row">
+						- 添加筛选功能
+					</view>
+					<view class="row">
+						- 添加定时记账功能
+					</view>
+					<view class="row">
+						- 添加预算设置功能
+					</view>
+					<view class="row">
+						- 添加主题配色功能
+					</view>
+				</view>
+			</mj-card>
 		</view>
+		<u-safe-bottom></u-safe-bottom>
 	</view>
 </template>
 

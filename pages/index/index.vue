@@ -119,14 +119,22 @@
 			if(state) return
 			// console.log("用户token没过期，继续执行下面的逻辑");
 			
-			// 获取用户3日账单列表
-			this.getUserBills()
+			// 判断用户是否登录，如果未登录，说明是新用户；如果登录了 则获取账单、资产
+			const {uid} = uniCloud.getCurrentUserInfo()
+			if (!uid) {
+				
+			} else {
+				// 获取用户3日账单列表
+				this.getUserBills()
+				// 获取用户资产列表
+				this.getUserAssets()
+				// 获取用户本月支出和本月收入
+				this.getUserMonthlyBillBalance()
+			}
+			
+			// 绑定全局事件：更新账单、资产、月支出月收入
 			uni.$on('updateBillsList',this.getUserBills)
-			// 获取用户资产列表
-			this.getUserAssets()
 			uni.$on('updateAssetsList',this.getUserAssets)
-			// 获取用户本月支出和本月收入
-			this.getUserMonthlyBillBalance()
 			uni.$on('updateMonthlyBillBalance',this.getUserMonthlyBillBalance)
 		},
 		methods: {
@@ -166,7 +174,7 @@
 				this.userBills.forEach(item => {
 					item.data.forEach(bill => bill.bill_amount /= 100)
 				})
-				console.log('userBills',this.userBills)
+				// console.log('userBills',this.userBills)
 				uni.setStorage({
 					key:'mj-user-bills',
 					data: this.userBills
@@ -230,6 +238,20 @@
 			uni.$off('updateAssetsList')
 			uni.$off('updateBillsList')
 			uni.$off('updateMonthlyBillBalance')
+		},
+		// 分享功能
+		onShareAppMessage () {
+			return {
+				title: "妙记——记录你的生活",
+				path: "/pages/index/index",
+				imageUrl: "/static/share.png"
+			}
+		},
+		// 分享到朋友圈功能
+		onShareTimeline(){
+			return {
+				title: '妙记——记录你的生活'
+			}
 		}
 	}
 </script>

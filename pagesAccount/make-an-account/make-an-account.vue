@@ -149,7 +149,7 @@
 </template>
 
 <script>
-	import ICONCONFIG from "@/utils/icon-config.js";
+	import {getCategoryIconListForExpend, getCategoryIconListForIncome, getAssetsStyle} from "@/utils/icon-config.js";
 	const db = uniCloud.database()
 	export default {
 		data() {
@@ -655,11 +655,11 @@
 			// 初始化相关方法
 			initPage() {
 				// 获取分类列表，该用户所有资产信息，将用户资产信息添加对应资产icon样式
-				this.categoryIconListForExpend = ICONCONFIG.getCategoryIconListForExpend()
-				this.categoryIconListForIncome = ICONCONFIG.getCategoryIconListForIncome()
+				this.categoryIconListForExpend = getCategoryIconListForExpend()
+				this.categoryIconListForIncome = getCategoryIconListForIncome()
 				this.userAssets = uni.getStorageSync('mj-user-assets')
 				this.expendOrIncomeInfo.asset_id = this.userAssets.filter(asset => asset.default_asset === true)[0]?._id ?? ''
-				this.assetsStyle = ICONCONFIG.getAssetsStyle()
+				this.assetsStyle = getAssetsStyle()
 				this.addAssetStyle()
 				this.currentAssetTitle = this.userAssets.filter(asset => asset.default_asset === true)[0]?.assetStyle.title ?? '未选择资产'
 				// console.log('onLoad,initPage:用户资产列表',this.userAssets);

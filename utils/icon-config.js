@@ -186,6 +186,7 @@ function getAssetsStyle() {
 	}
 }
 
+
 function getAllIconList() {
 	let allIconList = []
 	// 缓存中是否有分类-支出样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
@@ -217,7 +218,15 @@ function getAllIconList() {
 	return allIconList
 }
 
-export default {
+// 注:export default 不可以在导入时使用解构赋值
+// export default {
+// 	getCategoryIconListForExpend,
+// 	getCategoryIconListForIncome,
+// 	getAssetsStyle,
+// 	getAllIconList
+// }
+// 修改: 使用export进行按需导入
+export {
 	getCategoryIconListForExpend,
 	getCategoryIconListForIncome,
 	getAssetsStyle,

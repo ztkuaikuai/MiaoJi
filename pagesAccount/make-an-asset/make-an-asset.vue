@@ -9,7 +9,7 @@
 </template>
 
 <script>
-	import ICONCONFIG from "@/utils/icon-config.js";
+	import {getAssetsStyle} from "@/utils/icon-config.js";
 	
 	export default {
 		data() {
@@ -25,7 +25,7 @@
 			},
 		},
 		onLoad() {
-			this.assetsStyle = ICONCONFIG.getAssetsStyle()
+			this.assetsStyle = getAssetsStyle()
 		}
 	}
 </script>
