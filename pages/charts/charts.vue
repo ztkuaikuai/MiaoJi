@@ -142,7 +142,9 @@
 		},
 		async onShow() {
 			// 判断用户是否登录，如果未登录 则跳转到登录页
-			const {uid} = uniCloud.getCurrentUserInfo()
+			const {
+				uid
+			} = uniCloud.getCurrentUserInfo()
 			if (!uid) {
 				uni.redirectTo({
 					url: "/uni_modules/uni-id-pages/pages/login/login-withoutpwd"
@@ -278,7 +280,6 @@
 				// 存入相应数组
 				this.expendCategoryList = groupedBills.group0 || []
 				this.incomeCategoryList = groupedBills.group1 || []
-				
 				
 			},
 			// 整理数据，渲染图表
