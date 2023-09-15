@@ -3,7 +3,7 @@
 		<view class="logo">
 			<u--image src="/static/logo.png" width="72px" height="72px" radius="20px" ></u--image>
 			<view class="version">
-				版本号：0.7.5 (Early Access)
+				版本号：0.7.6 (Early Access)
 			</view>
 		</view>
 		<view class="main">
@@ -18,6 +18,20 @@
 				</view>
 			</mj-card>
 			<mj-card title="版本更新说明">
+				<view class="one-update">
+					<view class="title highlight">
+						0.7.6 —— 9月15日更新
+					</view>
+					<view class="row">
+						- 优化首次进入小程序的体验
+					</view>
+					<view class="row">
+						- 添加分享朋友和朋友圈功能
+					</view>
+					<view class="row">
+						- 添加账单详情弹出框
+					</view>
+				</view>
 				<view class="one-update">
 					<view class="title highlight">
 						0.7.5 —— 9月12日更新

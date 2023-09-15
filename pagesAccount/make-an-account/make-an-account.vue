@@ -238,6 +238,28 @@
 				isEdit: false,
 			};
 		},
+		computed: {
+			bill_type: {
+				get() {
+					return this.expendOrIncomeInfo.bill_type
+				},
+				set(value) {
+					this.expendOrIncomeInfo.bill_type = value
+				}
+			},
+			category_type: {
+				get() {
+					return this.expendOrIncomeInfo.category_type
+				},
+				set(value) {
+					this.expendOrIncomeInfo.category_type = value
+				}
+			}
+		},
+		onLoad({type,tab}) {
+			this.initPage()
+			this.initEditPage(type,tab)
+		},
 		methods: {
 			clickTab({index}) {  // 0 支出  1 收入  2 转账
 				// 如果点击的是当前所在tab,return
@@ -718,30 +740,7 @@
 					}
 				}
 			},
-			
 		},
-		onLoad({type,tab}) {
-			this.initPage()
-			this.initEditPage(type,tab)
-		},
-		computed: {
-			bill_type: {
-				get() {
-					return this.expendOrIncomeInfo.bill_type
-				},
-				set(value) {
-					this.expendOrIncomeInfo.bill_type = value
-				}
-			},
-			category_type: {
-				get() {
-					return this.expendOrIncomeInfo.category_type
-				},
-				set(value) {
-					this.expendOrIncomeInfo.category_type = value
-				}
-			}
-		}
 		
 	}
 </script>
