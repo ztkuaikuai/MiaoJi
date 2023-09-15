@@ -35,7 +35,7 @@
 					</view>
 				</u-swipe-action-item>
 			</u-swipe-action>
-			<mj-bill-details-popup  
+			<mj-bill-details-popup
 				:bill="billDetails"
 				:show="showBillDetails" 
 				@close="showBillDetails = false" 
@@ -52,7 +52,7 @@
 	const db = uniCloud.database()
 	export default {
 		name: "mj-bill-card",
-		props: ['userBillsFromDB','userAssetsFromDB','indexTemp'],
+		props: ['userBillsFromDB','userAssetsFromDB'],
 		// userBillsFromDB 中金额单位为元
 		data() {
 			return {
@@ -71,13 +71,27 @@
 				}],
 				userBills: [],
 				userAssets: [],
-				iconGather: [],
-				assetsStyle: [],
+				iconGather: getAllIconList(),
+				assetsStyle: getAssetsStyle(),
 				today: '',
 				// 账单详情 
 				billDetails: {},
 				showBillDetails: false
 			};
+		},
+		computed: {
+			// 支出 = 支出 + 手续费
+			totalExpenditure() {
+				const expendBills = this.userBills.filter(bill => bill.bill_type === 0)
+				const transferBills = this.userBills.filter(bill => bill.bill_type === 2)
+				return (expendBills.reduce((prev,next) => prev + next.bill_amount ,0) + transferBills.reduce((prev,next) => prev + next.bill_amount ,0)).toFixed(2)
+			},
+			// 收入
+			totalIncome() {
+				const incomeBills = this.userBills.filter(bill => bill.bill_type === 1)
+				return incomeBills.reduce((prev,next) => prev + next.bill_amount ,0).toFixed(2)
+			}
+			
 		},
 		methods: {
 			clickBillDetail(bill) {
@@ -191,20 +205,18 @@
 				if(this.today === uni.$u.timeFormat(Date.now() - 172800000, 'mm月dd日')) this.today += ' 前天'
 			}
 		},
-		onReady() {
-			// 获取所有icon样式
-			this.iconGather = getAllIconList()
-			// 获取资产样式
-			this.assetsStyle = getAssetsStyle()
-		},
 		watch: {
 			userBillsFromDB: {
 				deep:true,
+				immediate: true,
 				handler(newValue) {
+					if(!newValue?.length) {
+						this.userBills = []
+						return
+					}
 					this.userBills = newValue
-					// console.log('监听userBillsFromDB',this.userBills );
+					
 					// 通过type给每一条添加对应billStyle
-					if(!this.userBills) this.userBills = []
 					this.userBills.forEach(bill => {
 						bill.billStyle = this.iconGather.find(item => item.type === bill.category_type)
 					})
@@ -212,31 +224,18 @@
 					this.userBills.forEach(bill => {
 						bill.assetStyle = this.assetsStyle.find(item => item.type === bill.asset_id[0]?.asset_type)  // 如果账单对应的资产被用户删除，则不赋值
 					})
-					// console.log('userBills',this.userBills);
 					this.setToday()
+					console.log('监听userBillsFromDB，赋值userbills',this.userBills );
 				}
 			},
 			userAssetsFromDB: {
 				deep:true,
+				immediate: true,
 				handler(newValue) {
 					this.userAssets = newValue
 				}
 			}
 		},
-		computed: {
-			// 支出 = 支出 + 手续费
-			totalExpenditure() {
-				const expendBills = this.userBills.filter(bill => bill.bill_type === 0)
-				const transferBills = this.userBills.filter(bill => bill.bill_type === 2)
-				return (expendBills.reduce((prev,next) => prev + next.bill_amount ,0) + transferBills.reduce((prev,next) => prev + next.bill_amount ,0)).toFixed(2)
-			},
-			// 收入
-			totalIncome() {
-				const incomeBills = this.userBills.filter(bill => bill.bill_type === 1)
-				return incomeBills.reduce((prev,next) => prev + next.bill_amount ,0).toFixed(2)
-			}
-			
-		}
 	}
 </script>
 

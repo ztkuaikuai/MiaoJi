@@ -27,9 +27,12 @@
 				<text>账单明细</text>
 			</view>
 			<!-- 需要 到达底部钩子，按需加载 -->
-			<view v-for="index in 31" :key="index">
-				<mj-bill-card :userBillsFromDB="userBillsByDay[index]" :userAssetsFromDB="userAssets" :indexTemp="index"></mj-bill-card>
-			</view>
+			<!-- 延迟加载 -->
+			<template v-if="!delay">
+				<view v-for="index in 31" :key="index">
+					<mj-bill-card :userBillsFromDB="userBillsByDay[index]" :userAssetsFromDB="userAssets"></mj-bill-card>
+				</view>
+			</template>
 			<view v-show="userBillsCount === 0">
 				<u-empty mode="list" text="没有找到符合条件的账单哦,快去记一笔吧"></u-empty>
 			</view>
@@ -92,7 +95,8 @@
 					monthlyExpend: 0,
 					monthlyIncome: 0
 				},
-				firstEntry: true
+				firstEntry: true,
+				delay: true
 			};
 		},
 		computed: {
@@ -119,7 +123,7 @@
 				await this.getUserBills()
 				// 获取用户资产列表
 				this.getUserAssets()
-				// 获取报表数据
+				// 获取报表数据 ，延迟渲染账单数据，在报表中delay = false
 				this.getChartData()
 				uni.$on('updateBillPage',this.upDateMonthBills)
 			}
@@ -273,6 +277,8 @@
 				}
 				
 				this.chartsDataColumn=result
+				// 延迟渲染账单列表
+				this.delay = false
 			},
 			// 触发日期选择器
 			pickDate(res) {

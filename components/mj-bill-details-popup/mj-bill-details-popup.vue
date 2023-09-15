@@ -113,7 +113,7 @@
 		computed: {
 			billDetails() {
 				const bill = this.bill
-				console.log("computed billDetails",bill);
+				// console.log("computed billDetails",bill);
 				if(bill.bill_type === 2) {
 					// 如果类型为转账
 					bill.transfer_amount /= 100
