@@ -19,13 +19,13 @@
 						</view>
 						<view class="right">
 							<view class="money" v-if="bill.bill_type === 0">
-								<u--text mode="price" :text="bill.bill_amount" color="#dd524d" size="32rpx"bold></u--text>
+								<u--text mode="price" :text="bill.bill_amount" color="#dd524d" size="32rpx" bold></u--text>
 							</view>
 							<view class="money" v-if="bill.bill_type === 1">
-								<u--text mode="price" :text="bill.bill_amount" color="#219a6d" size="32rpx"bold></u--text>
+								<u--text mode="price" :text="bill.bill_amount" color="#219a6d" size="32rpx" bold></u--text>
 							</view>
 							<view class="money" v-if="bill.bill_type === 2">
-								<u--text mode="price" :text="(bill.transfer_amount / 100)" color="#212121" size="32rpx"bold></u--text>
+								<u--text mode="price" :text="(bill.transfer_amount / 100)" color="#212121" size="32rpx" bold></u--text>
 							</view>
 							<view class="minor">{{bill.assetStyle.title}}</view>
 						</view>

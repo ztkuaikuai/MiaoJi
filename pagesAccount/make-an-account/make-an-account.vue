@@ -542,7 +542,7 @@
 						transfer_amount: this.transferAccountInfo.transfer_amount
 					})
 					// 返还资金模块
-					console.log('返还资金模块');
+					// console.log('返还资金模块');
 					await this.updateInitAssetsBalance()
 					// 更新金额模块
 					await this.upDateUserTwoAssetBalance()
@@ -688,7 +688,7 @@
 					this.editInitBill.destination_asset_id = this.editInitBill.destination_asset_id[0]?._id ?? ''
 					// 修改transfer_amount的单位
 					this.editInitBill.transfer_amount ? this.editInitBill.transfer_amount /= 100 : ''
-					console.log('editInitBill',this.editInitBill);
+					// console.log('editInitBill',this.editInitBill);
 					// 修改keyboard的数据
 					// 修改日期事件
 					this.userChooseDate = uni.$u.timeFormat(this.editInitBill.bill_date, 'mm月dd日')

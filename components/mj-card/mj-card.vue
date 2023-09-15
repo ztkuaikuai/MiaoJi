@@ -1,6 +1,6 @@
 <template>
 	<view class="card">
-		<uni-section :title="title" type="line" titleFontSize="28rpx" titleColor="#212121" white="true"></uni-section>
+		<uni-section :title="title" type="line" :titleFontSize="titleFontSize" titleColor="#212121" white="true"></uni-section>
 		<view class="slot">
 			<slot></slot>
 		</view>
@@ -18,6 +18,10 @@
 			title: {
 				type: String,
 				default: ''
+			},
+			titleFontSize: {
+				type: String,
+				default: '32rpx'
 			}
 		}
 	}
@@ -26,10 +30,12 @@
 <style lang="scss" scoped>
 .card {
 	box-sizing: border-box;
+	overflow: hidden;
+	border-radius: 20px;
 	margin: 24rpx 20rpx;
 	background-color: #fff;
 	display: block;
 	padding: 0 16rpx 16rpx;
-	box-shadow: rgba(0, 0, 0, 0.03) 2.4px 2.4px 3.2px;
+	box-shadow: rgba(0, 0, 0, 0.03) 2.4px 2.4px 4.8px;
 }
 </style>

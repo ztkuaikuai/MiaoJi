@@ -91,7 +91,7 @@
 		.about-textarea {
 			text-indent: 2em;
 			font-size: 32rpx;
-			color: $mj-text-color;
+			color: $mj-text-color-grey;
 			line-height: 48rpx;
 		}
 		.highlight {
@@ -100,7 +100,7 @@
 		}
 		.one-update {
 			font-size: 32rpx;
-			color: $mj-text-color;
+			color: $mj-text-color-grey;
 			line-height: 48rpx;
 			.title {
 				font-size: 36rpx;

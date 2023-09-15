@@ -22,7 +22,7 @@
 		<!-- 修改了uni-section的样式，背景色和装饰line颜色改变,padding -->
 		<view class="options">
 			<!-- 常用功能 -->
-			<uni-section class="section" title="常用功能" type="line" titleFontSize="28rpx"
+			<uni-section class="section" title="常用功能" type="line" titleFontSize="32rpx"
 				titleColor="#212121"></uni-section>
 			<!-- grid组件 -->
 			<u-grid :border="false" @click="clickOption" col="4">
@@ -36,7 +36,7 @@
 				</u-grid-item>
 			</u-grid>
 			<!-- 偏好 -->
-			<uni-section class="section" title="偏好" type="line" titleFontSize="28rpx"
+			<uni-section class="section" title="偏好" type="line" titleFontSize="32rpx"
 				titleColor="#212121"></uni-section>
 			<u-grid :border="false" @click="clickLike" col="4">
 				<u-grid-item v-for="item,index in likeList" :key="index" >
@@ -50,7 +50,7 @@
 			</u-grid>
 
 			<!-- 其他 -->
-			<uni-section class="section" title="其他" type="line" titleFontSize="28rpx"
+			<uni-section class="section" title="其他" type="line" titleFontSize="32rpx"
 				titleColor="#212121"></uni-section>
 			<u-cell-group :border="false">
 				<u-cell title="反馈问题" :isLink="true" @click="clickFeedback">
@@ -145,24 +145,32 @@
 				})
 			},
 			clickOption(index) {
-				// console.log("点击了常用功能", index)
-				if(index === 0) {
-					uni.navigateTo({
-						url:"/pagesMy/my-assets/my-assets"
-					})
-				} else {
-					uni.showToast({
-						title:"正在开发中~",
-						icon: "none"
-					})
+				switch (index) {
+					case 0:
+						uni.navigateTo({
+							url:"/pagesMy/my-assets/my-assets"
+						})
+						break
+					case 1:
+						uni.navigateTo({
+							url:"/pagesMy/bill-template/bill-template"
+						})
+						break
+					default:
+						uni.showToast({
+							title:"正在开发中~",
+							icon: "none"
+						})
 				}
 			},
-			clickLike(name) {
-				// console.log("点击了偏好", name);
-				uni.showToast({
-					title:"正在开发中~",
-					icon: "none"
-				})
+			clickLike(index) {
+				switch (index) {
+					default:
+						uni.showToast({
+							title:"正在开发中~",
+							icon: "none"
+						})
+				}
 			},
 			clickFeedback() {
 				uni.navigateTo({

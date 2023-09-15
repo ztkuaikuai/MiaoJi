@@ -1,11 +1,11 @@
 <template>
 	<view class="my-assets">
-		<mj-card title="净资产(元)——包含隐藏资产">
+		<mj-card title="净资产(元)——包含隐藏资产" titleFontSize="28rpx">
 			<view class="moneyContent">
 				<u--text mode="price" :text="totalAssets" size="56rpx" color="#219a6d"></u--text>
 			</view>
 		</mj-card>
-		<mj-card title="资产设置">
+		<mj-card title="资产设置" titleFontSize="28rpx">
 			<u-cell-group :border="false">
 				<u-cell  title="选择默认资产" label="记账页默认选择的资产账户" :border="false" :clickable="true" @click="chooseDefaultAsset">
 					<view slot="value" class="defaultAsset">
