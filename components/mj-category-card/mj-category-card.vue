@@ -30,7 +30,7 @@
 </template>
 
 <script>
-	import ICONCONFIG from '@/utils/icon-config.js'
+	import {getAllIconList} from '@/utils/icon-config.js'
 	export default {
 		name:"mj-category-card",
 		props: ['categoryListFromChart'],
@@ -40,7 +40,7 @@
 		},
 		computed: {
 			categoryList(){
-				const allIconList = ICONCONFIG.getAllIconList()
+				const allIconList = getAllIconList()
 				const categoryListFromC = uni.$u.deepClone(this.categoryListFromChart)
 				categoryListFromC.forEach(category => {
 					category['category_title'] = allIconList.filter(item => item.type === category.category_type)[0].title

@@ -22,7 +22,7 @@
 		<!-- 修改了uni-section的样式，背景色和装饰line颜色改变,padding -->
 		<view class="options">
 			<!-- 常用功能 -->
-			<uni-section class="section" title="常用功能" type="line" titleFontSize="28rpx"
+			<uni-section class="section" title="常用功能" type="line" titleFontSize="32rpx"
 				titleColor="#212121"></uni-section>
 			<!-- grid组件 -->
 			<u-grid :border="false" @click="clickOption" col="4">
@@ -36,7 +36,7 @@
 				</u-grid-item>
 			</u-grid>
 			<!-- 偏好 -->
-			<uni-section class="section" title="偏好" type="line" titleFontSize="28rpx"
+			<uni-section class="section" title="偏好" type="line" titleFontSize="32rpx"
 				titleColor="#212121"></uni-section>
 			<u-grid :border="false" @click="clickLike" col="4">
 				<u-grid-item v-for="item,index in likeList" :key="index" >
@@ -50,7 +50,7 @@
 			</u-grid>
 
 			<!-- 其他 -->
-			<uni-section class="section" title="其他" type="line" titleFontSize="28rpx"
+			<uni-section class="section" title="其他" type="line" titleFontSize="32rpx"
 				titleColor="#212121"></uni-section>
 			<u-cell-group :border="false">
 				<u-cell title="反馈问题" :isLink="true" @click="clickFeedback">
@@ -115,6 +115,29 @@
 				showUserAssetsList: false,
 			};
 		},
+		onReady() {
+			const state = UT.checkUserTokenExpierd() // 检查老用户的token是否过期，如果过期则跳转登录，并返回true；没过期返回false
+			if(state) return
+			// console.log("用户token没过期，继续执行下面的逻辑");
+			
+			// 如果用户登录了，进行初始化
+			const {uid} = uniCloud.getCurrentUserInfo()
+			if (uid) {
+				this.getUserInfo()
+			}
+		},
+		onShow() {
+			// 判断用户是否登录，如果未登录 则跳转到登录页
+			const {uid} = uniCloud.getCurrentUserInfo()
+			if (!uid) {
+				uni.redirectTo({
+					url: "/uni_modules/uni-id-pages/pages/login/login-withoutpwd"
+				})
+				return
+			}
+			this.resetUserInfo()
+
+		},
 		methods: {
 			clickUserCard() {
 				uni.navigateTo({
@@ -122,24 +145,36 @@
 				})
 			},
 			clickOption(index) {
-				// console.log("点击了常用功能", index)
-				if(index === 0) {
-					uni.navigateTo({
-						url:"/pagesMy/my-assets/my-assets"
-					})
-				} else {
-					uni.showToast({
-						title:"正在开发中~",
-						icon: "none"
-					})
+				switch (index) {
+					case 0:
+						uni.navigateTo({
+							url:"/pagesMy/my-assets/my-assets"
+						})
+						break
+					case 1:
+						uni.showToast({
+							title:"正在开发中~",
+							icon: "none"
+						})
+						// uni.navigateTo({
+						// 	url:"/pagesMy/bill-template/bill-template"
+						// })
+						break
+					default:
+						uni.showToast({
+							title:"正在开发中~",
+							icon: "none"
+						})
 				}
 			},
-			clickLike(name) {
-				// console.log("点击了偏好", name);
-				uni.showToast({
-					title:"正在开发中~",
-					icon: "none"
-				})
+			clickLike(index) {
+				switch (index) {
+					default:
+						uni.showToast({
+							title:"正在开发中~",
+							icon: "none"
+						})
+				}
 			},
 			clickFeedback() {
 				uni.navigateTo({
@@ -212,23 +247,19 @@
 				this.userInfo.useDate = Math.ceil(useDate / (1000 * 60 * 60 * 24))
 			}
 		},
-		onReady() {
-			const state = UT.checkUserTokenExpierd() // 检查老用户的token是否过期，如果过期则跳转登录，并返回true；没过期返回false
-			if(state) return
-			// console.log("用户token没过期，继续执行下面的逻辑");
-			this.getUserInfo()
-		},
-		onShow() {
-			// 判断用户是否登录，如果未登录 则跳转到登录页
-			const {uid} = uniCloud.getCurrentUserInfo()
-			if (!uid) {
-				uni.redirectTo({
-					url: "/uni_modules/uni-id-pages/pages/login/login-withoutpwd"
-				})
-				return
+		// 分享功能
+		onShareAppMessage () {
+			return {
+				title: "妙记——记录你的生活",
+				path: "/pages/index/index",
+				imageUrl: "/static/share.png"
 			}
-			this.resetUserInfo()
-
+		},
+		// 分享到朋友圈功能
+		onShareTimeline(){
+			return {
+				title: '妙记——记录你的生活'
+			}
 		}
 	}
 </script>

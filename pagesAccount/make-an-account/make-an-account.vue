@@ -149,7 +149,7 @@
 </template>
 
 <script>
-	import ICONCONFIG from "@/utils/icon-config.js";
+	import {getCategoryIconListForExpend, getCategoryIconListForIncome, getAssetsStyle} from "@/utils/icon-config.js";
 	const db = uniCloud.database()
 	export default {
 		data() {
@@ -237,6 +237,28 @@
 				editInitBill: {},
 				isEdit: false,
 			};
+		},
+		computed: {
+			bill_type: {
+				get() {
+					return this.expendOrIncomeInfo.bill_type
+				},
+				set(value) {
+					this.expendOrIncomeInfo.bill_type = value
+				}
+			},
+			category_type: {
+				get() {
+					return this.expendOrIncomeInfo.category_type
+				},
+				set(value) {
+					this.expendOrIncomeInfo.category_type = value
+				}
+			}
+		},
+		onLoad({type,tab}) {
+			this.initPage()
+			this.initEditPage(type,tab)
 		},
 		methods: {
 			clickTab({index}) {  // 0 支出  1 收入  2 转账
@@ -374,6 +396,13 @@
 				if(Number(this.keyboardInfo.balance) === 0) {
 					uni.showToast({
 						title:"请填写金额",
+						icon:"none"
+					})
+					return
+				}
+				if(!this.expendOrIncomeInfo.asset_id) {
+					uni.showToast({
+						title:"请选择资产",
 						icon:"none"
 					})
 					return
@@ -535,7 +564,7 @@
 						transfer_amount: this.transferAccountInfo.transfer_amount
 					})
 					// 返还资金模块
-					console.log('返还资金模块');
+					// console.log('返还资金模块');
 					await this.updateInitAssetsBalance()
 					// 更新金额模块
 					await this.upDateUserTwoAssetBalance()
@@ -648,13 +677,13 @@
 			// 初始化相关方法
 			initPage() {
 				// 获取分类列表，该用户所有资产信息，将用户资产信息添加对应资产icon样式
-				this.categoryIconListForExpend = ICONCONFIG.getCategoryIconListForExpend()
-				this.categoryIconListForIncome = ICONCONFIG.getCategoryIconListForIncome()
+				this.categoryIconListForExpend = getCategoryIconListForExpend()
+				this.categoryIconListForIncome = getCategoryIconListForIncome()
 				this.userAssets = uni.getStorageSync('mj-user-assets')
-				this.expendOrIncomeInfo.asset_id = this.userAssets[0]._id
-				this.assetsStyle = ICONCONFIG.getAssetsStyle()
+				this.expendOrIncomeInfo.asset_id = this.userAssets.filter(asset => asset.default_asset === true)[0]?._id ?? ''
+				this.assetsStyle = getAssetsStyle()
 				this.addAssetStyle()
-				this.currentAssetTitle = this.userAssets[0].assetStyle.title
+				this.currentAssetTitle = this.userAssets.filter(asset => asset.default_asset === true)[0]?.assetStyle.title ?? '未选择资产'
 				// console.log('onLoad,initPage:用户资产列表',this.userAssets);
 			},
 			// 给userAssets添加type值对应的assetStyle
@@ -681,7 +710,7 @@
 					this.editInitBill.destination_asset_id = this.editInitBill.destination_asset_id[0]?._id ?? ''
 					// 修改transfer_amount的单位
 					this.editInitBill.transfer_amount ? this.editInitBill.transfer_amount /= 100 : ''
-					console.log('editInitBill',this.editInitBill);
+					// console.log('editInitBill',this.editInitBill);
 					// 修改keyboard的数据
 					// 修改日期事件
 					this.userChooseDate = uni.$u.timeFormat(this.editInitBill.bill_date, 'mm月dd日')
@@ -711,30 +740,7 @@
 					}
 				}
 			},
-			
 		},
-		onLoad({type,tab}) {
-			this.initPage()
-			this.initEditPage(type,tab)
-		},
-		computed: {
-			bill_type: {
-				get() {
-					return this.expendOrIncomeInfo.bill_type
-				},
-				set(value) {
-					this.expendOrIncomeInfo.bill_type = value
-				}
-			},
-			category_type: {
-				get() {
-					return this.expendOrIncomeInfo.category_type
-				},
-				set(value) {
-					this.expendOrIncomeInfo.category_type = value
-				}
-			}
-		}
 		
 	}
 </script>

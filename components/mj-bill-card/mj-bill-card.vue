@@ -9,7 +9,7 @@
 			<!-- 滑动单元格 -->
 			<u-swipe-action>
 				<u-swipe-action-item :options="options" v-for="bill,index in userBills" :key="bill._id" :threshold="80" @click="clickSwipeActionItemBtn($event,bill)">
-					<view class="swipe-action-item">
+					<view class="swipe-action-item" @click="clickBillDetail(bill)">
 						<view class="left">
 							<mj-icon-with-background :type="bill.billStyle.icon" size="48rpx" customPrefix="miaoji"></mj-icon-with-background>
 							<view class="info">
@@ -19,13 +19,13 @@
 						</view>
 						<view class="right">
 							<view class="money" v-if="bill.bill_type === 0">
-								<u--text mode="price" :text="bill.bill_amount" color="#dd524d" size="32rpx"bold></u--text>
+								<u--text mode="price" :text="bill.bill_amount" color="#dd524d" size="32rpx" bold></u--text>
 							</view>
 							<view class="money" v-if="bill.bill_type === 1">
-								<u--text mode="price" :text="bill.bill_amount" color="#219a6d" size="32rpx"bold></u--text>
+								<u--text mode="price" :text="bill.bill_amount" color="#219a6d" size="32rpx" bold></u--text>
 							</view>
 							<view class="money" v-if="bill.bill_type === 2">
-								<u--text mode="price" :text="(bill.transfer_amount / 100)" color="#212121" size="32rpx"bold></u--text>
+								<u--text mode="price" :text="(bill.transfer_amount / 100)" color="#212121" size="32rpx" bold></u--text>
 							</view>
 							<view class="minor">{{bill.assetStyle.title}}</view>
 						</view>
@@ -35,12 +35,20 @@
 					</view>
 				</u-swipe-action-item>
 			</u-swipe-action>
+			<mj-bill-details-popup  
+				:bill="billDetails"
+				:show="showBillDetails" 
+				@close="showBillDetails = false" 
+				@updateBill="clickSwipeActionItemBtn({index: 0},billDetails)" 
+				@deleteBill="clickSwipeActionItemBtn({index: 1},billDetails)"
+			>
+			</mj-bill-details-popup>
 		</view>
 	</view>
 </template>
 
 <script>
-	import ICONCONFIG from "@/utils/icon-config.js";
+	import {getAllIconList, getAssetsStyle} from "@/utils/icon-config.js";
 	const db = uniCloud.database()
 	export default {
 		name: "mj-bill-card",
@@ -66,9 +74,22 @@
 				iconGather: [],
 				assetsStyle: [],
 				today: '',
+				// 账单详情 
+				billDetails: {},
+				showBillDetails: false
 			};
 		},
 		methods: {
+			clickBillDetail(bill) {
+				// 用户点击某个账单
+				// 1 拿到账单信息，处理账单
+				// 2 将账单信息传递给 mj-bill-details-popup
+				// 3 show弹出框
+				this.billDetails = {}
+				const billTemp = {...bill}
+				this.billDetails = billTemp
+				this.showBillDetails = true
+			},
 			clickSwipeActionItemBtn({index},bill) {  // 0 修改  1 删除
 				if(index === 1) {
 					uni.showModal({
@@ -77,6 +98,10 @@
 						confirmColor:"#9fcba7",
 						success:async res =>  {
 							if(res.confirm) {
+								uni.showLoading({
+									title: "删除中",
+									mask: true
+								})
 								await db.collection("mj-user-bills").doc(bill._id).remove()
 								// console.log('删除账单成功');
 								uni.$emit('updateBillsList')
@@ -86,16 +111,25 @@
 								uni.$emit('updateAssetsList')
 								// 更新账单页面
 								uni.$emit('updateBillPage')
+								uni.hideLoading()
 								uni.showToast({
 									title: "删除成功",
 									icon: "success"
 								})
+								// 如果是弹出框中点击删除，则隐藏弹出框
+								if(this.showBillDetails) {
+									this.showBillDetails = false
+								}
 							}
 						}
 					})
 				} else {
 					// 修改账单  存入缓存，在记一笔页面读取
 					uni.setStorageSync('mj-bill-edit',bill)
+					// 如果是弹出框中点击修改，则隐藏弹出框
+					if(this.showBillDetails) {
+						this.showBillDetails = false
+					}
 					// 传递参数，挑战到记一笔页面
 					uni.navigateTo({
 						url:`/pagesAccount/make-an-account/make-an-account?type=edit&tab=${bill.bill_type}`
@@ -129,7 +163,7 @@
 					let transferOutAssetBalance = this.userAssets.find(item => item._id === bill.asset_id[0]?._id)?.asset_balance ?? 'none'
 					// 转入账户 资产余额
 					let transferIntoAssetBalance = this.userAssets.find(item => item._id === bill.destination_asset_id[0]?._id)?.asset_balance ?? 'none'
-					// 如果取不到资产余额，即用户账单对应的资产以及被删除了，则不执行
+					// 如果取不到资产余额，即用户账单对应的资产已经被删除了，则不执行
 					if(transferOutAssetBalance != 'none') {
 						transferOutAssetBalance = Math.round(transferOutAssetBalance * 100)  // 转换单位为分
 						// 删除账单后转出资产余额 = 转出资产余额 + 手续费 + 转账金额  注意单位为分
@@ -159,9 +193,9 @@
 		},
 		onReady() {
 			// 获取所有icon样式
-			this.iconGather = ICONCONFIG.getAllIconList()
+			this.iconGather = getAllIconList()
 			// 获取资产样式
-			this.assetsStyle = ICONCONFIG.getAssetsStyle()
+			this.assetsStyle = getAssetsStyle()
 		},
 		watch: {
 			userBillsFromDB: {

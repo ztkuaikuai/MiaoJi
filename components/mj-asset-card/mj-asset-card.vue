@@ -4,12 +4,13 @@
 		<view class="content">
 			<!-- 滑动单元格 -->
 			<u-swipe-action>
-				<u-swipe-action-item :options="options" v-for="asset in userAssetsShow" :key="asset._id" :threshold="80" @click="clickSwipeActionItemBtn($event,asset)" >
+				<u-swipe-action-item :options="options" v-for="asset,index in userAssetsShow" :key="asset._id" :threshold="80" @click="clickSwipeActionItemBtn($event,asset)" >
 					<view class="swipe-action-item">
 						<view class="left">
 							<mj-icon-with-background :type="asset.assetStyle.icon" size="48rpx" customPrefix="miaoji" :color="asset.assetStyle.color"></mj-icon-with-background>
 							<view class="info">
 								<view>{{asset.assetStyle.title}}</view>
+								<view class="asset-name" v-if="asset.asset_name">{{asset.asset_name}}</view>
 							</view>
 						</view>
 						<view class="right">
@@ -21,7 +22,7 @@
 							</view>
 						</view>
 					</view>
-					<view class="line" v-if="item != 2">
+					<view class="line" v-if="index != userAssetsShow.length - 1">
 						<u-line length="80%"></u-line>
 					</view>
 				</u-swipe-action-item>
@@ -30,7 +31,7 @@
 		<view class="hideAsset" @click="clickHideAsset">查看隐藏资产</view>
 		
 		<!-- 隐藏资产弹出框 -->
-		<u-popup :show="showHideAsset" @close="showHideAsset = false" round="20px" :safeAreaInsetBottom="false" > 
+		<u-popup :show="showHideAsset" @close="showHideAsset = false" round="20px" :safeAreaInsetBottom="safeAreaInsetBottom" > 
 			<view>
 				<view class="top">小金库</view>
 				<view v-if="userAssetsHide.length">
@@ -41,6 +42,7 @@
 									<mj-icon-with-background :type="asset.assetStyle.icon" size="48rpx" customPrefix="miaoji" :color="asset.assetStyle.color"></mj-icon-with-background>
 									<view class="info">
 										<view>{{asset.assetStyle.title}}</view>
+										<view class="asset-name" v-if="asset.asset_name">{{asset.asset_name}}</view>
 									</view>
 								</view>
 								<view class="right">
@@ -67,12 +69,12 @@
 </template>
 
 <script>
-	import ICONCONFIG from "@/utils/icon-config.js";
+	import {getAssetsStyle} from "@/utils/icon-config.js";
 	const db = uniCloud.database()
 	
 	export default {
 		name: "mj-asset-card",
-		props: ['userAssetsFromDB','isEyeShow'],
+		props: ['userAssetsFromDB','isEyeShow','safeAreaInsetBottom'],
 
 		data() {
 			return {
@@ -95,10 +97,24 @@
 				showBalance: true,
 			};
 		},
+		computed: {
+			userAssetsShow() {
+				return this.assets.filter(item => item.hide_in_interface == false)
+			},
+			// 隐藏资产，一定不计入总资产
+			userAssetsHide() {
+				return this.assets.filter(item => item.hide_in_interface == true)
+			}
+		},
+		onReady() {
+			// console.log('onReady',this.userAssetsFromDB);
+			this.assetsStyle = getAssetsStyle()
+			this.addAssetStyle()
+		},
 		methods: {
 			clickSwipeActionItemBtn({index},asset) { // 0 点击了修改  1 点击了删除
 				// 获取资产信息 ，如果点击了修改，则先缓存，后跳转到修改页拿到缓存渲染页面，后删除缓存；如果点击了删除，先提示弹框，后通过id删除
-				console.log(index,asset);
+				// console.log(index,asset);
 				if(index == 0) {
 					uni.setStorageSync('mj-asset-edit',asset)
 					uni.navigateTo({
@@ -106,7 +122,7 @@
 						url:`/pagesAccount/set-asset/set-asset?type=${asset.asset_type}`
 					})
 				} else {
-					console.log("点击了删除");
+					// console.log("点击了删除");
 					uni.showModal({
 						content: "你确定删除该资产账户吗？（删除之后不可恢复哦）",
 						cancelColor: "rgba(0,0,0,0.6)",
@@ -126,7 +142,7 @@
 			},
 			clickHideAsset() {
 				this.showHideAsset = true
-				console.log(this.userAssetsHide);
+				// console.log(this.userAssetsHide);
 			},
 			// 给userAssetsFromDB赋值为assets（首先，不可以直接修改props，其次将对象内容变成响应式的，可以被computed监测到），并添加type值对应的assetStyle
 			addAssetStyle() {
@@ -136,20 +152,6 @@
 				})
 				// console.log('addAssetStyle',this.assets);
 			}
-		},
-		computed: {
-			userAssetsShow() {
-				return this.assets.filter(item => item.hide_in_interface == false)
-			},
-			// 隐藏资产，一定不计入总资产
-			userAssetsHide() {
-				return this.assets.filter(item => item.hide_in_interface == true)
-			}
-		},
-		onReady() {
-			console.log('onReady',this.userAssetsFromDB);
-			this.assetsStyle = ICONCONFIG.getAssetsStyle()
-			this.addAssetStyle()
 		},
 		watch: {
 			userAssetsFromDB: {
@@ -184,6 +186,10 @@
 					flex-direction: column;
 					justify-content: center;
 					padding-left: 24rpx;
+					.asset-name {
+						color: $mj-text-color-grey;
+						font-size: 24rpx;
+					}
 				}
 			}
 

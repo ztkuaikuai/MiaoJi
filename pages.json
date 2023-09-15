@@ -84,6 +84,15 @@
                 }
                 
                 }
+                ,{
+                    "path" : "bill-template/bill-template",
+                    "style" :                                                                                    
+                {
+                    "navigationBarTitleText": "我的模板",
+                    "enablePullDownRefresh": false
+                }
+                
+                }
             ]
 		}, {
 			"root": "pagesFilter",
