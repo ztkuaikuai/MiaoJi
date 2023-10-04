@@ -15,10 +15,10 @@
 		</view>
 		<view class="card-money">
 			<view class="left">
-				月支出：<u--text mode="price" :text="monthlyBalance.monthlyExpend" color="#219a6d" size="24rpx" bold></u--text>
+				月支出：<u--text mode="price" :text="monthlyBalance.monthlyExpend" color="#dd524d" size="24rpx" bold></u--text>
 			</view>
 			<view class="right">
-				月收入：<u--text mode="price" :text="monthlyBalance.monthlyIncome" color="#dd524d" size="24rpx" bold></u--text>
+				月收入：<u--text mode="price" :text="monthlyBalance.monthlyIncome" color="#219a6d" size="24rpx" bold></u--text>
 			</view>
 		</view>
 		<view class="bill-list">

@@ -291,7 +291,8 @@
 					let data = []
 					for (const categoryList of categoryData) {
 						const objTemp = {}
-						objTemp['value'] = categoryList.total_amount
+						// 固定2位小数
+						objTemp['value'] = parseFloat(categoryList.total_amount.toFixed(2))
 						objTemp['name'] = allIconList.filter(item => item.type === categoryList.category_type)[0].title
 						data.push(objTemp)
 					}
@@ -316,11 +317,12 @@
 				// 修改图表设置
 				if(this.type === '月支出') {
 					this.opts.title.name = '月支出'
-					this.opts.subtitle.name = `￥${this.monthlyBalance.monthlyExpend}`
+					// 固定2位小数
+					this.opts.subtitle.name = `￥${this.monthlyBalance.monthlyExpend.toFixed(2)}`
 				}
 				if(this.type === '月收入') {
 					this.opts.title.name = '月收入'
-					this.opts.subtitle.name = `￥${this.monthlyBalance.monthlyIncome}`
+					this.opts.subtitle.name = `￥${this.monthlyBalance.monthlyIncome.toFixed(2)}`
 				}
 				this.chartData = JSON.parse(JSON.stringify(res))
 				

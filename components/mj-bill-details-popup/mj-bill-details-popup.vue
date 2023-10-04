@@ -115,7 +115,7 @@
 				const bill = this.bill
 				// console.log("computed billDetails",bill);
 				if(bill.bill_type === 2) {
-					// 如果类型为转账
+					// 如果类型为转账  将转账金额转换为元
 					bill.transfer_amount /= 100
 					const assetsStyle = getAssetsStyle()
 					bill.transferAssetStyle = assetsStyle.find(item => item.type === bill.destination_asset_id[0]?.asset_type)

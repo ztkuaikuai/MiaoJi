@@ -100,8 +100,7 @@
 				// 2 将账单信息传递给 mj-bill-details-popup
 				// 3 show弹出框
 				this.billDetails = {}
-				const billTemp = {...bill}
-				this.billDetails = billTemp
+				this.billDetails = {...bill}
 				this.showBillDetails = true
 			},
 			clickSwipeActionItemBtn({index},bill) {  // 0 修改  1 删除
