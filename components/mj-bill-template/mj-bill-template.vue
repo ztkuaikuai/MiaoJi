@@ -1,6 +1,7 @@
 <template>
 	<view class="bill-template">
-		<mj-card title="支出">
+		<!-- 需要从数据库中获取数据进行渲染 -->
+		<mj-card title="支出" @click.native="clickTemp">
 			<view class="one-bill-template">
 				<view class="left">
 					<mj-icon-with-background type="mj-wucan" size="48rpx" customPrefix="miaoji"></mj-icon-with-background>
@@ -15,6 +16,14 @@
 				</view>
 			</view>
 		</mj-card>
+		<mj-bill-details-popup
+			:bill="templateDetails"
+			:show="showBillDetails" 
+			@close="showBillDetails = false" 
+			@updateBill="updateTemp" 
+			@deleteBill="deleteTemp"
+		>
+		</mj-bill-details-popup>
 	</view>
 </template>
 
@@ -23,8 +32,24 @@
 		name:"mj-bill-template",
 		data() {
 			return {
-				
+				templateDetails: {},
+				showBillDetails: false
 			};
+		},
+		methods: {
+			updateTemp() {
+				uni.showToast({
+					title:"正在开发中~",
+					icon: "none"
+				})
+			},
+			deleteTemp() {
+				console.log('删除模板')
+			},
+			clickTemp() {
+				console.log("点击")
+				this.showBillDetails = true
+			}
 		}
 	}
 </script>

@@ -50,9 +50,6 @@
 			<mj-card title="未来更新计划">
 				<view class="one-update">
 					<view class="row">
-						- 添加分享给朋友和朋友圈功能
-					</view>
-					<view class="row">
 						- 添加模板记账功能
 					</view>
 					<view class="row">

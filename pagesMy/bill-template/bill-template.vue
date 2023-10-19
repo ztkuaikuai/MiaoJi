@@ -5,7 +5,7 @@
 				账单模板可用于经常购买或记帐的账单，如每天都吃香菇滑鸡11元，可保存为帐单模板方便快速记账。
 			</view>
 		</mj-card>
-		<!-- 传入用户模板账单组成的数组，组件内进行遍历 -->
+		<!-- 传入用户模板账单组成的对象数组，组件内进行遍历 -->
 		<view class="bill-template-wrapper">
 			<mj-bill-template></mj-bill-template>
 		</view>
@@ -28,7 +28,9 @@
 		},
 		methods: {
 			clickBottomBtn() {
-				console.log("添加模板");
+				uni.navigateTo({
+					url: `/pagesAccount/make-an-account/make-an-account?type=template`
+				})
 			}
 		}
 	}
