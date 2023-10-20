@@ -73,6 +73,7 @@
 				</mj-card>
 			</view>
 		</view>
+		<u-safe-bottom></u-safe-bottom>
 	</u-popup>
 </template>
 

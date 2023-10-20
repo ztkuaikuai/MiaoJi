@@ -176,7 +176,7 @@
 							</view>
 						</view>
 					</mj-card>
-				</view>
+				</view> 
 			</view>
 		</u-popup>
 	</view>
