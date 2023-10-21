@@ -65,9 +65,9 @@
 				<view style="color: #6d6d6d;padding-left: 8rpx;font-size: 24rpx;">
 					手续费——从转出账户转出的钱=转出金额+手续费
 				</view>
-				<u--form :model="transferAccountInfo" :borderBottom="false" ref="uForm" errorType="toast">
-					<u-form-item prop="bill_amount" :borderBottom="false">
-						<u--input v-model="transferAccountInfo.bill_amount" placeholder="手续费" placeholderStyle="color: #6d6d6d" type="digit" border="surround" clearable
+				<u--form :model="transferInfo" :borderBottom="false" ref="uForm" errorType="toast">
+					<u-form-item prop="serviceCharge" :borderBottom="false">
+						<u--input v-model="transferInfo.serviceCharge" placeholder="手续费" placeholderStyle="color: #6d6d6d" type="digit" border="surround" clearable
 							shape="circle" maxlength="8" fontSize="13px" :customStyle="inputStyle" prefixIcon="rmb-circle"
 							prefixIconStyle="color: #6d6d6d"></u--input>
 					</u-form-item>
@@ -161,21 +161,7 @@
 					</view>
 				</view>
 				<view class="template-list">
-					<mj-card title="支出" v-for="item in 3" :key="item">
-						<view class="one-bill-template">
-							<view class="left">
-								<mj-icon-with-background type="mj-wucan" size="48rpx" customPrefix="miaoji"></mj-icon-with-background>
-								<view class="info">
-									<view>餐饮</view>
-									<view class="minor"><u--text :lines="1" text="我是备注我是备注" color="rgba(0,0,0, 0.6)" size="24rpx"></u--text></view> <!-- 设置超过一行就... 可以使用u-text组件 -->
-								</view>
-							</view>
-							<view class="right">
-								<u--text mode="price" text="1234222" color="#dd524d" size="32rpx" bold></u--text>
-								<view class="minor">银行卡</view>
-							</view>
-						</view>
-					</mj-card>
+					<mj-bill-template :templateList="templateList" @updateList="getUserTemplate" pageType="account" @getTemp="getTemp"></mj-bill-template>
 				</view> 
 			</view>
 		</u-popup>
@@ -205,7 +191,6 @@
 				assetsStyle: [],
 				showUserAssetsList: false,
 				showDatetimePicker: false,
-				showTemplate: false,
 				currentDate: Date.now(),
 				userChooseDate: uni.$u.timeFormat(Date.now(), 'mm月dd日'),
 				// 转出转入账户的渲染样式
@@ -214,7 +199,7 @@
 				// 转账页用户点击的账户，用于clickOneAsset方法判断。 0 转出账户   1 转入账户
 				userClickAsset: 0,
 				rules: {
-					'bill_amount': [
+					'serviceCharge': [
 						{
 							type: 'number',
 							message: '请输入数字金额'
@@ -256,6 +241,10 @@
 					transfer_amount: 0.00,  //转账金额
 					destination_asset_id: ''  // 转入资产id
 				},
+				// 转账页手续费
+				transferInfo: {
+					serviceCharge: 0.00
+				},
 				//  keyboard相关数据
 				keyboardInfo: {
 					notes: '',
@@ -273,7 +262,9 @@
 				isEdit: false,
 				
 				// 模板管理相关数据
-				isTemplate: false
+				showTemplate: false,
+				isTemplate: false,
+				templateList: []
 			};
 		},
 		computed: {
@@ -298,6 +289,9 @@
 			this.initPage()
 			this.initEditPage(type,tab)
 		},
+		onShow() {
+			this.getUserTemplate()
+		},
 		methods: {
 			// 初始化相关方法
 			initPage() {
@@ -310,6 +304,8 @@
 				this.addAssetStyle()
 				this.currentAssetTitle = this.userAssets.filter(asset => asset.default_asset === true)[0]?.assetStyle.title ?? '未选择资产'
 				// console.log('onLoad,initPage:用户资产列表',this.userAssets);
+				// 获取用户模板列表
+				this.getUserTemplate()
 			},
 			// 给userAssets添加type值对应的assetStyle
 			addAssetStyle() {
@@ -547,17 +543,15 @@
 				// 表单验证失败返回false，成功返回true
 				const flag = await this.validatorTransferInfo()
 				if(!flag) return
-				this.transferAccountInfo.bill_amount = Math.round(this.transferAccountInfo.bill_amount * 100)
+				this.transferAccountInfo.bill_amount = Math.round(this.transferInfo.serviceCharge * 100)
 				this.transferAccountInfo.bill_notes = this.keyboardInfo.notes
 				this.transferAccountInfo.transfer_amount = Math.round(this.keyboardInfo.balance * 100)
 				// 组合备注
 				const transferOutTitle = this.userAssets.find(item => item._id === this.transferAccountInfo.asset_id).assetStyle.title
 				const transferInTitle = this.userAssets.find(item => item._id === this.transferAccountInfo.destination_asset_id).assetStyle.title
+				this.transferAccountInfo.bill_notes = `${this.transferAccountInfo.bill_notes + '-'}${transferOutTitle}转出至${transferInTitle},手续费${this.transferAccountInfo.bill_amount / 100}元`
 				// console.log('数据整理完毕，准备存入数据库',this.transferAccountInfo);
-				await db.collection("mj-user-bills").add({
-					...this.transferAccountInfo,
-					bill_notes: `${this.transferAccountInfo.bill_notes + '-'}${transferOutTitle}转出至${transferInTitle},手续费${this.transferAccountInfo.bill_amount / 100}`
-					})
+				await db.collection("mj-user-bills").add({...this.transferAccountInfo})
 				uni.switchTab({
 					url:"/pages/index/index"
 				})
@@ -570,8 +564,8 @@
 					this.isSetRules = true
 				}
 				let flag = false
-				// 如果是0 不走验证，如果是其他，走验证
-				this.transferAccountInfo.bill_amount == 0 ? '' : flag = true
+				// 如果手续费是0 不走验证，如果是其他，走验证
+				this.transferInfo.serviceCharge == 0 ? '' : flag = true
 				if(flag) {
 					// 验证成功则继续执行，验证失败中断执行
 					try{
@@ -670,7 +664,7 @@
 					// 表单验证失败返回false，成功返回true
 					const flag = await this.validatorTransferInfo()
 					if(!flag) return
-					this.transferAccountInfo.bill_amount = Math.round(this.transferAccountInfo.bill_amount * 100)
+					this.transferAccountInfo.bill_amount = Math.round(this.transferInfo.serviceCharge * 100)
 					this.transferAccountInfo.bill_notes = this.keyboardInfo.notes
 					this.transferAccountInfo.transfer_amount = Math.round(this.keyboardInfo.balance * 100)
 					// console.log('数据整理完毕，准备更新数据库',this.transferAccountInfo);
@@ -792,11 +786,6 @@
 			},
 			
 			// 添加模板相关方法
-			goTemplatePage() {
-				uni.navigateTo({
-					url: `/pagesAccount/make-an-account/make-an-account?type=template`
-				})
-			},
 			async addOneTemplate() {
 				// 1 判断用户支出||收入||转账
 				// 2 进行表单验证
@@ -835,20 +824,83 @@
 					// 表单验证失败返回false，成功返回true
 					const flag = await this.validatorTransferInfo()
 					if(!flag) return
-					this.transferAccountInfo.bill_amount = Math.round(this.transferAccountInfo.bill_amount * 100)
+					this.transferAccountInfo.bill_amount = Math.round(this.transferInfo.serviceCharge * 100)
 					this.transferAccountInfo.bill_notes = this.keyboardInfo.notes
 					this.transferAccountInfo.transfer_amount = Math.round(this.keyboardInfo.balance * 100)
 					// 组合备注
 					const transferOutTitle = this.userAssets.find(item => item._id === this.transferAccountInfo.asset_id).assetStyle.title
 					const transferInTitle = this.userAssets.find(item => item._id === this.transferAccountInfo.destination_asset_id).assetStyle.title
+					this.transferAccountInfo.bill_notes = `${this.transferAccountInfo.bill_notes + '-'}${transferOutTitle}转出至${transferInTitle},手续费${this.transferAccountInfo.bill_amount / 100}元`
 					// console.log('数据整理完毕，准备存入数据库',this.transferAccountInfo);
 					const {asset_id,bill_amount,bill_notes,bill_type,category_type,destination_asset_id,transfer_amount} = this.transferAccountInfo
-					await db.collection("mj-user-templates").add({
-						asset_id,bill_amount,bill_type,category_type,destination_asset_id,transfer_amount,
-						bill_notes: `${this.transferAccountInfo.bill_notes + '-'}${transferOutTitle}转出至${transferInTitle},手续费${this.transferAccountInfo.bill_amount / 100}`
-						})
+					await db.collection("mj-user-templates").add({asset_id, bill_amount, bill_type, category_type, destination_asset_id, transfer_amount, bill_notes})
 					uni.navigateBack()
 				}
+			},
+			// 点击添加模板按钮
+			goTemplatePage() {
+				uni.navigateTo({
+					url: `/pagesAccount/make-an-account/make-an-account?type=template`
+				})
+				this.showTemplate = false
+			},
+			// 获取用户的模板
+			async getUserTemplate() {
+				const res = await db.collection('mj-user-templates').where('user_id == $cloudEnv_uid').orderBy('template_creation_date desc').get()
+				this.templateList = res.result.data
+			},
+			// 点击模板卡片触发，获取用户点击的模板数据，并赋值
+			getTemp(temp) {
+				console.log('temp: ',temp);
+				const {bill_type, category_type, bill_notes, bill_amount, asset_id, hasAsset, transfer_amount, hasDestinationAsset, destination_asset_id} = temp
+				this.clickTab({index: bill_type})
+				if(bill_type !== 2) {
+					// 支出||收入模板
+					// 账单类型
+					this.expendOrIncomeInfo.bill_type = bill_type
+					// 分类
+					this.expendOrIncomeInfo.category_type = category_type
+					if(bill_type === 0) {
+						const index = this.categoryIconListForExpend.findIndex(item => item.type === category_type)
+						this.currentExpendIndex = index
+					} else {
+						const index = this.categoryIconListForIncome.findIndex(item => item.type === category_type)
+						this.currentIncomeIndex = index
+					}
+					// 备注
+					this.keyboardInfo.notes = bill_notes
+					// 金额
+					this.keyboardInfo.balance = bill_amount.toString()
+					// 资产
+					if(hasAsset) {
+						this.expendOrIncomeInfo.asset_id = asset_id
+						this.currentAssetTitle = temp.assetStyle.title
+					} else {
+						this.expendOrIncomeInfo.asset_id = ''
+						this.currentAssetTitle = '资产已删除'
+					}
+				} else {
+					// 转账模板
+					// 账单类型和分类类型不变
+					// 备注 只截取 - 前面的值
+					const regex = /^([^-\n]+)/
+					const match = regex.exec(bill_notes)
+					this.keyboardInfo.notes = match ? match[1] : ''
+					// 金额
+					this.keyboardInfo.balance = (transfer_amount / 100).toString()
+					// 手续费
+					this.transferInfo.serviceCharge = bill_amount
+					// 转出账户
+					if(hasAsset) {
+						this.transferAccountInfo.asset_id = asset_id
+						this.transferOutAssetStyle = temp.assetStyle
+					}
+					if(hasDestinationAsset) {
+						this.transferAccountInfo.destination_asset_id = destination_asset_id
+						this.transferIntoAssetStyle = temp.destinationAssetStyle
+					}
+				}
+				this.showTemplate = false
 			}
 		}
 	}
@@ -993,6 +1045,7 @@
 			}
 		}
 		.user-template-list {
+			
 			.header {
 				display: flex;
 				justify-content: space-between;
@@ -1026,40 +1079,8 @@
 				}
 			}
 			.template-list {
-				.one-bill-template {
-					display: flex;
-					justify-content: space-between;
-					color: $mj-text-color;
-					
-					font-size: 32rpx;
-					padding: 8rpx 0;
-				
-					.left {
-						display: flex;
-						justify-content: right;
-						align-items: center;
-				
-						.info {
-							display: flex;
-							flex-direction: column;
-							justify-content: center;
-							padding-left: 24rpx;
-						}
-					}
-				
-					.right {
-						display: flex;
-						flex-direction: column;
-						justify-content: center;
-						align-items: flex-end;
-						padding-right: 20rpx;
-						
-					}
-					.minor {
-						color: $mj-text-color-grey;
-						font-size: 24rpx;
-					}
-				}
+				max-height: 750rpx;
+				overflow: auto;
 			}
 		}
 	}

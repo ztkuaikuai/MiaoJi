@@ -7,8 +7,9 @@
 		</mj-card>
 		<!-- 传入用户模板账单组成的对象数组，组件内进行遍历 -->
 		<view class="bill-template-wrapper">
-			<mj-bill-template :templateList="templateList" @updateList="getUserTemplate"></mj-bill-template>
+			<mj-bill-template :templateList="templateList" @updateList="getUserTemplate" pageType="temp"></mj-bill-template>
 		</view>
+		<view class="placeholder"></view>
 		<!-- 固定定位，最底下 -->
 		<view class="bottom-btn" >
 			<u-button text="添加模板" color="#9fcba7" shape="circle" @click="clickBottomBtn"></u-button>
@@ -46,6 +47,9 @@
 </script>
 
 <style lang="scss" scoped>
+	.placeholder {
+		height: 64px;
+	}
 	.bottom-btn {
 		box-sizing: border-box;
 		z-index: 999;

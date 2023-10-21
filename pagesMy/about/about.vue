@@ -3,7 +3,7 @@
 		<view class="logo">
 			<u--image src="/static/logo.png" width="72px" height="72px" radius="20px" ></u--image>
 			<view class="version">
-				版本号：0.7.6 (Early Access)
+				版本号：0.7.7 (Early Access)
 			</view>
 		</view>
 		<view class="main">
@@ -18,6 +18,20 @@
 				</view>
 			</mj-card>
 			<mj-card title="版本更新说明">
+				<view class="one-update">
+					<view class="title highlight">
+						0.7.7 —— 10月21日更新
+					</view>
+					<view class="row highlight">
+						- 添加模板记账功能
+					</view>
+					<view class="row">
+						- 修复手续费金额显示错误问题
+					</view>
+					<view class="row">
+						- 修复图表页金额显示错误问题
+					</view>
+				</view>
 				<view class="one-update">
 					<view class="title highlight">
 						0.7.6 —— 9月15日更新
@@ -49,9 +63,6 @@
 			</mj-card>
 			<mj-card title="未来更新计划">
 				<view class="one-update">
-					<view class="row">
-						- 添加模板记账功能
-					</view>
 					<view class="row">
 						- 记一笔页面添加秒记和再记功能
 					</view>

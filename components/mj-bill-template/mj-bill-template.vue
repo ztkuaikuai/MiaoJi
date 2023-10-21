@@ -33,6 +33,10 @@
 				</view>
 			</mj-card>
 		</view>
+		<view v-show="formatTempList.length == 0">
+			<u-empty mode="list" text="暂时没有模板哦,快去添加一个吧"></u-empty>
+		</view>
+
 		
 		<mj-bill-details-popup
 			:bill="templateDetails"
@@ -50,7 +54,8 @@
 	import {getAllIconList, getAssetsStyle} from "@/utils/icon-config.js";
 	export default {
 		name:"mj-bill-template",
-		props: ['templateList'],
+		// templateList 原始模板列表；pageType 页面类型:account 记一笔页面  temp 管理模板页面
+		props: ['templateList','pageType'],
 		data() {
 			return {
 				templateDetails: {},
@@ -95,10 +100,18 @@
 					}
 				})
 			},
+			// 点击每个模板卡片触发
 			clickTemp(temp) {
-				this.templateDetails = {}
-				this.templateDetails = temp
-				this.showBillDetails = true
+				// 只有在模板管理页面才能查看模板详情
+				if(this.pageType === 'temp') {
+					this.templateDetails = {}
+					this.templateDetails = temp
+					this.showBillDetails = true
+				}
+				// 如果在记一笔页面，返回当前点击的模板数据
+				if(this.pageType === 'account') {
+					this.$emit('getTemp',temp)
+				}
 			},
 			formatTemp() {
 				// 获取用户资产信息
@@ -116,16 +129,21 @@
 					// 判断模板的资产id对应的资产有没有被用户删除
 					if(asset_type) {
 						temp.assetStyle = this.assetsStyle.find(item => item.type === asset_type)
+						// hasAsset 用户是否存在对应资产
+						temp.hasAsset = true
 					} else {
 						temp.assetStyle = {}
 						temp.assetStyle.title = '资产已删除'
+						temp.hasAsset = false
 					}
 					const destination_asset_type = assets.find(item => item._id ===  temp.destination_asset_id)?.asset_type
 					if(destination_asset_type) {
 						temp.destinationAssetStyle = this.assetsStyle.find(item => item.type === destination_asset_type)
+						temp.hasDestinationAsset = true
 					} else {
 						temp.destinationAssetStyle = {}
 						temp.destinationAssetStyle.title = '资产已删除'
+						temp.hasDestinationAsset = false
 					}
 				})
 				this.formatTempList = arr
