@@ -214,8 +214,8 @@
 						return
 					}
 					this.userBills = newValue
-					
 					// 通过type给每一条添加对应billStyle
+					if(!this.userBills) this.userBills = []
 					this.userBills.forEach(bill => {
 						bill.billStyle = this.iconGather.find(item => item.type === bill.category_type)
 					})
