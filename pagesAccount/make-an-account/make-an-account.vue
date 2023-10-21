@@ -65,9 +65,9 @@
 				<view style="color: #6d6d6d;padding-left: 8rpx;font-size: 24rpx;">
 					手续费——从转出账户转出的钱=转出金额+手续费
 				</view>
-				<u--form :model="transferAccountInfo" :borderBottom="false" ref="uForm" errorType="toast">
-					<u-form-item prop="bill_amount" :borderBottom="false">
-						<u--input v-model="transferAccountInfo.bill_amount" placeholder="手续费" placeholderStyle="color: #6d6d6d" type="digit" border="surround" clearable
+				<u--form :model="transferInfo" :borderBottom="false" ref="uForm" errorType="toast">
+					<u-form-item prop="serviceCharge" :borderBottom="false">
+						<u--input v-model="transferInfo.serviceCharge" placeholder="手续费" placeholderStyle="color: #6d6d6d" type="digit" border="surround" clearable
 							shape="circle" maxlength="8" fontSize="13px" :customStyle="inputStyle" prefixIcon="rmb-circle"
 							prefixIconStyle="color: #6d6d6d"></u--input>
 					</u-form-item>
@@ -81,14 +81,14 @@
 						<view><uni-icons type="wallet" size="28rpx"></uni-icons></view>
 						<view>{{currentAssetTitle}}</view>
 					</view>
-					<view class="item" @click="chooseDate">
+					<view class="item" @click="chooseDate" v-if="!isTemplate">
 						<view><uni-icons type="calendar" size="28rpx"></uni-icons></view>
 						<view>{{userChooseDate}}</view>
 					</view>
-					<!-- <view class="item">
+					<view class="item" @click="chooseTemplate" v-if="!isTemplate">
 						<view><uni-icons type="mj-layout" size="28rpx" customPrefix="miaoji"></uni-icons></view>
 						<view>模板</view>
-					</view> -->
+					</view>
 				</view>
 				<view class="bgc">
 					<view class="header">
@@ -145,6 +145,26 @@
 						@cancel="showDatetimePicker = false"
 						@confirm="getBillDate"
 		></u-datetime-picker>
+		
+		<!-- 模板的popup -->
+		<u-popup :show="showTemplate" @close="showTemplate = false" round="20px" zIndex="10076">
+			<view class="user-template-list">
+				<view class="header">
+					<view class="left">
+						占位
+					</view>
+					<view class="middle">
+						帐单模板
+					</view>
+					<view class="right" @click="goTemplatePage">
+						添加
+					</view>
+				</view>
+				<view class="template-list">
+					<mj-bill-template :templateList="templateList" @updateList="getUserTemplate" pageType="account" @getTemp="getTemp"></mj-bill-template>
+				</view> 
+			</view>
+		</u-popup>
 	</view>
 </template>
 
@@ -179,7 +199,7 @@
 				// 转账页用户点击的账户，用于clickOneAsset方法判断。 0 转出账户   1 转入账户
 				userClickAsset: 0,
 				rules: {
-					'bill_amount': [
+					'serviceCharge': [
 						{
 							type: 'number',
 							message: '请输入数字金额'
@@ -221,6 +241,10 @@
 					transfer_amount: 0.00,  //转账金额
 					destination_asset_id: ''  // 转入资产id
 				},
+				// 转账页手续费
+				transferInfo: {
+					serviceCharge: 0.00
+				},
 				//  keyboard相关数据
 				keyboardInfo: {
 					notes: '',
@@ -236,6 +260,11 @@
 				// 账单的初始数据
 				editInitBill: {},
 				isEdit: false,
+				
+				// 模板管理相关数据
+				showTemplate: false,
+				isTemplate: false,
+				templateList: []
 			};
 		},
 		computed: {
@@ -260,7 +289,86 @@
 			this.initPage()
 			this.initEditPage(type,tab)
 		},
+		onShow() {
+			this.getUserTemplate()
+		},
 		methods: {
+			// 初始化相关方法
+			initPage() {
+				// 获取分类列表，该用户所有资产信息，将用户资产信息添加对应资产icon样式
+				this.categoryIconListForExpend = getCategoryIconListForExpend()
+				this.categoryIconListForIncome = getCategoryIconListForIncome()
+				this.userAssets = uni.getStorageSync('mj-user-assets')
+				this.expendOrIncomeInfo.asset_id = this.userAssets.filter(asset => asset.default_asset === true)[0]?._id ?? ''
+				this.assetsStyle = getAssetsStyle()
+				this.addAssetStyle()
+				this.currentAssetTitle = this.userAssets.filter(asset => asset.default_asset === true)[0]?.assetStyle.title ?? '未选择资产'
+				// console.log('onLoad,initPage:用户资产列表',this.userAssets);
+				// 获取用户模板列表
+				this.getUserTemplate()
+			},
+			// 给userAssets添加type值对应的assetStyle
+			addAssetStyle() {
+				this.userAssets.forEach(asset => {
+					asset.assetStyle = this.assetsStyle.find(item => item.type == asset.asset_type)
+				})
+				// console.log('addAssetStyle',this.assets);
+			},
+			// 编辑账单 初始化
+			initEditPage(type,tab) {
+				if(type === 'edit') {
+					// 赋值账单初始数据
+					this.editInitBill = uni.getStorageSync('mj-bill-edit')
+					this.isEdit = true
+					uni.removeStorage({
+						key: 'mj-bill-edit',
+						success: () => {}
+					})
+					// 触发clickTab事件，index为tab
+					this.$refs.tabs.clickHandler({},tab)
+					// 清洗editInitBill的asset_id和destination_asset_id，使其从array => string
+					this.editInitBill.asset_id = this.editInitBill.asset_id[0]?._id ?? ''
+					this.editInitBill.destination_asset_id = this.editInitBill.destination_asset_id[0]?._id ?? ''
+					// 修改transfer_amount的单位
+					this.editInitBill.transfer_amount ? this.editInitBill.transfer_amount /= 100 : ''
+					// console.log('editInitBill',this.editInitBill);
+					// 修改keyboard的数据
+					// 修改日期事件
+					this.userChooseDate = uni.$u.timeFormat(this.editInitBill.bill_date, 'mm月dd日')
+					// 修改备注
+					this.keyboardInfo.notes = this.editInitBill.bill_notes
+					if(tab != 2) {
+						// 如果是支出 和 收入 ，存入支出||收入表单信息
+						this.expendOrIncomeInfo = uni.$u.deepClone(this.editInitBill)
+						// 修改keyboard金额
+						this.keyboardInfo.balance = this.editInitBill.bill_amount.toFixed(2)
+						// 修改左下资产标题
+						this.currentAssetTitle = this.editInitBill?.assetStyle?.title ?? '未选择资产'
+						// 高亮选择的icon
+						if(tab == 0) {
+							this.currentExpendIndex = this.categoryIconListForExpend.findIndex(item => item.type === this.editInitBill.billStyle.type)
+						} else {
+							this.currentIncomeIndex = this.categoryIconListForIncome.findIndex(item => item.type === this.editInitBill.billStyle.type)
+						}
+					} else {
+						// 如果是转账，存入转账表单信息
+						this.transferAccountInfo = uni.$u.deepClone(this.editInitBill)
+						this.keyboardInfo.balance = this.editInitBill.transfer_amount.toFixed(2)
+						// 修改转账信息，只拿到了转出的资产信息
+						this.transferOutAssetStyle = this.editInitBill.assetStyle
+						// 将表单中转入账户id清空
+						this.transferAccountInfo.destination_asset_id = ''
+					}
+				}
+				if(type === 'template' || type === 'templateEdit') {
+					// 如果是添加或修改模板
+					// 标记为 模板管理页面 来的
+					this.isTemplate = true
+					if(type === 'templateEdit') {
+						console.log('修改模板，暂不支持');
+					}
+				}
+			},
 			clickTab({index}) {  // 0 支出  1 收入  2 转账
 				// 如果点击的是当前所在tab,return
 				if(this.currentTabIndex === index) return
@@ -325,6 +433,10 @@
 			chooseDate() {
 				this.showDatetimePicker = true
 			},
+			chooseTemplate() {
+				this.showTemplate = true
+				// 发起请求获取用户的模板列表数据
+			},
 			// 用户选择的日期，返回值为时间戳（毫秒）
 			getBillDate({value}) {
 				this.showDatetimePicker = false
@@ -335,7 +447,7 @@
 				this.transferAccountInfo.bill_date = value
 				this.userChooseDate = uni.$u.timeFormat(value, 'mm月dd日')
 			},
-			// keyboard被点击（不包含退格键）
+			// keyboard被点击（不包含退格键） e:用户在键盘点击的字符
 			tapKeyboard(e) {
 				// 允许最大8位整数
 				if(this.keyboardInfo.balance.length >= 9) {
@@ -348,6 +460,11 @@
 				let balance = this.keyboardInfo.balance
 				if(e === '保存') {
 					if(!uni.$u.test.amount(balance)) return
+					if(this.isTemplate) {
+						// 如果是添加模板
+						this.addOneTemplate()
+						return
+					}
 					if(this.isEdit) {
 						// 如果是编辑账单
 						// console.log('editInitBill',this.editInitBill);
@@ -408,7 +525,7 @@
 					return
 				}
 				this.expendOrIncomeInfo.bill_amount = Math.round(this.keyboardInfo.balance * 100)
-				this.expendOrIncomeInfo.bill_notes =this.keyboardInfo.notes
+				this.expendOrIncomeInfo.bill_notes = this.keyboardInfo.notes
 				await db.collection("mj-user-bills").add({
 					...this.expendOrIncomeInfo
 				})
@@ -426,17 +543,15 @@
 				// 表单验证失败返回false，成功返回true
 				const flag = await this.validatorTransferInfo()
 				if(!flag) return
-				this.transferAccountInfo.bill_amount = Math.round(this.transferAccountInfo.bill_amount * 100)
+				this.transferAccountInfo.bill_amount = Math.round(this.transferInfo.serviceCharge * 100)
 				this.transferAccountInfo.bill_notes = this.keyboardInfo.notes
 				this.transferAccountInfo.transfer_amount = Math.round(this.keyboardInfo.balance * 100)
 				// 组合备注
 				const transferOutTitle = this.userAssets.find(item => item._id === this.transferAccountInfo.asset_id).assetStyle.title
 				const transferInTitle = this.userAssets.find(item => item._id === this.transferAccountInfo.destination_asset_id).assetStyle.title
+				this.transferAccountInfo.bill_notes = `${this.transferAccountInfo.bill_notes + '-'}${transferOutTitle}转出至${transferInTitle},手续费${this.transferAccountInfo.bill_amount / 100}元`
 				// console.log('数据整理完毕，准备存入数据库',this.transferAccountInfo);
-				await db.collection("mj-user-bills").add({
-					...this.transferAccountInfo,
-					bill_notes: `${this.transferAccountInfo.bill_notes + '-'}${transferOutTitle}转出至${transferInTitle},手续费${this.transferAccountInfo.bill_amount / 100}`
-					})
+				await db.collection("mj-user-bills").add({...this.transferAccountInfo})
 				uni.switchTab({
 					url:"/pages/index/index"
 				})
@@ -449,8 +564,8 @@
 					this.isSetRules = true
 				}
 				let flag = false
-				// 如果是0 不走验证，如果是其他，走验证
-				this.transferAccountInfo.bill_amount == 0 ? '' : flag = true
+				// 如果手续费是0 不走验证，如果是其他，走验证
+				this.transferInfo.serviceCharge == 0 ? '' : flag = true
 				if(flag) {
 					// 验证成功则继续执行，验证失败中断执行
 					try{
@@ -549,7 +664,7 @@
 					// 表单验证失败返回false，成功返回true
 					const flag = await this.validatorTransferInfo()
 					if(!flag) return
-					this.transferAccountInfo.bill_amount = Math.round(this.transferAccountInfo.bill_amount * 100)
+					this.transferAccountInfo.bill_amount = Math.round(this.transferInfo.serviceCharge * 100)
 					this.transferAccountInfo.bill_notes = this.keyboardInfo.notes
 					this.transferAccountInfo.transfer_amount = Math.round(this.keyboardInfo.balance * 100)
 					// console.log('数据整理完毕，准备更新数据库',this.transferAccountInfo);
@@ -670,78 +785,124 @@
 				}
 			},
 			
-			
-			
-			
-			
-			// 初始化相关方法
-			initPage() {
-				// 获取分类列表，该用户所有资产信息，将用户资产信息添加对应资产icon样式
-				this.categoryIconListForExpend = getCategoryIconListForExpend()
-				this.categoryIconListForIncome = getCategoryIconListForIncome()
-				this.userAssets = uni.getStorageSync('mj-user-assets')
-				this.expendOrIncomeInfo.asset_id = this.userAssets.filter(asset => asset.default_asset === true)[0]?._id ?? ''
-				this.assetsStyle = getAssetsStyle()
-				this.addAssetStyle()
-				this.currentAssetTitle = this.userAssets.filter(asset => asset.default_asset === true)[0]?.assetStyle.title ?? '未选择资产'
-				// console.log('onLoad,initPage:用户资产列表',this.userAssets);
-			},
-			// 给userAssets添加type值对应的assetStyle
-			addAssetStyle() {
-				this.userAssets.forEach(asset => {
-					asset.assetStyle = this.assetsStyle.find(item => item.type == asset.asset_type)
-				})
-				// console.log('addAssetStyle',this.assets);
-			},
-			// 编辑账单 初始化
-			initEditPage(type,tab) {
-				if(type === 'edit') {
-					// 赋值账单初始数据
-					this.editInitBill = uni.getStorageSync('mj-bill-edit')
-					this.isEdit = true
-					uni.removeStorage({
-						key: 'mj-bill-edit',
-						success: () => {}
-					})
-					// 触发clickTab事件，index为tab
-					this.$refs.tabs.clickHandler({},tab)
-					// 清洗editInitBill的asset_id和destination_asset_id，使其从array => string
-					this.editInitBill.asset_id = this.editInitBill.asset_id[0]?._id ?? ''
-					this.editInitBill.destination_asset_id = this.editInitBill.destination_asset_id[0]?._id ?? ''
-					// 修改transfer_amount的单位
-					this.editInitBill.transfer_amount ? this.editInitBill.transfer_amount /= 100 : ''
-					// console.log('editInitBill',this.editInitBill);
-					// 修改keyboard的数据
-					// 修改日期事件
-					this.userChooseDate = uni.$u.timeFormat(this.editInitBill.bill_date, 'mm月dd日')
-					// 修改备注
-					this.keyboardInfo.notes = this.editInitBill.bill_notes
-					if(tab != 2) {
-						// 如果是支出 和 收入 ，存入支出||收入表单信息
-						this.expendOrIncomeInfo = uni.$u.deepClone(this.editInitBill)
-						// 修改keyboard金额
-						this.keyboardInfo.balance = this.editInitBill.bill_amount.toFixed(2)
-						// 修改左下资产标题
-						this.currentAssetTitle = this.editInitBill?.assetStyle?.title ?? '未选择资产'
-						// 高亮选择的icon
-						if(tab == 0) {
-							this.currentExpendIndex = this.categoryIconListForExpend.findIndex(item => item.type === this.editInitBill.billStyle.type)
-						} else {
-							this.currentIncomeIndex = this.categoryIconListForIncome.findIndex(item => item.type === this.editInitBill.billStyle.type)
-						}
-					} else {
-						// 如果是转账，存入转账表单信息
-						this.transferAccountInfo = uni.$u.deepClone(this.editInitBill)
-						this.keyboardInfo.balance = this.editInitBill.transfer_amount.toFixed(2)
-						// 修改转账信息，只拿到了转出的资产信息
-						this.transferOutAssetStyle = this.editInitBill.assetStyle
-						// 将表单中转入账户id清空
-						this.transferAccountInfo.destination_asset_id = ''
+			// 添加模板相关方法
+			async addOneTemplate() {
+				// 1 判断用户支出||收入||转账
+				// 2 进行表单验证
+				// 3 验证通过，保存模板，并回到上一页
+				console.log('保存一个模板',this.expendOrIncomeInfo,this.transferAccountInfo);
+				if(!this.showTransferAccounts) {
+					// 类型为支出||收入
+					// 金额不能为0
+					if(Number(this.keyboardInfo.balance) === 0) {
+						uni.showToast({
+							title:"请填写金额",
+							icon:"none"
+						})
+						return
 					}
+					if(!this.expendOrIncomeInfo.asset_id) {
+						uni.showToast({
+							title:"请选择资产",
+							icon:"none"
+						})
+						return
+					}
+					this.expendOrIncomeInfo.bill_amount = Math.round(this.keyboardInfo.balance * 100)
+					this.expendOrIncomeInfo.bill_notes = this.keyboardInfo.notes
+					const {asset_id,bill_amount,bill_notes,bill_type,category_type} = this.expendOrIncomeInfo
+					await db.collection("mj-user-templates").add({
+						asset_id,bill_amount,bill_notes,bill_type,category_type
+					})
+					uni.navigateBack()
+				} else {
+					// 类型为转账
+					// 添加转账账单
+					// 1 验证手续费格式
+					// 2 验证转出转入账户是否都存在，并且不相同
+					// 3 存入bill_amount，存入keyboard信息，金额不准为0
+					// 表单验证失败返回false，成功返回true
+					const flag = await this.validatorTransferInfo()
+					if(!flag) return
+					this.transferAccountInfo.bill_amount = Math.round(this.transferInfo.serviceCharge * 100)
+					this.transferAccountInfo.bill_notes = this.keyboardInfo.notes
+					this.transferAccountInfo.transfer_amount = Math.round(this.keyboardInfo.balance * 100)
+					// 组合备注
+					const transferOutTitle = this.userAssets.find(item => item._id === this.transferAccountInfo.asset_id).assetStyle.title
+					const transferInTitle = this.userAssets.find(item => item._id === this.transferAccountInfo.destination_asset_id).assetStyle.title
+					this.transferAccountInfo.bill_notes = `${this.transferAccountInfo.bill_notes + '-'}${transferOutTitle}转出至${transferInTitle},手续费${this.transferAccountInfo.bill_amount / 100}元`
+					// console.log('数据整理完毕，准备存入数据库',this.transferAccountInfo);
+					const {asset_id,bill_amount,bill_notes,bill_type,category_type,destination_asset_id,transfer_amount} = this.transferAccountInfo
+					await db.collection("mj-user-templates").add({asset_id, bill_amount, bill_type, category_type, destination_asset_id, transfer_amount, bill_notes})
+					uni.navigateBack()
 				}
 			},
-		},
-		
+			// 点击添加模板按钮
+			goTemplatePage() {
+				uni.navigateTo({
+					url: `/pagesAccount/make-an-account/make-an-account?type=template`
+				})
+				this.showTemplate = false
+			},
+			// 获取用户的模板
+			async getUserTemplate() {
+				const res = await db.collection('mj-user-templates').where('user_id == $cloudEnv_uid').orderBy('template_creation_date desc').get()
+				this.templateList = res.result.data
+			},
+			// 点击模板卡片触发，获取用户点击的模板数据，并赋值
+			getTemp(temp) {
+				console.log('temp: ',temp);
+				const {bill_type, category_type, bill_notes, bill_amount, asset_id, hasAsset, transfer_amount, hasDestinationAsset, destination_asset_id} = temp
+				this.clickTab({index: bill_type})
+				if(bill_type !== 2) {
+					// 支出||收入模板
+					// 账单类型
+					this.expendOrIncomeInfo.bill_type = bill_type
+					// 分类
+					this.expendOrIncomeInfo.category_type = category_type
+					if(bill_type === 0) {
+						const index = this.categoryIconListForExpend.findIndex(item => item.type === category_type)
+						this.currentExpendIndex = index
+					} else {
+						const index = this.categoryIconListForIncome.findIndex(item => item.type === category_type)
+						this.currentIncomeIndex = index
+					}
+					// 备注
+					this.keyboardInfo.notes = bill_notes
+					// 金额
+					this.keyboardInfo.balance = bill_amount.toString()
+					// 资产
+					if(hasAsset) {
+						this.expendOrIncomeInfo.asset_id = asset_id
+						this.currentAssetTitle = temp.assetStyle.title
+					} else {
+						this.expendOrIncomeInfo.asset_id = ''
+						this.currentAssetTitle = '资产已删除'
+					}
+				} else {
+					// 转账模板
+					// 账单类型和分类类型不变
+					// 备注 只截取 - 前面的值
+					const regex = /^([^-\n]+)/
+					const match = regex.exec(bill_notes)
+					this.keyboardInfo.notes = match ? match[1] : ''
+					// 金额
+					this.keyboardInfo.balance = (transfer_amount / 100).toString()
+					// 手续费
+					this.transferInfo.serviceCharge = bill_amount
+					// 转出账户
+					if(hasAsset) {
+						this.transferAccountInfo.asset_id = asset_id
+						this.transferOutAssetStyle = temp.assetStyle
+					}
+					if(hasDestinationAsset) {
+						this.transferAccountInfo.destination_asset_id = destination_asset_id
+						this.transferIntoAssetStyle = temp.destinationAssetStyle
+					}
+				}
+				this.showTemplate = false
+			}
+		}
 	}
 </script>
 
@@ -881,6 +1042,45 @@
 						}
 					}
 				}
+			}
+		}
+		.user-template-list {
+			
+			.header {
+				display: flex;
+				justify-content: space-between;
+				padding-top: 24rpx;
+				.left {
+					visibility: hidden;
+					box-sizing: border-box;
+					padding: 4px 8px;
+					margin-left: 8px;
+					background-color: $mj-theme-color;
+					border-radius: 16px;
+					font-size: 28rpx;
+					color: $mj-bg-color;
+				}
+				.middle {
+					text-align: center;
+					// scss中font另一种写法
+					font: {
+						size: 32rpx;
+						weight: bold;
+					}
+				}
+				.right {
+					box-sizing: border-box;
+					padding: 4px 8px;
+					margin-right: 8px;
+					background-color: $mj-theme-color;
+					border-radius: 16px;
+					font-size: 28rpx;
+					color: $mj-bg-color;
+				}
+			}
+			.template-list {
+				max-height: 750rpx;
+				overflow: auto;
 			}
 		}
 	}

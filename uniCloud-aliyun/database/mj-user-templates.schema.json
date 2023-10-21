@@ -26,10 +26,10 @@
 				"$env": "now"
 			}
 		},
-		"category_code": {
-			"bsonType": "int",
-			"description": "分类编号，默认为0 餐饮",
-			"defaultValue": 0
+		"category_type": {
+			"bsonType": "string",
+			"description": "分类类型，默认为dining 餐饮",
+			"defaultValue": "dining"
 		},
 		"bill_type": {
 			"bsonType": "int",

@@ -15,10 +15,10 @@
 		</view>
 		<view class="card-money">
 			<view class="left">
-				月支出：<u--text mode="price" :text="monthlyBalance.monthlyExpend" color="#219a6d" size="24rpx" bold></u--text>
+				月支出：<u--text mode="price" :text="monthlyBalance.monthlyExpend" color="#dd524d" size="24rpx" bold></u--text>
 			</view>
 			<view class="right">
-				月收入：<u--text mode="price" :text="monthlyBalance.monthlyIncome" color="#dd524d" size="24rpx" bold></u--text>
+				月收入：<u--text mode="price" :text="monthlyBalance.monthlyIncome" color="#219a6d" size="24rpx" bold></u--text>
 			</view>
 		</view>
 		<view class="bill-list">
@@ -27,8 +27,14 @@
 				<text>账单明细</text>
 			</view>
 			<!-- 需要 到达底部钩子，按需加载 -->
-			<view v-for="index in 31" :key="index">
-				<mj-bill-card :userBillsFromDB="userBillsByDay[index]" :userAssetsFromDB="userAssets" :indexTemp="index"></mj-bill-card>
+			<!-- 延迟加载 -->
+			<template v-if="!delay">
+				<view v-for="index in 31" :key="index">
+					<mj-bill-card :userBillsFromDB="userBillsByDay[index]" :userAssetsFromDB="userAssets"></mj-bill-card>
+				</view>
+			</template>
+			<view v-show="userBillsCount === 0">
+				<u-empty mode="list" text="没有找到符合条件的账单哦,快去记一笔吧"></u-empty>
 			</view>
 			<view v-show="userBillsCount === 0">
 				<u-empty mode="list" text="没有找到符合条件的账单哦,快去记一笔吧"></u-empty>
@@ -92,7 +98,8 @@
 					monthlyExpend: 0,
 					monthlyIncome: 0
 				},
-				firstEntry: true
+				firstEntry: true,
+				delay: true
 			};
 		},
 		computed: {
@@ -118,7 +125,7 @@
 				await this.getUserBills()
 				// 获取用户资产列表
 				this.getUserAssets()
-				// 获取报表数据
+				// 获取报表数据 ，延迟渲染账单数据，在报表中delay = false
 				this.getChartData()
 				uni.$on('updateBillPage',this.upDateMonthBills)
 			}
@@ -272,6 +279,8 @@
 				}
 				
 				this.chartsDataColumn=result
+				// 延迟渲染账单列表
+				this.delay = false
 			},
 			// 触发日期选择器
 			pickDate(res) {

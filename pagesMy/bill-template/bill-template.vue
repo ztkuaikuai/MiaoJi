@@ -5,10 +5,11 @@
 				账单模板可用于经常购买或记帐的账单，如每天都吃香菇滑鸡11元，可保存为帐单模板方便快速记账。
 			</view>
 		</mj-card>
-		<!-- 传入用户模板账单组成的数组，组件内进行遍历 -->
+		<!-- 传入用户模板账单组成的对象数组，组件内进行遍历 -->
 		<view class="bill-template-wrapper">
-			<mj-bill-template></mj-bill-template>
+			<mj-bill-template :templateList="templateList" @updateList="getUserTemplate" pageType="temp"></mj-bill-template>
 		</view>
+		<view class="placeholder"></view>
 		<!-- 固定定位，最底下 -->
 		<view class="bottom-btn" >
 			<u-button text="添加模板" color="#9fcba7" shape="circle" @click="clickBottomBtn"></u-button>
@@ -17,24 +18,38 @@
 </template>
 
 <script>
+	const db = uniCloud.database()
 	export default {
 		data() {
 			return {
-				
+				templateList: []
 			};
 		},
 		onLoad() {
-			
+			this.getUserTemplate()
+		},
+		onShow() {
+			this.getUserTemplate()
 		},
 		methods: {
 			clickBottomBtn() {
-				console.log("添加模板");
+				uni.navigateTo({
+					url: `/pagesAccount/make-an-account/make-an-account?type=template`
+				})
+			},
+			async getUserTemplate() {
+				// 获取模板信息
+				const res = await db.collection('mj-user-templates').where('user_id == $cloudEnv_uid').orderBy('template_creation_date desc').get()
+				this.templateList = res.result.data
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
+	.placeholder {
+		height: 64px;
+	}
 	.bottom-btn {
 		box-sizing: border-box;
 		z-index: 999;

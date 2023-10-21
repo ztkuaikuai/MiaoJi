@@ -152,13 +152,9 @@
 						})
 						break
 					case 1:
-						uni.showToast({
-							title:"正在开发中~",
-							icon: "none"
+						uni.navigateTo({
+							url:"/pagesMy/bill-template/bill-template"
 						})
-						// uni.navigateTo({
-						// 	url:"/pagesMy/bill-template/bill-template"
-						// })
 						break
 					default:
 						uni.showToast({
