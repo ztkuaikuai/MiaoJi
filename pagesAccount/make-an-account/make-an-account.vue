@@ -264,6 +264,8 @@
 				// 模板管理相关数据
 				showTemplate: false,
 				isTemplate: false,
+				isTemplateEdit: false,
+				templateEditId: '',
 				templateList: []
 			};
 		},
@@ -314,7 +316,7 @@
 				})
 				// console.log('addAssetStyle',this.assets);
 			},
-			// 编辑账单 初始化
+			// 编辑账单||编辑模板 初始化
 			initEditPage(type,tab) {
 				if(type === 'edit') {
 					// 赋值账单初始数据
@@ -362,10 +364,20 @@
 				}
 				if(type === 'template' || type === 'templateEdit') {
 					// 如果是添加或修改模板
-					// 标记为 模板管理页面 来的
+					// 标记为 模板页面
 					this.isTemplate = true
 					if(type === 'templateEdit') {
-						console.log('修改模板，暂不支持');
+						// 修改模板
+						this.isTemplateEdit = true
+						const temp = uni.getStorageSync('mj-user-temp-template')
+						// 设置编辑模板的id
+						this.templateEditId = temp._id
+						this.getTemp(temp)
+						// 删除缓存的数据
+						uni.removeStorage({
+							key: 'mj-user-temp-template',
+							success: () => {}
+						})
 					}
 				}
 			},
@@ -461,7 +473,13 @@
 				if(e === '保存') {
 					if(!uni.$u.test.amount(balance)) return
 					if(this.isTemplate) {
-						// 如果是添加模板
+						// 如果是添加或编辑模板
+						if(this.isTemplateEdit) {
+							// 如果是编辑模板
+							// 通过模板id删除之前的模板
+							db.collection('mj-user-templates').doc(this.templateEditId).remove()
+						}
+						// 添加新模板
 						this.addOneTemplate()
 						return
 					}
@@ -790,7 +808,6 @@
 				// 1 判断用户支出||收入||转账
 				// 2 进行表单验证
 				// 3 验证通过，保存模板，并回到上一页
-				console.log('保存一个模板',this.expendOrIncomeInfo,this.transferAccountInfo);
 				if(!this.showTransferAccounts) {
 					// 类型为支出||收入
 					// 金额不能为0
@@ -849,7 +866,7 @@
 				const res = await db.collection('mj-user-templates').where('user_id == $cloudEnv_uid').orderBy('template_creation_date desc').get()
 				this.templateList = res.result.data
 			},
-			// 点击模板卡片触发，获取用户点击的模板数据，并赋值
+			// 点击模板卡片||编辑模板 触发，获取用户点击的模板数据，并赋值
 			getTemp(temp) {
 				console.log('temp: ',temp);
 				const {bill_type, category_type, bill_notes, bill_amount, asset_id, hasAsset, transfer_amount, hasDestinationAsset, destination_asset_id} = temp
