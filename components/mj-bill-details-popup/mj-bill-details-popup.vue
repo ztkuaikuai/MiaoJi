@@ -73,7 +73,7 @@
 				</mj-card>
 			</view>
 		</view>
-		<u-safe-bottom></u-safe-bottom>
+		<u-safe-bottom v-if="type !== 'bill'"></u-safe-bottom>
 	</u-popup>
 </template>
 
@@ -93,6 +93,10 @@
 			safeAreaInsetBottom : {
 				type: Boolean,
 				default: false
+			},
+			type: {
+				type: String,
+				default: 'bill'
 			}
 		},
 		data() {

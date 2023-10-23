@@ -39,6 +39,7 @@
 
 		
 		<mj-bill-details-popup
+			type="temp"
 			:bill="templateDetails"
 			:show="showBillDetails" 
 			@close="showBillDetails = false" 
