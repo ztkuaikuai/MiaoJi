@@ -1,5 +1,6 @@
 <template>
 	<view class="my">
+		<view class="linear-gradient"></view>
 		<!-- 用户卡片 -->
 		<uni-card :is-shadow="true" @click="clickUserCard" shadow="rgba(149, 157, 165, 0.2) 0px 8px 24px;">
 			<view class="user-card">
@@ -136,7 +137,6 @@
 				return
 			}
 			this.resetUserInfo()
-
 		},
 		methods: {
 			clickUserCard() {
@@ -202,7 +202,7 @@
 			
 			
 			
-			// 页面挂载时获取数据  1 如果有缓存，获取缓存进行渲染  2 若无缓存，获取db数据，并赋值，存入缓存  3 获取用户使用天数
+			// 页面挂载时获取数据  1 如果有缓存，获取缓存进行渲染  2 若无缓存，获取db数据，并赋值  3 获取用户使用天数 4 存入缓存
 			async getUserInfo() {
 				try {
 					const storageUserInfo = uni.getStorageSync('mj-user-info')
@@ -211,7 +211,7 @@
 					} else {
 						const res = await db.collection("uni-id-users").where("_id == $cloudEnv_uid").field(
 							"_id,nickname,avatar,register_date").get()
-						const {
+						let {
 							avatar: avatarSrc,
 							nickname,
 							register_date: registerDate
@@ -227,12 +227,21 @@
 						})
 					}
 					this.getUserDate()
+					uni.setStorage({
+						key:'mj-user-info',
+						data: this.userInfo
+					})
 				} catch (err) {
-					// console.log(err);
+					console.log('err',err);
 				}
 			},
 			resetUserInfo() {
 				const storageUserInfo = uni.getStorageSync('mj-user-info')
+				if(!storageUserInfo) {
+					// 如果没有用户信息的缓存
+					this.getUserInfo()
+					return
+				}
 				Object.assign(this.userInfo, storageUserInfo)
 				this.getUserDate()
 			},
@@ -262,6 +271,15 @@
 
 <style lang="scss" scoped>
 	.my {
+		position: relative;
+		.linear-gradient {
+			position: absolute;
+			top: -15px;
+			left: 0;
+			right: 0;
+			height: 220rpx;
+			background-image: linear-gradient(#9fcba7, #fafafa);
+		}
 		.user-card {
 			display: flex;
 			justify-content: space-between;

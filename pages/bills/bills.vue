@@ -8,6 +8,7 @@
 				筛选
 			</view>
 		</view>
+		<view class="linear-gradient"></view>
 		<view class="card-chart">
 			<view class="ucharts">
 				<qiun-data-charts type="column" :opts="opts" :chartData="chartsDataColumn" :ontouch="true" canvasId="uchartscolumn1" :canvas2d="true" />
@@ -33,9 +34,6 @@
 					<mj-bill-card :userBillsFromDB="userBillsByDay[index]" :userAssetsFromDB="userAssets"></mj-bill-card>
 				</view>
 			</template>
-			<view v-show="userBillsCount === 0">
-				<u-empty mode="list" text="没有找到符合条件的账单哦,快去记一笔吧"></u-empty>
-			</view>
 			<view v-show="userBillsCount === 0">
 				<u-empty mode="list" text="没有找到符合条件的账单哦,快去记一笔吧"></u-empty>
 			</view>
@@ -325,6 +323,7 @@
 
 <style lang="scss" scoped>
 .bills {
+	position: relative;
 	.header-fixed {
 		position: fixed;
 		width: 100%;
@@ -340,6 +339,15 @@
 		font-size: 32rpx;
 		color: $mj-text-color;
 		z-index: 999;
+	}
+	.linear-gradient {
+		position: absolute;
+		top: -16rpx;
+		left: 0;
+		right: 0;
+		height: 100rpx;
+		background-image: linear-gradient(#9fcba7, #fafafa);
+		z-index: -1;
 	}
 	.card-chart {
 		margin: 0 28rpx;
