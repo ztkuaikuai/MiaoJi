@@ -36,6 +36,9 @@
 			<view v-show="userBillsCount === 0">
 				<u-empty mode="list" text="没有找到符合条件的账单哦,快去记一笔吧"></u-empty>
 			</view>
+			<view v-show="userBillsCount === 0">
+				<u-empty mode="list" text="没有找到符合条件的账单哦,快去记一笔吧"></u-empty>
+			</view>
 		</view>
 	</view>
 </template>
@@ -115,7 +118,6 @@
 			const state = UT.checkUserTokenExpierd() // 检查老用户的token是否过期，如果过期则跳转登录，并返回true；没过期返回false
 			if(state) return
 			// console.log("用户token没过期，继续执行下面的逻辑");
-			
 			// 如果用户登陆了，进行初始化
 			const {uid} = uniCloud.getCurrentUserInfo()
 			if (uid) {
