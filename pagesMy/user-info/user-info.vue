@@ -1,5 +1,6 @@
 <template>
 	<view class="userInfo">
+		<view class="linear-gradient"></view>
 		<mj-card title="我的">
 			<view class="me">
 				<view class="avatar">
@@ -151,15 +152,22 @@
 
 <style lang="scss" scoped>
 	.userInfo {
+		position: relative;
+		.linear-gradient {
+			position: absolute;
+			top: -24rpx;
+			left: 0;
+			right: 0;
+			height: 130rpx;
+			background-image: linear-gradient(#9fcba7, #fafafa);
+			z-index: -1;
+		}
 		.me {
-
 			display: flex;
 			justify-content: start;
 			align-items: center;
-
 			.avatar {
 				position: relative;
-
 				.avatarBtn {
 					position: absolute;
 					top: 0;
@@ -169,7 +177,6 @@
 					opacity: 0;
 				}
 			}
-
 			.main {
 				margin-left: 20rpx;
 				margin-top: 8rpx;
@@ -177,14 +184,12 @@
 				flex-direction: column;
 				justify-content: center;
 				align-items: flex-start;
-
 				.username {
 					font-size: 40rpx;
 					line-height: 40rpx;
 					color: $mj-text-color;
 					margin-bottom: 16rpx;
 				}
-
 				.day {
 					font-size: 28rpx;
 					line-height: 28rpx;

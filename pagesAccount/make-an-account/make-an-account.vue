@@ -174,6 +174,7 @@
 	export default {
 		data() {
 			return {
+				pageType: 'add', // 页面类型，默认为添加； 还有 edit：编辑；template：添加模板；templateEdit：编辑模板；
 				tabList: [{
 					name: '支出'
 				}, {
@@ -266,7 +267,9 @@
 				isTemplate: false,
 				isTemplateEdit: false,
 				templateEditId: '',
-				templateList: []
+				templateList: [],
+				// 再记标识
+				isAddAgain: false,
 			};
 		},
 		computed: {
@@ -288,6 +291,7 @@
 			}
 		},
 		onLoad({type,tab}) {
+			this.pageType = type ?? 'add'
 			this.initPage()
 			this.initEditPage(type,tab)
 		},
@@ -471,35 +475,17 @@
 				}
 				let balance = this.keyboardInfo.balance
 				if(e === '保存') {
-					if(!uni.$u.test.amount(balance)) return
-					if(this.isTemplate) {
-						// 如果是添加或编辑模板
-						if(this.isTemplateEdit) {
-							// 如果是编辑模板
-							// 通过模板id删除之前的模板
-							db.collection('mj-user-templates').doc(this.templateEditId).remove()
-						}
-						// 添加新模板
-						this.addOneTemplate()
-						return
-					}
-					if(this.isEdit) {
-						// 如果是编辑账单
-						// console.log('editInitBill',this.editInitBill);
-						// console.log('transferAccountInfo',this.transferAccountInfo);
-						// console.log('expendOrIncomeInfo',this.expendOrIncomeInfo);
-						this.updateUserBill()
-						return
-					}
-					if(this.showTransferAccounts) {
-						this.addOneTransfer()
-						return
-					}
-					this.addOneBill()
+					// 使用节流，防止用户持续点击导致的重复增加账单
+					uni.$u.throttle(this.tapSaveBtn, 10000)
+				} else if (e === '再记') {
+					uni.showToast({title:"正在开发中~",icon: 'none'})
+					// 再记：保存数据，上传数据库，并跳转到新的记一笔页面
+					// uni.$u.throttle(this.addAgain, 10000)
+					// return
 				} else if (e === '.') {
 					if(balance.indexOf('.') !== -1) return // 如果含有 .  return
 					balance += e
-				} else if (e === '再记' || e === '秒记1' || e === '秒记2') {  // 再记：保存数据，上传数据库，提示用户，并清空重置
+				} else if (e === '秒记1' || e === '秒记2') {
 					uni.showToast({title:"正在开发中~",icon: 'none'})
 				} else {
 					// 用户输入0-9
@@ -524,7 +510,42 @@
 				// console.log('更新后的balance',balance)
 				this.keyboardInfo.balance = balance.toString()
 			},
-			
+			// 用户点击再记触发
+			addAgain() {
+				if(this.pageType !== 'add') {
+					uni.showToast({title:"“再记”只可以在添加账单时使用",icon: 'none'})
+				}
+				this.isAddAgain = true
+				this.tapSaveBtn()
+			},
+			// 用户点击保存按钮触发  判断类型，并触发相应逻辑
+			tapSaveBtn() {
+				if(!uni.$u.test.amount(this.keyboardInfo.balance)) return
+				if(this.isTemplate) {
+					// 如果是添加或编辑模板
+					if(this.isTemplateEdit) {
+						// 如果是编辑模板
+						// 通过模板id删除之前的模板
+						db.collection('mj-user-templates').doc(this.templateEditId).remove()
+					}
+					// 添加新模板
+					this.addOneTemplate()
+					return
+				}
+				if(this.isEdit) {
+					// 如果是编辑账单
+					// console.log('editInitBill',this.editInitBill);
+					// console.log('transferAccountInfo',this.transferAccountInfo);
+					// console.log('expendOrIncomeInfo',this.expendOrIncomeInfo);
+					this.updateUserBill()
+					return
+				}
+				if(this.showTransferAccounts) {
+					this.addOneTransfer()
+					return
+				}
+				this.addOneBill()
+			},
 			// 添加支出||收入账单
 			async addOneBill() {
 				// 金额不能为0
@@ -547,6 +568,16 @@
 				await db.collection("mj-user-bills").add({
 					...this.expendOrIncomeInfo
 				})
+				// 如果为再记
+				if(this.isAddAgain) {
+					console.log('再记，有些问题：1 按钮依然有节流  2 资产金额不对');
+					return
+					await this.upDateUserAssetBalance()
+					uni.redirectTo({
+						url:'/pagesAccount/make-an-account/make-an-account'
+					})
+					return
+				}
 				uni.switchTab({
 					url:"/pages/index/index"
 				})

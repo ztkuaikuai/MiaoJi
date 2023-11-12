@@ -11,7 +11,14 @@
 		<view class="linear-gradient"></view>
 		<view class="card-chart">
 			<view class="ucharts">
-				<qiun-data-charts type="column" :opts="opts" :chartData="chartsDataColumn" :ontouch="true" canvasId="uchartscolumn1" :canvas2d="true" />
+				<qiun-data-charts 
+					type="column" 
+					:opts="opts" 
+					:chartData="chartsDataColumn" 
+					:ontouch="true" 
+					canvasId="uchartscolumn1" 
+					:canvas2d="true" 
+				/>
 			</view>
 		</view>
 		<view class="card-money">
@@ -28,12 +35,13 @@
 				<text>账单明细</text>
 			</view>
 			<!-- 需要 到达底部钩子，按需加载 -->
-			<!-- 延迟加载 -->
-			<template v-if="!delay">
-				<view v-for="index in 31" :key="index">
-					<mj-bill-card :userBillsFromDB="userBillsByDay[index]" :userAssetsFromDB="userAssets"></mj-bill-card>
-				</view>
-			</template>
+				<mj-bill-card 
+					v-for="(bills,index) in userBillsByDay"
+					:key="index"
+					:userBillsFromDB="bills" 
+					:userAssetsFromDB="userAssets"
+				>
+				</mj-bill-card>
 			<view v-show="userBillsCount === 0">
 				<u-empty mode="list" text="没有找到符合条件的账单哦,快去记一笔吧"></u-empty>
 			</view>
@@ -87,6 +95,7 @@
 					},
 				},
 				month: uni.$u.timeFormat(Date.now(), 'yyyy-mm'),
+				monthNow: uni.$u.timeFormat(Date.now(), 'yyyy-mm'),
 				userAssets: [],
 				userBills: [],
 				// 按日分组的账单，给mj-bill-card使用
@@ -96,8 +105,6 @@
 					monthlyExpend: 0,
 					monthlyIncome: 0
 				},
-				firstEntry: true,
-				delay: true
 			};
 		},
 		computed: {
@@ -123,9 +130,11 @@
 				await this.getUserBills()
 				// 获取用户资产列表
 				this.getUserAssets()
-				// 获取报表数据 ，延迟渲染账单数据，在报表中delay = false
+				// 获取报表数据
 				this.getChartData()
 				uni.$on('updateBillPage',this.upDateMonthBills)
+				// 将状态改为非初始化
+				this.initBillCard = false
 			}
 			
 		},
@@ -138,14 +147,6 @@
 				})
 				return
 			}
-			if(this.firstEntry) {
-				// 用户第一次进入账单页面
-				this.firstEntry = false
-			} else {
-				// 用户再次进入账单页面
-				this.getMonthBills(this.month)
-			}
-			
 		},
 		methods: {
 			toFilterBills() {
@@ -167,6 +168,13 @@
 				}
 			},
 			async getMonthBills(month) {
+				// 如果非初始化
+				if(!this.initBillCard) {
+					// 重置账单和图表数据
+					this.userBillsByDay = []
+					this.chartsDataColumn = {}
+				}
+				
 				// 按月份获取账单 记账日期降序排列
 				const userMonthBills = db.collection("mj-user-bills").where(`user_id == $cloudEnv_uid && dateToString(add(new Date(0),bill_date),"%Y-%m","+0800") == "${month}"`).orderBy('bill_date desc').getTemp()
 				const userAssets = db.collection("mj-user-assets").where('user_id == $cloudEnv_uid').field('_id,asset_type,user_id').getTemp()
@@ -189,10 +197,10 @@
 				this.monthlyBalance.monthlyExpend = categorizedBillsByBillType[0] + categorizedBillsByBillType[2]
 				this.monthlyBalance.monthlyIncome = categorizedBillsByBillType[1]
 				
-				let numberOfDays = 31
+				let numberOfDays
 				// 按天对bill进行分类
-				if(this.initBillCard) {
-					// 如果是初始化
+				if(this.initBillCard || this.month === this.monthNow) {
+					// 如果是初始化 或者是当月
 					// 创建一个二维数组，元素个数按1号到今天 9号创建9个
 					const today = new Date();
 					numberOfDays = today.getDate();
@@ -218,14 +226,12 @@
 				// [[今天的账单],[昨天的账单],[前天账单],[9月6日账单]……[9月1日账单]]
 				// [[月末的账单],…………[月初的账单]]
 				
-				
-				// 非初始化，重新渲染账单和图表
+				// 非初始化，重新渲染图表
 				if(!this.initBillCard) this.getChartData()
 			},
 			upDateMonthBills() {
 				// 用户点击确认删除账单触发
-				// initBillCard为false，告知getMonthBills 非初始化，更新图表
-				this.initBillCard = false
+				// 更新账单，更新过程中图表显示loading，账单更新完毕后更新图表
 				this.getMonthBills(this.month)
 			},
 			getUserAssets() {
@@ -276,18 +282,15 @@
 				  result.series[1].data.push(dayIncome);
 				}
 				
-				this.chartsDataColumn=result
-				// 延迟渲染账单列表
-				this.delay = false
+				this.chartsDataColumn = result
 			},
 			// 触发日期选择器
 			pickDate(res) {
 				// 用户选择了月账单
 				// 1 格式化日期，获得月份 如2023-09
-				// 2 initBillCard为false，告知getMonthBills 非初始化，更新图表
+				// 2 更新账单，更新过程中图表显示loading，账单更新完毕后更新图表
 				const {value} = res
 				this.month = uni.$u.timeFormat(value, 'yyyy-mm')
-				this.initBillCard = false
 				this.getMonthBills(this.month)
 				
 			},
@@ -342,7 +345,7 @@
 	}
 	.linear-gradient {
 		position: absolute;
-		top: -16rpx;
+		top: -18rpx;
 		left: 0;
 		right: 0;
 		height: 100rpx;

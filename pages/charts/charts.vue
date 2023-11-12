@@ -391,7 +391,7 @@
 		}
 		.linear-gradient {
 			position: absolute;
-			top: -16rpx;
+			top: -18rpx;
 			left: 0;
 			right: 0;
 			height: 100rpx;

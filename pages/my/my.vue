@@ -277,7 +277,7 @@
 			top: -15px;
 			left: 0;
 			right: 0;
-			height: 220rpx;
+			height: 130rpx;
 			background-image: linear-gradient(#9fcba7, #fafafa);
 		}
 		.user-card {

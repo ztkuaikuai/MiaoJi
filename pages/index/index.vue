@@ -53,9 +53,13 @@
 				</view>
 			</view>
 			<!-- 组件：账单卡片 -->
-			<view v-for="index in 3" :key="index">
-				<mj-bill-card :userBillsFromDB="userBills[index].data" :userAssetsFromDB="userAssets" :indexTemp="index"></mj-bill-card>
-			</view>
+			<mj-bill-card 
+				v-for="(bills,index) in userBills"
+				:key="index"
+				:userBillsFromDB="bills.data" 
+				:userAssetsFromDB="userAssets" 
+			>
+			</mj-bill-card>
 			<view v-show="userBillsCount === 0">
 				<u-empty mode="list" text="近日没有账单哦,快去记一笔吧"></u-empty>
 			</view>
