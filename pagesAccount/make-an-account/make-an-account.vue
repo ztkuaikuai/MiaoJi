@@ -40,7 +40,7 @@
 							<uni-icons type="wallet" color="#6d6d6d" size="40rpx"></uni-icons>
 						</view>
 						<view class="asset-type" :style="transferOutAssetStyle.title ? '' : 'color: #6d6d6d;'" >
-							{{transferOutAssetStyle.title  || '转出账户'}}
+							{{transferOutAssetStyle.asset_name || transferOutAssetStyle.title  || '转出账户'}}
 						</view>
 					</view>
 					<view class="asset-icon" v-show="transferOutAssetStyle">
@@ -54,7 +54,7 @@
 							<uni-icons type="wallet" color="#6d6d6d" size="40rpx"></uni-icons>
 						</view>
 						<view class="asset-type" :style="transferIntoAssetStyle.title ? '' : 'color: #6d6d6d;'" >
-							{{transferIntoAssetStyle.title || '转入账户'}}
+							{{transferIntoAssetStyle.asset_name || transferIntoAssetStyle.title || '转入账户'}}
 						</view>
 					</view>
 					<view class="asset-icon" v-show="transferIntoAssetStyle">
@@ -122,7 +122,7 @@
 				</view>
 				<view class="content">
 					<u-cell-group :border="false" >
-						<u-cell :title="asset.assetStyle.title" :clickable="true" @click="clickOneAsset(asset)" v-for="asset in userAssets" :key="asset._id" >
+						<u-cell :title="asset.asset_name ? asset.asset_name : asset.assetStyle.title" :clickable="true" @click="clickOneAsset(asset)" v-for="asset in userAssets" :key="asset._id" >
 							<uni-icons slot="icon" :type="asset.assetStyle.icon" size="36rpx" custom-prefix="miaoji" :color="asset.assetStyle.color"></uni-icons>
 							<view slot="value">
 								<u--text mode="price" :text="asset.asset_balance" color="#219a6d" size="28rpx" bold></u--text>
@@ -169,11 +169,13 @@
 </template>
 
 <script>
-	import {getCategoryIconListForExpend, getCategoryIconListForIncome, getAssetsStyle} from "@/utils/icon-config.js";
+	import { getCategoryIconListForExpend, getCategoryIconListForIncome, getAssetsStyle } from "@/utils/icon-config.js";
+	import { throttle } from '@/utils/throttle.js'
 	const db = uniCloud.database()
 	export default {
 		data() {
 			return {
+				pageType: 'add', // 页面类型，默认为添加； 还有 edit：编辑；template：添加模板；templateEdit：编辑模板；
 				tabList: [{
 					name: '支出'
 				}, {
@@ -264,7 +266,15 @@
 				// 模板管理相关数据
 				showTemplate: false,
 				isTemplate: false,
-				templateList: []
+				isTemplateEdit: false,
+				templateEditId: '',
+				templateList: [],
+				// 再记标识
+				isAddAgain: false,
+				// 保存按钮触发函数：使用节流
+				throttleTapSaveBtn: throttle(this.tapSaveBtn, 5000),
+				// 再记按钮触发函数：使用节流
+				throttleAddAgain: throttle(this.addAgain, 50000)
 			};
 		},
 		computed: {
@@ -286,6 +296,7 @@
 			}
 		},
 		onLoad({type,tab}) {
+			this.pageType = type ?? 'add'
 			this.initPage()
 			this.initEditPage(type,tab)
 		},
@@ -302,7 +313,8 @@
 				this.expendOrIncomeInfo.asset_id = this.userAssets.filter(asset => asset.default_asset === true)[0]?._id ?? ''
 				this.assetsStyle = getAssetsStyle()
 				this.addAssetStyle()
-				this.currentAssetTitle = this.userAssets.filter(asset => asset.default_asset === true)[0]?.assetStyle.title ?? '未选择资产'
+				const currentAsset = this.userAssets.filter(asset => asset.default_asset === true)
+				this.currentAssetTitle = currentAsset[0]?.asset_name || currentAsset[0]?.assetStyle.title || '未选择资产'
 				// console.log('onLoad,initPage:用户资产列表',this.userAssets);
 				// 获取用户模板列表
 				this.getUserTemplate()
@@ -314,7 +326,7 @@
 				})
 				// console.log('addAssetStyle',this.assets);
 			},
-			// 编辑账单 初始化
+			// 编辑账单||编辑模板 初始化
 			initEditPage(type,tab) {
 				if(type === 'edit') {
 					// 赋值账单初始数据
@@ -326,6 +338,15 @@
 					})
 					// 触发clickTab事件，index为tab
 					this.$refs.tabs.clickHandler({},tab)
+					
+					if(tab != 2) {
+						// 如果为收入 || 支出
+						// 修改左下资产标题
+						this.currentAssetTitle =  this.editInitBill.asset_id[0].asset_name || this.editInitBill.assetStyle?.title || '未选择资产'
+					} else {
+						// 如果为转账，获取转出账户的资产名
+						this.transferOutAssetStyle = {asset_name: this.editInitBill.asset_id[0].asset_name}
+					}
 					// 清洗editInitBill的asset_id和destination_asset_id，使其从array => string
 					this.editInitBill.asset_id = this.editInitBill.asset_id[0]?._id ?? ''
 					this.editInitBill.destination_asset_id = this.editInitBill.destination_asset_id[0]?._id ?? ''
@@ -342,8 +363,6 @@
 						this.expendOrIncomeInfo = uni.$u.deepClone(this.editInitBill)
 						// 修改keyboard金额
 						this.keyboardInfo.balance = this.editInitBill.bill_amount.toFixed(2)
-						// 修改左下资产标题
-						this.currentAssetTitle = this.editInitBill?.assetStyle?.title ?? '未选择资产'
 						// 高亮选择的icon
 						if(tab == 0) {
 							this.currentExpendIndex = this.categoryIconListForExpend.findIndex(item => item.type === this.editInitBill.billStyle.type)
@@ -355,17 +374,27 @@
 						this.transferAccountInfo = uni.$u.deepClone(this.editInitBill)
 						this.keyboardInfo.balance = this.editInitBill.transfer_amount.toFixed(2)
 						// 修改转账信息，只拿到了转出的资产信息
-						this.transferOutAssetStyle = this.editInitBill.assetStyle
+						this.transferOutAssetStyle = Object.assign(this.transferOutAssetStyle, this.editInitBill.assetStyle)
 						// 将表单中转入账户id清空
 						this.transferAccountInfo.destination_asset_id = ''
 					}
 				}
 				if(type === 'template' || type === 'templateEdit') {
 					// 如果是添加或修改模板
-					// 标记为 模板管理页面 来的
+					// 标记为 模板页面
 					this.isTemplate = true
 					if(type === 'templateEdit') {
-						console.log('修改模板，暂不支持');
+						// 修改模板
+						this.isTemplateEdit = true
+						const temp = uni.getStorageSync('mj-user-temp-template')
+						// 设置编辑模板的id
+						this.templateEditId = temp._id
+						this.getTemp(temp)
+						// 删除缓存的数据
+						uni.removeStorage({
+							key: 'mj-user-temp-template',
+							success: () => {}
+						})
 					}
 				}
 			},
@@ -411,15 +440,15 @@
 					if(!this.userClickAsset) {
 						// 如果是转出
 						this.transferAccountInfo.asset_id = asset._id
-						this.transferOutAssetStyle = asset.assetStyle
+						this.transferOutAssetStyle = {...asset.assetStyle, asset_name: asset.asset_name}
 					} else {
 						this.transferAccountInfo.destination_asset_id = asset._id
-						this.transferIntoAssetStyle = asset.assetStyle
+						this.transferIntoAssetStyle = {...asset.assetStyle, asset_name: asset.asset_name}
 					}
 					return
 				}
 				this.expendOrIncomeInfo.asset_id = asset._id
-				this.currentAssetTitle = asset.assetStyle.title
+				this.currentAssetTitle = asset.asset_name || asset.assetStyle.title
 				// console.log(this.expendOrIncomeInfo);
 			},
 			
@@ -459,29 +488,16 @@
 				}
 				let balance = this.keyboardInfo.balance
 				if(e === '保存') {
-					if(!uni.$u.test.amount(balance)) return
-					if(this.isTemplate) {
-						// 如果是添加模板
-						this.addOneTemplate()
-						return
-					}
-					if(this.isEdit) {
-						// 如果是编辑账单
-						// console.log('editInitBill',this.editInitBill);
-						// console.log('transferAccountInfo',this.transferAccountInfo);
-						// console.log('expendOrIncomeInfo',this.expendOrIncomeInfo);
-						this.updateUserBill()
-						return
-					}
-					if(this.showTransferAccounts) {
-						this.addOneTransfer()
-						return
-					}
-					this.addOneBill()
+					// 使用节流，防止用户持续点击导致的重复增加账单
+					this.throttleTapSaveBtn()
+				} else if (e === '再记') {
+					// 再记：保存数据，上传数据库，更新资产缓存，并跳转到新的记一笔页面
+					this.throttleAddAgain()
+					return
 				} else if (e === '.') {
 					if(balance.indexOf('.') !== -1) return // 如果含有 .  return
 					balance += e
-				} else if (e === '再记' || e === '秒记1' || e === '秒记2') {  // 再记：保存数据，上传数据库，提示用户，并清空重置
+				} else if (e === '秒记1' || e === '秒记2') {
 					uni.showToast({title:"正在开发中~",icon: 'none'})
 				} else {
 					// 用户输入0-9
@@ -506,7 +522,47 @@
 				// console.log('更新后的balance',balance)
 				this.keyboardInfo.balance = balance.toString()
 			},
-			
+			// 用户点击再记触发
+			addAgain() {
+				if(this.pageType !== 'add') {
+					uni.showToast({title:"“再记”只可以在添加账单时使用",icon: 'none'})
+					return
+				}
+				uni.showLoading({
+					title: '生成账单中',
+					mask: true
+				})
+				this.isAddAgain = true
+				this.tapSaveBtn()
+			},
+			// 用户点击保存按钮触发  判断类型，并触发相应逻辑
+			tapSaveBtn() {
+				if(!uni.$u.test.amount(this.keyboardInfo.balance)) return
+				if(this.isTemplate) {
+					// 如果是添加或编辑模板
+					if(this.isTemplateEdit) {
+						// 如果是编辑模板
+						// 通过模板id删除之前的模板
+						db.collection('mj-user-templates').doc(this.templateEditId).remove()
+					}
+					// 添加新模板
+					this.addOneTemplate()
+					return
+				}
+				if(this.isEdit) {
+					// 如果是编辑账单
+					// console.log('editInitBill',this.editInitBill);
+					// console.log('transferAccountInfo',this.transferAccountInfo);
+					// console.log('expendOrIncomeInfo',this.expendOrIncomeInfo);
+					this.updateUserBill()
+					return
+				}
+				if(this.showTransferAccounts) {
+					this.addOneTransfer()
+					return
+				}
+				this.addOneBill()
+			},
 			// 添加支出||收入账单
 			async addOneBill() {
 				// 金额不能为0
@@ -529,6 +585,16 @@
 				await db.collection("mj-user-bills").add({
 					...this.expendOrIncomeInfo
 				})
+				// 如果为再记
+				if(this.isAddAgain) {
+					await this.upDateUserAssetBalance()
+					// 更新资产缓存
+					await this.getUserAssets()
+					uni.reLaunch({
+						url:'/pagesAccount/make-an-account/make-an-account'
+					})
+					return
+				}
 				uni.switchTab({
 					url:"/pages/index/index"
 				})
@@ -547,11 +613,23 @@
 				this.transferAccountInfo.bill_notes = this.keyboardInfo.notes
 				this.transferAccountInfo.transfer_amount = Math.round(this.keyboardInfo.balance * 100)
 				// 组合备注
-				const transferOutTitle = this.userAssets.find(item => item._id === this.transferAccountInfo.asset_id).assetStyle.title
-				const transferInTitle = this.userAssets.find(item => item._id === this.transferAccountInfo.destination_asset_id).assetStyle.title
+				const transferOutAsset = this.userAssets.find(item => item._id === this.transferAccountInfo.asset_id)
+				const transferOutTitle = transferOutAsset.asset_name || transferOutAsset.assetStyle.title
+				const transferInAsset = this.userAssets.find(item => item._id === this.transferAccountInfo.destination_asset_id)
+				const transferInTitle = transferInAsset.asset_name || transferInAsset.assetStyle.title
 				this.transferAccountInfo.bill_notes = `${this.transferAccountInfo.bill_notes + '-'}${transferOutTitle}转出至${transferInTitle},手续费${this.transferAccountInfo.bill_amount / 100}元`
 				// console.log('数据整理完毕，准备存入数据库',this.transferAccountInfo);
 				await db.collection("mj-user-bills").add({...this.transferAccountInfo})
+				// 如果为再记
+				if(this.isAddAgain) {
+					await this.upDateUserTwoAssetBalance()
+					// 更新资产缓存
+					await this.getUserAssets()
+					uni.reLaunch({
+						url:'/pagesAccount/make-an-account/make-an-account'
+					})
+					return
+				}
 				uni.switchTab({
 					url:"/pages/index/index"
 				})
@@ -605,6 +683,7 @@
 				let assetBalance = this.userAssets.find(item => item._id === this.expendOrIncomeInfo.asset_id).asset_balance
 				assetBalance = Math.round(assetBalance * 100)  // 转换单位为分
 				// console.log(assetBalance);
+				console.log('bill_type',this.expendOrIncomeInfo.bill_type);
 				if(this.expendOrIncomeInfo.bill_type === 0) {
 					const asset_balance = assetBalance - this.expendOrIncomeInfo.bill_amount
 					await db.collection("mj-user-assets").doc(this.expendOrIncomeInfo.asset_id).update({
@@ -618,7 +697,10 @@
 				}
 				uni.$emit('updateBillsList')
 				uni.$emit('updateMonthlyBillBalance')
-				uni.$emit('updateAssetsList')
+				if(!this.isAddAgain) {
+					// 如果不是再记，则更新用户资产，并更新缓存
+					uni.$emit('updateAssetsList')
+				}
 			},
 			// 更新用户 转出与转入 资产金额
 			async upDateUserTwoAssetBalance() {
@@ -790,7 +872,6 @@
 				// 1 判断用户支出||收入||转账
 				// 2 进行表单验证
 				// 3 验证通过，保存模板，并回到上一页
-				console.log('保存一个模板',this.expendOrIncomeInfo,this.transferAccountInfo);
 				if(!this.showTransferAccounts) {
 					// 类型为支出||收入
 					// 金额不能为0
@@ -828,8 +909,10 @@
 					this.transferAccountInfo.bill_notes = this.keyboardInfo.notes
 					this.transferAccountInfo.transfer_amount = Math.round(this.keyboardInfo.balance * 100)
 					// 组合备注
-					const transferOutTitle = this.userAssets.find(item => item._id === this.transferAccountInfo.asset_id).assetStyle.title
-					const transferInTitle = this.userAssets.find(item => item._id === this.transferAccountInfo.destination_asset_id).assetStyle.title
+					const transferOutAsset = this.userAssets.find(item => item._id === this.transferAccountInfo.asset_id)
+					const transferOutTitle = transferOutAsset.asset_name || transferOutAsset.assetStyle.title
+					const transferInAsset = this.userAssets.find(item => item._id === this.transferAccountInfo.destination_asset_id)
+					const transferInTitle = transferInAsset.asset_name || transferInAsset.assetStyle.title
 					this.transferAccountInfo.bill_notes = `${this.transferAccountInfo.bill_notes + '-'}${transferOutTitle}转出至${transferInTitle},手续费${this.transferAccountInfo.bill_amount / 100}元`
 					// console.log('数据整理完毕，准备存入数据库',this.transferAccountInfo);
 					const {asset_id,bill_amount,bill_notes,bill_type,category_type,destination_asset_id,transfer_amount} = this.transferAccountInfo
@@ -846,10 +929,12 @@
 			},
 			// 获取用户的模板
 			async getUserTemplate() {
-				const res = await db.collection('mj-user-templates').where('user_id == $cloudEnv_uid').orderBy('template_creation_date desc').get()
+				const temp = db.collection('mj-user-templates').where('user_id == $cloudEnv_uid').orderBy('template_creation_date desc').getTemp()
+				const userAssets = db.collection("mj-user-assets").where('user_id == $cloudEnv_uid').field('_id,asset_type,user_id,asset_name').getTemp()
+				const res = await db.collection(temp, userAssets).get()
 				this.templateList = res.result.data
 			},
-			// 点击模板卡片触发，获取用户点击的模板数据，并赋值
+			// 点击模板卡片||编辑模板 触发，获取用户点击的模板数据，并赋值
 			getTemp(temp) {
 				console.log('temp: ',temp);
 				const {bill_type, category_type, bill_notes, bill_amount, asset_id, hasAsset, transfer_amount, hasDestinationAsset, destination_asset_id} = temp
@@ -873,8 +958,8 @@
 					this.keyboardInfo.balance = bill_amount.toString()
 					// 资产
 					if(hasAsset) {
-						this.expendOrIncomeInfo.asset_id = asset_id
-						this.currentAssetTitle = temp.assetStyle.title
+						this.expendOrIncomeInfo.asset_id = asset_id[0]._id
+						this.currentAssetTitle = asset_id[0].asset_name || temp.assetStyle.title
 					} else {
 						this.expendOrIncomeInfo.asset_id = ''
 						this.currentAssetTitle = '资产已删除'
@@ -892,15 +977,28 @@
 					this.transferInfo.serviceCharge = bill_amount
 					// 转出账户
 					if(hasAsset) {
-						this.transferAccountInfo.asset_id = asset_id
-						this.transferOutAssetStyle = temp.assetStyle
+						this.transferAccountInfo.asset_id = asset_id[0]._id
+						this.transferOutAssetStyle = {...temp.assetStyle, asset_name: asset_id[0].asset_name}
 					}
 					if(hasDestinationAsset) {
-						this.transferAccountInfo.destination_asset_id = destination_asset_id
-						this.transferIntoAssetStyle = temp.destinationAssetStyle
+						this.transferAccountInfo.destination_asset_id = destination_asset_id[0]._id
+						this.transferIntoAssetStyle = {...temp.destinationAssetStyle, asset_name: destination_asset_id[0].asset_name}
 					}
 				}
 				this.showTemplate = false
+			},
+			// 再记使用：更新用户资产列表，并存入缓存
+			async getUserAssets() {
+				// console.log("getUserAssets");
+				const res = await db.collection("mj-user-assets").where(" user_id == $cloudEnv_uid ").get()
+				const userAssetsTemp = res.result.data
+				// 统一修改金额
+				userAssetsTemp.forEach(item => item.asset_balance /= 100)
+				// 保存在缓存中
+				uni.setStorage({
+					key:'mj-user-assets',
+					data: userAssetsTemp
+				})
 			}
 		}
 	}

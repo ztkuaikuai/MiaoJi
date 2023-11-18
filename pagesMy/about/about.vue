@@ -3,7 +3,7 @@
 		<view class="logo">
 			<u--image src="/static/logo.png" width="72px" height="72px" radius="20px" ></u--image>
 			<view class="version">
-				版本号：0.7.7 (Early Access)
+				版本号：0.7.8 (Early Access)
 			</view>
 		</view>
 		<view class="main">
@@ -18,6 +18,23 @@
 				</view>
 			</mj-card>
 			<mj-card title="版本更新说明">
+				<view class="one-update">
+					<view class="title highlight">
+						0.7.8 —— 11月18日更新
+					</view>
+					<view class="row highlight">
+						- 添加再记功能
+					</view>
+					<view class="row highlight">
+						- 优化记账体验：资产如果有资产名，则优先显示资产名
+					</view>
+					<view class="row">
+						- 优化首页和账单页加载速度
+					</view>
+					<view class="row">
+						- 修复记一笔页面多次点击保存会生成多个账单的问题
+					</view>
+				</view>
 				<view class="one-update">
 					<view class="title highlight">
 						0.7.7 —— 10月21日更新
@@ -64,7 +81,7 @@
 			<mj-card title="未来更新计划">
 				<view class="one-update">
 					<view class="row">
-						- 记一笔页面添加秒记和再记功能
+						- 记一笔页面添加秒记功能
 					</view>
 					<view class="row">
 						- 添加筛选功能

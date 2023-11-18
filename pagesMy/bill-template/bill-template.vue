@@ -2,7 +2,7 @@
 	<view>
 		<mj-card title="提示">
 			<view style="font-size: 28rpx;color: rgba(0, 0, 0, 0.6);">
-				账单模板可用于经常购买或记帐的账单，如每天都吃香菇滑鸡11元，可保存为帐单模板方便快速记账。
+				账单模板可用于记录经常购买的账单，如每天都吃香菇滑鸡11元，每月交房租1500元等，可保存为帐单模板方便快速记账。
 			</view>
 		</mj-card>
 		<!-- 传入用户模板账单组成的对象数组，组件内进行遍历 -->
@@ -39,7 +39,9 @@
 			},
 			async getUserTemplate() {
 				// 获取模板信息
-				const res = await db.collection('mj-user-templates').where('user_id == $cloudEnv_uid').orderBy('template_creation_date desc').get()
+				const temp = db.collection('mj-user-templates').where('user_id == $cloudEnv_uid').orderBy('template_creation_date desc').getTemp()
+				const userAssets = db.collection("mj-user-assets").where('user_id == $cloudEnv_uid').field('_id,asset_type,user_id,asset_name').getTemp()
+				const res = await db.collection(temp, userAssets).get()
 				this.templateList = res.result.data
 			}
 		}

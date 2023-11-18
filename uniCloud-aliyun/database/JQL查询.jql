@@ -9,9 +9,6 @@
 // 详细JQL语法，请参考：https://uniapp.dcloud.net.cn/uniCloud/jql.html
 
 // 下面示例查询uni-id-users表的所有数据
-db.collection("mj-user-bills").remove()
-db.collection("mj-user-assets").remove()
-db.collection('uni-id-users').remove()
 
 
 // 32天时间戳  筛选条件 bill_date 日期格式化成 2023-09 的字段，按照账单类型进行分组，并计算每个分组的总价
@@ -32,7 +29,8 @@ const day3 = db.collection("mj-user-bills").where(
 db.multiSend(day1, day2, day3)
 
 const userMonthBills = db.collection("mj-user-bills").where(
-	`dateToString(add(new Date(0),bill_date),"%Y-%m","+0800") == "2023-09"`).getTemp()
+	`dateToString(add(new Date(0),bill_date),"%Y-%m","+0800") == "2023-11"`).getTemp()
 const userAssets = db.collection("mj-user-assets").field('_id,asset_type,user_id').getTemp()
 db.collection(userMonthBills, userAssets).get()
 
+db.collection("uni-id-users").get()

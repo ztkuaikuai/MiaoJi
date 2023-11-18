@@ -10,7 +10,7 @@
 				<u-cell  title="选择默认资产" label="记账页默认选择的资产账户" :border="false" :clickable="true" @click="chooseDefaultAsset">
 					<view slot="value" class="defaultAsset">
 						<template v-if="defaultAssetStyle">
-							<text>{{defaultAssetStyle.title}}</text><uni-icons :type="defaultAssetStyle.icon" :color="defaultAssetStyle.color" customPrefix="miaoji" size="28"></uni-icons>
+							<text>{{defaultAsset.asset_name ? defaultAsset.asset_name : defaultAssetStyle.title}}</text><uni-icons :type="defaultAssetStyle.icon" :color="defaultAssetStyle.color" customPrefix="miaoji" size="28"></uni-icons>
 						</template>
 						<template v-else="defaultAssetStyle">
 							<text>点我设置默认资产</text>
@@ -33,7 +33,7 @@
 				</view>
 				<view class="content">
 					<u-cell-group :border="false" >
-						<u-cell :title="asset.assetStyle.title" :clickable="true" @click="clickOneAsset(asset)" v-for="asset in userAssets" :key="asset._id" >
+						<u-cell :title="asset.asset_name ? asset.asset_name : asset.assetStyle.title" :clickable="true" @click="clickOneAsset(asset)" v-for="asset in userAssets" :key="asset._id" >
 							<uni-icons slot="icon" :type="asset.assetStyle.icon" size="36rpx" custom-prefix="miaoji" :color="asset.assetStyle.color"></uni-icons>
 							<view slot="value">
 								<u--text mode="price" :text="asset.asset_balance" color="#219a6d" size="28rpx" bold></u--text>

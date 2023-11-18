@@ -9,6 +9,7 @@
 				筛选
 			</view>
 		</view>
+		<view class="linear-gradient"></view>
 		<view class="card-chart">
 			<view class="radio">
 				<view>
@@ -367,6 +368,7 @@
 
 <style lang="scss">
 	.charts {
+		position: relative;
 		.header-fixed {
 			position: fixed;
 			width: 100%;
@@ -387,7 +389,15 @@
 			// 	padding-right: 120rpx;
 			// }
 		}
-
+		.linear-gradient {
+			position: absolute;
+			top: -18rpx;
+			left: 0;
+			right: 0;
+			height: 100rpx;
+			background-image: linear-gradient(#9fcba7, #fafafa);
+			z-index: -1;
+		}
 		.card-chart {
 			margin: 0 28rpx;
 			margin-top: 96rpx;

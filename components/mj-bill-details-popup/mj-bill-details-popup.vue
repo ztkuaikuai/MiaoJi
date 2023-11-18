@@ -53,16 +53,24 @@
 						<view>
 							资产账户
 						</view>
-						<view class="highlight">
-							{{billDetails.assetStyle.title || '资产已删除'}}
+						<view class="highlight" v-if="billDetails.assetStyle.title">
+							<!-- 格式：资产类型-资产名 -->
+							{{billDetails.asset_id[0].asset_name ? `${billDetails.assetStyle.title} - ${billDetails.asset_id[0].asset_name}` : billDetails.assetStyle.title}}
+						</view>
+						<view class="highlight" v-else>
+							资产已删除
 						</view>
 					</view>
 					<view class="row" v-if="billDetails.bill_type === 2">
 						<view>
 							入账账户
 						</view>
-						<view class="highlight">
-							{{billDetails.transferAssetStyle.title || '资产已删除'}}
+						<view class="highlight" v-if="billDetails.transferAssetStyle.title">
+							<!-- 格式：资产类型-资产名 -->
+							{{billDetails.destination_asset_id[0].asset_name ? `${billDetails.transferAssetStyle.title} - ${billDetails.destination_asset_id[0].asset_name}` : billDetails.transferAssetStyle.title}}
+						</view>
+						<view class="highlight" v-else>
+							资产已删除
 						</view>
 					</view>
 				</mj-card>
@@ -73,7 +81,7 @@
 				</mj-card>
 			</view>
 		</view>
-		<u-safe-bottom></u-safe-bottom>
+		<u-safe-bottom v-if="type !== 'bill'"></u-safe-bottom>
 	</u-popup>
 </template>
 
@@ -93,6 +101,10 @@
 			safeAreaInsetBottom : {
 				type: Boolean,
 				default: false
+			},
+			type: {
+				type: String,
+				default: 'bill'
 			}
 		},
 		data() {
@@ -121,6 +133,7 @@
 					const assetsStyle = getAssetsStyle()
 					bill.transferAssetStyle = assetsStyle.find(item => item.type === bill.destination_asset_id[0]?.asset_type)
 				}
+				console.log('billDetails',bill);
 				return bill
 			},
 			billDate() {
