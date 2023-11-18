@@ -130,7 +130,7 @@
 				await this.getUserBills()
 				// 获取用户资产列表
 				this.getUserAssets()
-				// 获取报表数据
+				// 获取报表数据 ，延迟渲染账单数据，在报表中delay = false
 				this.getChartData()
 				uni.$on('updateBillPage',this.upDateMonthBills)
 				// 将状态改为非初始化
