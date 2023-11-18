@@ -169,7 +169,8 @@
 </template>
 
 <script>
-	import {getCategoryIconListForExpend, getCategoryIconListForIncome, getAssetsStyle} from "@/utils/icon-config.js";
+	import { getCategoryIconListForExpend, getCategoryIconListForIncome, getAssetsStyle } from "@/utils/icon-config.js";
+	import { throttle } from '@/utils/throttle.js'
 	const db = uniCloud.database()
 	export default {
 		data() {
@@ -270,6 +271,10 @@
 				templateList: [],
 				// 再记标识
 				isAddAgain: false,
+				// 保存按钮触发函数：使用节流
+				throttleTapSaveBtn: throttle(this.tapSaveBtn, 5000),
+				// 再记按钮触发函数：使用节流
+				throttleAddAgain: throttle(this.addAgain, 50000)
 			};
 		},
 		computed: {
@@ -476,12 +481,11 @@
 				let balance = this.keyboardInfo.balance
 				if(e === '保存') {
 					// 使用节流，防止用户持续点击导致的重复增加账单
-					uni.$u.throttle(this.tapSaveBtn, 10000)
+					this.throttleTapSaveBtn()
 				} else if (e === '再记') {
-					uni.showToast({title:"正在开发中~",icon: 'none'})
-					// 再记：保存数据，上传数据库，并跳转到新的记一笔页面
-					// uni.$u.throttle(this.addAgain, 10000)
-					// return
+					// 再记：保存数据，上传数据库，更新资产缓存，并跳转到新的记一笔页面
+					this.throttleAddAgain()
+					return
 				} else if (e === '.') {
 					if(balance.indexOf('.') !== -1) return // 如果含有 .  return
 					balance += e
@@ -514,7 +518,12 @@
 			addAgain() {
 				if(this.pageType !== 'add') {
 					uni.showToast({title:"“再记”只可以在添加账单时使用",icon: 'none'})
+					return
 				}
+				uni.showLoading({
+					title: '生成账单中',
+					mask: true
+				})
 				this.isAddAgain = true
 				this.tapSaveBtn()
 			},
@@ -570,10 +579,10 @@
 				})
 				// 如果为再记
 				if(this.isAddAgain) {
-					console.log('再记，有些问题：1 按钮依然有节流  2 资产金额不对');
-					return
 					await this.upDateUserAssetBalance()
-					uni.redirectTo({
+					// 更新资产缓存
+					await this.getUserAssets()
+					uni.reLaunch({
 						url:'/pagesAccount/make-an-account/make-an-account'
 					})
 					return
@@ -601,6 +610,16 @@
 				this.transferAccountInfo.bill_notes = `${this.transferAccountInfo.bill_notes + '-'}${transferOutTitle}转出至${transferInTitle},手续费${this.transferAccountInfo.bill_amount / 100}元`
 				// console.log('数据整理完毕，准备存入数据库',this.transferAccountInfo);
 				await db.collection("mj-user-bills").add({...this.transferAccountInfo})
+				// 如果为再记
+				if(this.isAddAgain) {
+					await this.upDateUserTwoAssetBalance()
+					// 更新资产缓存
+					await this.getUserAssets()
+					uni.reLaunch({
+						url:'/pagesAccount/make-an-account/make-an-account'
+					})
+					return
+				}
 				uni.switchTab({
 					url:"/pages/index/index"
 				})
@@ -654,6 +673,7 @@
 				let assetBalance = this.userAssets.find(item => item._id === this.expendOrIncomeInfo.asset_id).asset_balance
 				assetBalance = Math.round(assetBalance * 100)  // 转换单位为分
 				// console.log(assetBalance);
+				console.log('bill_type',this.expendOrIncomeInfo.bill_type);
 				if(this.expendOrIncomeInfo.bill_type === 0) {
 					const asset_balance = assetBalance - this.expendOrIncomeInfo.bill_amount
 					await db.collection("mj-user-assets").doc(this.expendOrIncomeInfo.asset_id).update({
@@ -667,7 +687,10 @@
 				}
 				uni.$emit('updateBillsList')
 				uni.$emit('updateMonthlyBillBalance')
-				uni.$emit('updateAssetsList')
+				if(!this.isAddAgain) {
+					// 如果不是再记，则更新用户资产，并更新缓存
+					uni.$emit('updateAssetsList')
+				}
 			},
 			// 更新用户 转出与转入 资产金额
 			async upDateUserTwoAssetBalance() {
@@ -949,6 +972,19 @@
 					}
 				}
 				this.showTemplate = false
+			},
+			// 再记使用：更新用户资产列表，并存入缓存
+			async getUserAssets() {
+				// console.log("getUserAssets");
+				const res = await db.collection("mj-user-assets").where(" user_id == $cloudEnv_uid ").get()
+				const userAssetsTemp = res.result.data
+				// 统一修改金额
+				userAssetsTemp.forEach(item => item.asset_balance /= 100)
+				// 保存在缓存中
+				uni.setStorage({
+					key:'mj-user-assets',
+					data: userAssetsTemp
+				})
 			}
 		}
 	}

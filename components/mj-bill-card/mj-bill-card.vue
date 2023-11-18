@@ -206,7 +206,6 @@
 		},
 		watch: {
 			userBillsFromDB: {
-				deep:true,
 				immediate: true,
 				handler(newValue) {
 					if(!newValue?.length) {
@@ -224,11 +223,10 @@
 						bill.assetStyle = this.assetsStyle.find(item => item.type === bill.asset_id[0]?.asset_type)  // 如果账单对应的资产被用户删除，则不赋值
 					})
 					this.setToday()
-					// console.log('监听userBillsFromDB，赋值userbills',this.userBills );
+					console.log('监听userBillsFromDB，赋值userbills',this.userBills );
 				}
 			},
 			userAssetsFromDB: {
-				deep:true,
 				immediate: true,
 				handler(newValue) {
 					this.userAssets = newValue
