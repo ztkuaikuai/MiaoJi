@@ -27,7 +27,7 @@
 							<view class="money" v-if="bill.bill_type === 2">
 								<u--text mode="price" :text="(bill.transfer_amount / 100)" color="#212121" size="32rpx" bold></u--text>
 							</view>
-							<view class="minor">{{bill.assetStyle.title}}</view>
+							<view class="minor">{{bill.asset_id[0].asset_name ? bill.asset_id[0].asset_name : bill.assetStyle.title}}</view>
 						</view>
 					</view>
 					<view class="line" v-if="index != userBills.length - 1">
@@ -138,7 +138,6 @@
 					})
 				} else {
 					// 修改账单  存入缓存，在记一笔页面读取
-					uni.setStorageSync('mj-bill-edit',bill)
 					// 如果是弹出框中点击修改，则隐藏弹出框
 					if(this.showBillDetails) {
 						this.showBillDetails = false

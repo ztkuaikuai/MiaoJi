@@ -13,7 +13,7 @@
 					</view>
 					<view class="right">
 						<u--text mode="price" :text="temp.bill_amount" :color="temp.bill_type === 0 ? '#dd524d' : '#219a6d'" size="32rpx" bold></u--text>
-						<view class="minor">{{temp.assetStyle.title}}</view>
+						<view class="minor">{{temp.asset_id[0].asset_name || temp.assetStyle.title}}</view>
 					</view>
 				</view>
 			</mj-card>
@@ -28,7 +28,7 @@
 					</view>
 					<view class="right">
 						<u--text mode="price" :text="temp.transfer_amount / 100" color="#212121" size="32rpx" bold></u--text>
-						<view class="minor">{{temp.assetStyle.title}}</view>
+						<view class="minor">{{temp.asset_id[0].asset_name || temp.assetStyle.title}}</view>
 					</view>
 				</view>
 			</mj-card>
@@ -107,6 +107,7 @@
 			// 点击每个模板卡片触发
 			clickTemp(temp) {
 				// 只有在模板管理页面才能查看模板详情
+				console.log('temp123',temp);
 				if(this.pageType === 'temp') {
 					this.templateDetails = {}
 					this.templateDetails = temp
@@ -129,7 +130,7 @@
 					temp.bill_amount /= 100
 					temp.billStyle = this.iconGather.find(item => item.type === temp.category_type)
 					// 如果为undefined，则对应的资产被用户删除
-					const asset_type = assets.find(item => item._id ===  temp.asset_id)?.asset_type
+					const asset_type = assets.find(item => item._id ===  temp.asset_id[0]?._id)?.asset_type
 					// 判断模板的资产id对应的资产有没有被用户删除
 					if(asset_type) {
 						temp.assetStyle = this.assetsStyle.find(item => item.type === asset_type)
@@ -140,7 +141,7 @@
 						temp.assetStyle.title = '资产已删除'
 						temp.hasAsset = false
 					}
-					const destination_asset_type = assets.find(item => item._id ===  temp.destination_asset_id)?.asset_type
+					const destination_asset_type = assets.find(item => item._id ===  temp.destination_asset_id[0]?._id)?.asset_type
 					if(destination_asset_type) {
 						temp.destinationAssetStyle = this.assetsStyle.find(item => item.type === destination_asset_type)
 						temp.hasDestinationAsset = true

@@ -54,14 +54,22 @@
 			<uni-section class="section" title="其他" type="line" titleFontSize="32rpx"
 				titleColor="#212121"></uni-section>
 			<u-cell-group :border="false">
+				<u-cell :isLink="true" @click="clickAbout">
+					<view slot="title" class="about">
+						<view>
+							关于妙记
+						</view>
+						<view class="about-tag">
+							<u-tag text="v0.7.8" size="mini" @click="clickAbout"></u-tag>
+						</view>
+					</view>
+					<uni-icons slot="icon" type="info" size="36rpx"></uni-icons>
+				</u-cell>
 				<u-cell title="反馈问题" :isLink="true" @click="clickFeedback">
 					<uni-icons slot="icon" type="compose" size="36rpx"></uni-icons>
 				</u-cell>
 				<u-cell title="联系作者" :isLink="true" @click="clickAuthor">
 					<uni-icons slot="icon" type="personadd" size="36rpx"></uni-icons>
-				</u-cell>
-				<u-cell title="关于" :isLink="true" @click="clickAbout">
-					<uni-icons slot="icon" type="info" size="36rpx"></uni-icons>
 				</u-cell>
 				<u-cell title="退出登录" :isLink="true" @click="logout">
 					<uni-icons slot="icon" type="mj-logout" size="32rpx" customPrefix="miaoji"></uni-icons>
@@ -335,6 +343,14 @@
 					.grid-text {
 						font-size: 28rpx;
 					}
+				}
+			}
+			.about {
+				display: flex;
+				justify-content: start;
+				align-items: center;
+				.about-tag {
+					margin-left: 16rpx;
 				}
 			}
 		}

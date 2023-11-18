@@ -39,7 +39,9 @@
 			},
 			async getUserTemplate() {
 				// 获取模板信息
-				const res = await db.collection('mj-user-templates').where('user_id == $cloudEnv_uid').orderBy('template_creation_date desc').get()
+				const temp = db.collection('mj-user-templates').where('user_id == $cloudEnv_uid').orderBy('template_creation_date desc').getTemp()
+				const userAssets = db.collection("mj-user-assets").where('user_id == $cloudEnv_uid').field('_id,asset_type,user_id,asset_name').getTemp()
+				const res = await db.collection(temp, userAssets).get()
 				this.templateList = res.result.data
 			}
 		}
