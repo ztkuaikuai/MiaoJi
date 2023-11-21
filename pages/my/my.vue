@@ -22,8 +22,8 @@
 		</uni-card>
 		<!-- 修改了uni-section的样式，背景色和装饰line颜色改变,padding -->
 		<view class="options">
-			<!-- 常用功能 -->
-			<uni-section class="section" title="常用功能" type="line" titleFontSize="32rpx"
+			<!-- 功能 -->
+			<uni-section class="section" title="功能" type="line" titleFontSize="32rpx"
 				titleColor="#212121"></uni-section>
 			<!-- grid组件 -->
 			<u-grid :border="false" @click="clickOption" col="4">
@@ -103,6 +103,11 @@
 					{
 						icon: 'mj-layout',
 						title: '模板管理',
+						customPrefix: "miaoji"
+					},
+					{
+						icon: 'mj-miaosha',
+						title: '秒记管理',
 						customPrefix: "miaoji"
 					},
 					{
@@ -299,7 +304,7 @@
 				align-items: center;
 
 				.main {
-					margin-left: 12rpx;
+					margin-left: 24rpx;
 					margin-top: 8rpx;
 					display: flex;
 					flex-direction: column;

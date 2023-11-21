@@ -11,6 +11,14 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.mj-miaosha:before {
+  content: "\e60d";
+}
+
+.mj-naicha:before {
+  content: "\10121";
+}
+
 .mj-zhuanzhang:before {
   content: "\e6a1";
 }

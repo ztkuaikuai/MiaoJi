@@ -30,8 +30,13 @@ function assetIconList() {
 function categoryIconListForExpend() {
 	return [{
 			icon: 'mj-wucan',
-			title: '餐饮',
+			title: '餐品',
 			type: 'dining'
+		},
+		{
+			icon: 'mj-naicha',
+			title: '饮品',
+			type: 'drink'
 		},
 		{
 			icon: 'mj-duogouwu',

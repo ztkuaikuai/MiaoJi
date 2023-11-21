@@ -138,6 +138,7 @@
 					})
 				} else {
 					// 修改账单  存入缓存，在记一笔页面读取
+					uni.setStorageSync('mj-bill-edit',bill)
 					// 如果是弹出框中点击修改，则隐藏弹出框
 					if(this.showBillDetails) {
 						this.showBillDetails = false

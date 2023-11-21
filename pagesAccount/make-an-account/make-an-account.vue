@@ -342,6 +342,7 @@
 					if(tab != 2) {
 						// 如果为收入 || 支出
 						// 修改左下资产标题
+						console.log('this.editInitBill: ',this.editInitBill);
 						this.currentAssetTitle =  this.editInitBill.asset_id[0].asset_name || this.editInitBill.assetStyle?.title || '未选择资产'
 					} else {
 						// 如果为转账，获取转出账户的资产名
