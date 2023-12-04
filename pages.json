@@ -92,6 +92,14 @@
                     "enablePullDownRefresh": false
                 }
                 
+                },
+                {
+                	"path" : "seconds/seconds",
+                	"style" : 
+                	{
+                		"navigationBarTitleText" : "秒记管理",
+                		"enablePullDownRefresh" : false
+                	}
                 }
             ]
 		}, {

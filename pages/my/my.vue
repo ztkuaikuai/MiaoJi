@@ -169,6 +169,11 @@
 							url:"/pagesMy/bill-template/bill-template"
 						})
 						break
+					case 2:
+						uni.navigateTo({
+							url:"/pagesMy/seconds/seconds"
+						})
+						break
 					default:
 						uni.showToast({
 							title:"正在开发中~",

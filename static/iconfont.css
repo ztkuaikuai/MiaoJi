@@ -11,6 +11,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.mj-shuiguoshucai:before {
+  content: "\e7b0";
+}
+
 .mj-miaosha:before {
   content: "\e60d";
 }

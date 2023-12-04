@@ -103,12 +103,10 @@
 						</view>
 					</view>
 				</view>
-				<!-- 安全区适配 配置底部安全区 -->
-				<u-safe-bottom></u-safe-bottom>
 			</view>
 			<view class="keyboard">
 				<!-- 修改了u-number-keyboard中的样式,逻辑 -->
-				<u-keyboard mode="number" zIndex="1" :show="true" :tooltip="false" :overlay="false" @change="tapKeyboard" @backspace="tapBackspace"></u-keyboard>
+				<u-keyboard mode="number" zIndex="1" :show="true" :tooltip="false" :overlay="false" @change="tapKeyboard" @backspace="tapBackspace" :safeAreaInsetBottom="false"></u-keyboard>
 			</view>
 		</view>
 		
@@ -1094,7 +1092,7 @@
 		.mj-keyboard {
 			.fixed {
 				position: fixed;
-				bottom: 424rpx;
+				bottom: 392rpx;
 				left: 0;
 				right: 0;
 				.tags {
@@ -1121,6 +1119,8 @@
 				.bgc {
 					background-color: #fff;
 					border-top: 1px solid #f3f3f3;
+					box-sizing: border-box;
+					padding-bottom: 32rpx;
 					// margin-top: 8rpx;
 					.header {
 						display: flex;

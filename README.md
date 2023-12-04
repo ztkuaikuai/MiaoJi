@@ -1,6 +1,9 @@
 # 妙记——开发中
 
 ## 项目需求跟踪记录
+> 欢迎提交Issues
+
+[产品有不足或Bug？点我提出需求](https://siu9p6v1zlb.feishu.cn/share/base/form/shrcnNwskrIIk1t1IkOMgG4gisd)
 [点我跳转妙记项目需求跟踪记录文档](https://siu9p6v1zlb.feishu.cn/sheets/PkB9sXr2RhzY7KttdQ3cjwjXnyj?from=from_copylink)
 
 ## 接下来的规划

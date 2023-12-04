@@ -39,6 +39,11 @@ function categoryIconListForExpend() {
 			type: 'drink'
 		},
 		{
+			icon: 'mj-shuiguoshucai',
+			title: '水果蔬菜',
+			type: 'fruits'
+		},
+		{
 			icon: 'mj-duogouwu',
 			title: '购物',
 			type: 'shopping'
