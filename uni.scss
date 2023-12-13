@@ -27,6 +27,10 @@ $mj-bg-color: #fafafa; // 背景色
 $mj-color-red: #dd524d; // 支出颜色
 $mj-color-green: #219a6d; // 收入颜色
 
+:export {
+	themeColor: $mj-theme-color
+}
+
 
 /* 行为相关颜色 */
 $uni-color-primary: #007aff;

@@ -21,6 +21,11 @@
 - 捉到一些小虫子
 
 # 更新日志
+## 12.13
+- style: 秒记管理页静态完成
+- feat: 添加mj-bill-one-temlplate组件
+
+
 ## 12.4
 - style: 记一笔页面取消底部安全栏
 - style: 添加一个icon：水果蔬菜

@@ -197,7 +197,7 @@
 			},
 			clickAuthor() {
 				uni.showModal({
-					content: "微信：ztkuaikuai",
+					content: "微信：kuaikuaitz",
 					cancelColor: "rgba(0,0,0,0.6)",
 					confirmColor:"#9fcba7",
 					showCancel:false
@@ -217,9 +217,6 @@
 					url: "/uni_modules/uni-id-pages/pages/userinfo/deactivate/deactivate"
 				})
 			},
-			
-			
-			
 			// 页面挂载时获取数据  1 如果有缓存，获取缓存进行渲染  2 若无缓存，获取db数据，并赋值  3 获取用户使用天数 4 存入缓存
 			async getUserInfo() {
 				try {
