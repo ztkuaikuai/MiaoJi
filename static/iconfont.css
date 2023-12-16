@@ -11,12 +11,12 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.mj-shuiguoshucai:before {
-  content: "\e7b0";
+.mj-second:before {
+  content: "\e6ad";
 }
 
-.mj-miaosha:before {
-  content: "\e60d";
+.mj-shuiguoshucai:before {
+  content: "\e7b0";
 }
 
 .mj-naicha:before {

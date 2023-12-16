@@ -1,22 +1,38 @@
 <template>
 	<view class="one-bill-template">
-		<view class="left">
-			<mj-icon-with-background type="mj-shuiguoshucai" size="48rpx" customPrefix="miaoji"></mj-icon-with-background>
-			<view class="info">
-				<view>水果蔬菜</view>
-				<view class="minor" v-if="true"><u--text :lines="1" text="橘子" color="rgba(0,0,0, 0.6)" size="24rpx"></u--text></view>
+		<template v-if="oneTemplate">
+			<view class="left">
+				<mj-icon-with-background :type="oneTemplate.billStyle.icon" size="48rpx" customPrefix="miaoji"></mj-icon-with-background>
+				<view class="info">
+					<view>{{oneTemplate.billStyle.title}}</view>
+					<view class="minor" v-if="oneTemplate.bill_notes"><u--text :lines="1" :text="oneTemplate.bill_notes" color="rgba(0,0,0, 0.6)" size="24rpx"></u--text></view>
+				</view>
 			</view>
-		</view>
-		<view class="right">
-			<u--text mode="price" text="233.00" color="#dd524d" size="32rpx" bold></u--text>
-			<view class="minor">老佛爷</view>
-		</view>
+			<view class="right" v-if="oneTemplate.bill_type !== 2">
+				<u--text mode="price" :text="oneTemplate.bill_amount" :color="oneTemplate.bill_type === 0 ? '#dd524d' : '#219a6d'" size="32rpx" bold></u--text>
+				<view class="minor">{{oneTemplate.asset_id[0].asset_name || oneTemplate.assetStyle.title}}</view>
+			</view>
+			<view class="right" v-else>
+				<u--text mode="price" :text="oneTemplate.transfer_amount / 100" color="#212121" size="32rpx" bold></u--text>
+				<view class="minor">{{oneTemplate.asset_id[0].asset_name || oneTemplate.assetStyle.title}}</view>
+			</view>
+		</template>
+		<template v-else>
+			<view class="left">
+				<mj-icon-with-background></mj-icon-with-background>
+				<view class="info">
+					<view>未绑定模板</view>
+					<view class="minor" v-if="true"><u--text :lines="1" :text="fromType ? '点我绑定模板' : '快去点击修改按钮绑定模板吧!'" color="rgba(0,0,0, 0.6)" size="24rpx"></u--text></view>
+				</view>
+			</view>
+		</template>
 	</view>
 </template>
 
 <script>
 	export default {
 		name:"mj-bill-one-template",
+		props: ['oneTemplate','fromType'],
 		data() {
 			return {
 				

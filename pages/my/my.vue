@@ -106,7 +106,7 @@
 						customPrefix: "miaoji"
 					},
 					{
-						icon: 'mj-miaosha',
+						icon: 'mj-second',
 						title: '秒记管理',
 						customPrefix: "miaoji"
 					},
