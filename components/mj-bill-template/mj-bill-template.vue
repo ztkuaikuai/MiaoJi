@@ -107,7 +107,7 @@
 			// 点击每个模板卡片触发
 			clickTemp(temp) {
 				// 只有在模板管理页面才能查看模板详情
-				console.log('temp123',temp);
+				console.log('mj-bill-template:点击每个模板卡片触发',temp);
 				if(this.pageType === 'temp') {
 					this.templateDetails = {}
 					this.templateDetails = temp

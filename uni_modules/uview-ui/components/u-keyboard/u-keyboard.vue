@@ -54,6 +54,8 @@
 				    @change="change"
 				    :mode="mode"
 				    :dotDisabled="dotDisabled"
+					:secondOne="secondOne"
+					:secondTwo="secondTwo"
 				></u-number-keyboard>
 			</template>
 			<template v-else>
@@ -91,6 +93,8 @@
 	 * @property {String}			cancelText			取消按钮的文字 （默认 '取消' ）
 	 * @property {String}			confirmText			确认按钮的文字 （默认 '确认' ）
 	 * @property {Object}			customStyle			自定义样式，对象形式
+	 * @property {String}			secondOne			秒记1
+	 * @property {String}			secondTwo			秒记2
 	 * @event {Function} change 按键被点击(不包含退格键被点击)
 	 * @event {Function} cancel 键盘顶部工具条左边的"取消"按钮被点击
 	 * @event {Function} confirm 键盘顶部工具条右边的"完成"按钮被点击
@@ -104,7 +108,7 @@
 
 			}
 		},
-		mixins: [uni.$u.mpMixin, uni.$u.mixin,props],
+		mixins: [uni.$u.mpMixin, uni.$u.mixin, props],
 		methods: {
 			change(e) {
 				this.$emit('change', e);

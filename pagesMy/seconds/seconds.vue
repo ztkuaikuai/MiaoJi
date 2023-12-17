@@ -37,7 +37,7 @@
 			<view style="width: 480rpx;">
 				<uni-section title="秒记别名" type="line" titleFontSize="32rpx" titleColor="#212121" white="true" />
 				<u--input
-					placeholder="请输入秒记别名,最多可设置十个字"
+					placeholder="别名会显示在记账键盘上,最多设置十个字"
 					border="surround"
 					v-model="secondName"
 					shape="circle"
@@ -85,7 +85,7 @@
 
 <script>
 	import { themeColor } from '@/uni.scss'
-	import {getAllIconList, getAssetsStyle} from "@/utils/icon-config.js";
+	import { formatOneTemplate } from '@/utils/formatTemplate.js'
 	
 	const db = uniCloud.database()
 	export default {
@@ -127,12 +127,11 @@
 				secondTwoTemp: null,
 				showTemplate: false,
 				templateList: [],
-				secondType: undefined,
-				iconGather: getAllIconList(),
-				assetsStyle: getAssetsStyle(),
+				secondType: undefined
 			};
 		},
 		async onLoad() {
+			// 这里先获取模板数据为的是在获取秒记后通过模板id找到对应模板进行渲染
 			// 获取用户的模板
 			await this.getUserTemplate()
 			// 获取用户的秒记模板
@@ -148,7 +147,8 @@
 						this.secondOneData.subTitle = item.second_name
 						this.secondOneData.tempId = item.template_id
 						this.secondOneData._id = item._id
-					} else {
+					} 
+					if (item.second_type === 2) {
 						this.secondTwoData.subTitle = item.second_name
 						this.secondTwoData.tempId = item.template_id
 						this.secondTwoData._id = item._id
@@ -169,13 +169,13 @@
 				if (this.secondOneData.tempId) {
 					const index = this.templateList.findIndex(item => item._id === this.secondOneData.tempId)
 					if (index !== -1) {
-						this.secondOneTemp = this.formatOneTemplate(this.templateList[index])
+						this.secondOneTemp = formatOneTemplate(this.templateList[index])
 					}
 				}
 				if (this.secondTwoData.tempId) {
 					const index = this.templateList.findIndex(item => item._id === this.secondTwoData.tempId)
 					if (index !== -1) {
-						this.secondTwoTemp = this.formatOneTemplate(this.templateList[index])
+						this.secondTwoTemp = formatOneTemplate(this.templateList[index])
 					}
 				}
 			},
@@ -268,40 +268,6 @@
 				this.popTemplate = temp
 				this.popStyle['bottom'] = '0rpx'
 				this.showTemplate = false
-			},
-			// 格式化一条模板数据，用于界面展示
-			formatOneTemplate(oneTemplate) {
-				// 获取用户资产信息
-				const assets = uni.getStorageSync('mj-user-assets')
-				const tempObj = uni.$u.deepClone(oneTemplate)
-				// 1 修改金额单位 变为元
-				// 2 通过category_type给每一条添加对应billStyle
-				// 3 通过asset_type给每一条添加对应的assetStyle
-				// 4 如果转入资产的id，给其添加对应的destinationAssetStyle
-				tempObj.bill_amount /= 100
-				tempObj.billStyle = this.iconGather.find(item => item.type === tempObj.category_type)
-				// 如果为undefined，则对应的资产被用户删除
-				const asset_type = assets.find(item => item._id ===  tempObj.asset_id[0]?._id)?.asset_type
-				// 判断模板的资产id对应的资产有没有被用户删除
-				if(asset_type) {
-					tempObj.assetStyle = this.assetsStyle.find(item => item.type === asset_type)
-					// hasAsset 用户是否存在对应资产
-					tempObj.hasAsset = true
-				} else {
-					tempObj.assetStyle = {}
-					tempObj.assetStyle.title = '资产已删除'
-					tempObj.hasAsset = false
-				}
-				const destination_asset_type = assets.find(item => item._id ===  tempObj.destination_asset_id[0]?._id)?.asset_type
-				if(destination_asset_type) {
-					tempObj.destinationAssetStyle = this.assetsStyle.find(item => item.type === destination_asset_type)
-					tempObj.hasDestinationAsset = true
-				} else {
-					tempObj.destinationAssetStyle = {}
-					tempObj.destinationAssetStyle.title = '资产已删除'
-					tempObj.hasDestinationAsset = false
-				}
-				return tempObj
 			}
 		}
 	}

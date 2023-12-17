@@ -239,6 +239,10 @@
 			color: $mj-text-color-grey;
 			margin-top: 20px;
 		}
+		
+		.money {
+			font-weight: bold;
+		}
 
 	}
 </style>
