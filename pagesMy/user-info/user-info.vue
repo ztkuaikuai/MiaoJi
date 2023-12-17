@@ -31,7 +31,7 @@
 			</u-cell-group>
 		</mj-card>
 		<u-popup :show="showNicaNamePop" mode="center" :round="10" @close="showNicaNamePop = false"
-			:customStyle="popStyle">
+			:customStyle="popStyle" :safeAreaInsetBottom="false">
 			<form @submit="submitName">
 				<input type="nickname" placeholder="请输入昵称(10个字以内)" maxlength="10" name="nickname">
 				<button form-type="submit" class="btn">确认</button>

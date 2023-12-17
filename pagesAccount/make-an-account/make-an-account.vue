@@ -32,7 +32,7 @@
 					</u-grid-item>
 				</u-grid>
 			</view>
-			<view class="transfer-accounts" v-if="showTransferAccounts">
+			<view class="transfer-accounts" v-show="showTransferAccounts">
 				<!-- 转出账户 -->
 				<view class="asset-card" @click="chooseTransferAsset(0)">
 					<view class="left">
@@ -67,9 +67,19 @@
 				</view>
 				<u--form :model="transferInfo" :borderBottom="false" ref="uForm" errorType="toast">
 					<u-form-item prop="serviceCharge" :borderBottom="false">
-						<u--input v-model="transferInfo.serviceCharge" placeholder="手续费" placeholderStyle="color: #6d6d6d" type="digit" border="surround" clearable
-							shape="circle" maxlength="8" fontSize="13px" :customStyle="inputStyle" prefixIcon="rmb-circle"
-							prefixIconStyle="color: #6d6d6d"></u--input>
+						<u--input 
+							v-model="transferInfo.serviceCharge" 
+							placeholder="手续费" 
+							placeholderStyle="color: #6d6d6d" 
+							type="digit" 
+							border="surround" clearable
+							shape="circle" 
+							maxlength="8" 
+							fontSize="13px" 
+							:customStyle="inputStyle" 
+							prefixIcon="rmb-circle"
+							prefixIconStyle="color: #6d6d6d"
+						></u--input>
 					</u-form-item>
 				</u--form>
 			</view>
@@ -103,12 +113,21 @@
 						</view>
 					</view>
 				</view>
-				<!-- 安全区适配 配置底部安全区 -->
-				<u-safe-bottom></u-safe-bottom>
 			</view>
 			<view class="keyboard">
 				<!-- 修改了u-number-keyboard中的样式,逻辑 -->
-				<u-keyboard mode="number" zIndex="1" :show="true" :tooltip="false" :overlay="false" @change="tapKeyboard" @backspace="tapBackspace"></u-keyboard>
+				<u-keyboard 
+					mode="number" 
+					zIndex="1" 
+					:show="true" 
+					:tooltip="false" 
+					:overlay="false" 
+					@change="tapKeyboard" 
+					@backspace="tapBackspace" 
+					:safeAreaInsetBottom="false" 
+					:secondOne="secondOneData.second_name ? secondOneData.second_name : '秒记1'"
+					:secondTwo="secondTwoData.second_name ? secondTwoData.second_name : '秒记2'"
+				></u-keyboard>
 			</view>
 		</view>
 		
@@ -171,6 +190,7 @@
 <script>
 	import { getCategoryIconListForExpend, getCategoryIconListForIncome, getAssetsStyle } from "@/utils/icon-config.js";
 	import { throttle } from '@/utils/throttle.js'
+	import { formatOneTemplate } from '@/utils/formatTemplate.js'
 	const db = uniCloud.database()
 	export default {
 		data() {
@@ -274,7 +294,11 @@
 				// 保存按钮触发函数：使用节流
 				throttleTapSaveBtn: throttle(this.tapSaveBtn, 5000),
 				// 再记按钮触发函数：使用节流
-				throttleAddAgain: throttle(this.addAgain, 50000)
+				throttleAddAgain: throttle(this.addAgain, 5000),
+				// 秒记数据
+				secondOneData: null,
+				secondTwoData: null,
+				throttleAddSecond: throttle(this.addSecond, 5000)
 			};
 		},
 		computed: {
@@ -301,6 +325,9 @@
 			this.initEditPage(type,tab)
 		},
 		onShow() {
+			// 获取用户秒记列表
+			this.getUserSeconds()
+			// 获取用户模板列表
 			this.getUserTemplate()
 		},
 		methods: {
@@ -316,6 +343,8 @@
 				const currentAsset = this.userAssets.filter(asset => asset.default_asset === true)
 				this.currentAssetTitle = currentAsset[0]?.asset_name || currentAsset[0]?.assetStyle.title || '未选择资产'
 				// console.log('onLoad,initPage:用户资产列表',this.userAssets);
+				// 获取用户秒记列表
+				this.getUserSeconds()
 				// 获取用户模板列表
 				this.getUserTemplate()
 			},
@@ -342,6 +371,7 @@
 					if(tab != 2) {
 						// 如果为收入 || 支出
 						// 修改左下资产标题
+						console.log('this.editInitBill: ',this.editInitBill);
 						this.currentAssetTitle =  this.editInitBill.asset_id[0].asset_name || this.editInitBill.assetStyle?.title || '未选择资产'
 					} else {
 						// 如果为转账，获取转出账户的资产名
@@ -490,6 +520,7 @@
 				if(e === '保存') {
 					// 使用节流，防止用户持续点击导致的重复增加账单
 					this.throttleTapSaveBtn()
+					return
 				} else if (e === '再记') {
 					// 再记：保存数据，上传数据库，更新资产缓存，并跳转到新的记一笔页面
 					this.throttleAddAgain()
@@ -497,8 +528,10 @@
 				} else if (e === '.') {
 					if(balance.indexOf('.') !== -1) return // 如果含有 .  return
 					balance += e
-				} else if (e === '秒记1' || e === '秒记2') {
-					uni.showToast({title:"正在开发中~",icon: 'none'})
+				} else if (e === this.secondOneData?.second_name || e === this.secondTwoData?.second_name || e === '秒记1' || e === '秒记2') {
+					// 秒记：1 查找是否有对应模板  2 使用该模板并保存
+					this.throttleAddSecond(e)
+					return
 				} else {
 					// 用户输入0-9
 					if(balance === '0.00' || balance === '0') {
@@ -638,6 +671,7 @@
 			// 转账账单表单验证
 			async validatorTransferInfo() {
 				if(!this.isSetRules) {
+					console.log('setRules', this.$refs)
 					this.$refs.uForm.setRules(this.rules)
 					this.isSetRules = true
 				}
@@ -866,8 +900,7 @@
 					}
 				}
 			},
-			
-			// 添加模板相关方法
+			/** 添加模板相关方法 */
 			async addOneTemplate() {
 				// 1 判断用户支出||收入||转账
 				// 2 进行表单验证
@@ -938,7 +971,8 @@
 			getTemp(temp) {
 				console.log('temp: ',temp);
 				const {bill_type, category_type, bill_notes, bill_amount, asset_id, hasAsset, transfer_amount, hasDestinationAsset, destination_asset_id} = temp
-				this.clickTab({index: bill_type})
+				// 触发clickTab事件，index为bill_type
+				this.$refs.tabs.clickHandler({},bill_type)
 				if(bill_type !== 2) {
 					// 支出||收入模板
 					// 账单类型
@@ -987,6 +1021,7 @@
 				}
 				this.showTemplate = false
 			},
+			/** 再记相关方法 */
 			// 再记使用：更新用户资产列表，并存入缓存
 			async getUserAssets() {
 				// console.log("getUserAssets");
@@ -999,6 +1034,56 @@
 					key:'mj-user-assets',
 					data: userAssetsTemp
 				})
+			},
+			/** 秒记相关方法 */
+			async getUserSeconds() {
+				const res = await db.collection('mj-user-seconds').where('user_id == $cloudEnv_uid').get()
+				res.result.data.forEach(item => {
+					if (item.second_type === 1) {
+						this.secondOneData = item
+					} 
+					if (item.second_type === 2) {
+						this.secondTwoData = item
+					}
+				})
+			},
+			addSecond(secondName) {
+				// 判断是否为新增账单，若不是则return
+				if (this.pageType !== 'add') {
+					uni.showToast({
+						icon: 'none',
+						title: '“秒记”只可以在添加账单时使用'
+					})
+					return
+				}
+				const isSecondOne = secondName === this.secondOneData?.second_name
+				if (isSecondOne || secondName === '秒记1') {
+					const index = this.templateList.findIndex(item => item._id === this.secondOneData?.template_id)
+					if (index !== -1) {
+						// 格式化模板
+						const temp = formatOneTemplate(this.templateList[index])
+						this.getTemp(temp)
+						this.tapSaveBtn()
+					} else {
+						uni.showToast({
+							icon: 'none',
+							title: '未找到绑定的模板'
+						})
+					}
+				} else {
+					const index = this.templateList.findIndex(item => item._id === this.secondTwoData?.template_id)
+					if (index !== -1) {
+						// 格式化模板
+						const temp = formatOneTemplate(this.templateList[index])
+						this.getTemp(temp)
+						this.tapSaveBtn()
+					} else {
+						uni.showToast({
+							icon: 'none',
+							title: '未找到绑定的模板'
+						})
+					}
+				}
 			}
 		}
 	}
@@ -1093,7 +1178,7 @@
 		.mj-keyboard {
 			.fixed {
 				position: fixed;
-				bottom: 424rpx;
+				bottom: 392rpx;
 				left: 0;
 				right: 0;
 				.tags {
@@ -1120,6 +1205,8 @@
 				.bgc {
 					background-color: #fff;
 					border-top: 1px solid #f3f3f3;
+					box-sizing: border-box;
+					padding-bottom: 32rpx;
 					// margin-top: 8rpx;
 					.header {
 						display: flex;

@@ -1,9 +1,13 @@
 <template>
 	<view class="card">
-		<uni-section :title="title" type="line" :titleFontSize="titleFontSize" titleColor="#212121" white="true"></uni-section>
-		<view class="slot">
+		<uni-section :title="title" type="line" :titleFontSize="titleFontSize" titleColor="#212121" white="true" :sub-title="subTitle">
+			<template v-slot:right>
+				<slot name="right"></slot>
+			</template>
+		</uni-section>
+		<template>
 			<slot></slot>
-		</view>
+		</template>
 	</view>
 </template>
 
@@ -22,6 +26,10 @@
 			titleFontSize: {
 				type: String,
 				default: '32rpx'
+			},
+			subTitle: {
+				type: String,
+				default: ''
 			}
 		}
 	}

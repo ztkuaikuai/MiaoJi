@@ -14,6 +14,15 @@ export default {
         random: {
             type: Boolean,
             default: uni.$u.props.numberKeyboard.random
-        }
+        },
+		// 秒记
+		secondOne: {
+			type: String,
+			default: '秒记1'
+		},
+		secondTwo: {
+			type: String,
+			default: '秒记2'
+		}
     }
 }

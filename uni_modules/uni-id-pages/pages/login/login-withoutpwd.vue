@@ -244,9 +244,8 @@
 			box-sizing: border-box;
 			padding: 0 20rpx;
 			display: flex;
-			justify-content: center;
+			justify-content: right;
 			align-items: center;
-			
 		}
 	}
 	

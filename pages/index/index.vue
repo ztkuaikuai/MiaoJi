@@ -89,7 +89,7 @@
 	export default {
 		data() {
 			return {
-				isEyeShow: true,
+				isEyeShow: uni.getStorageSync('isEyeShow'),
 				isIndexShow: 0,  // 0 展示首页  1 展示资产页
 				bottomBtnText: '点我记账',
 				userAssets: [],
@@ -144,6 +144,7 @@
 		methods: {
 			clickEye() {
 				this.isEyeShow = !this.isEyeShow
+				uni.setStorageSync('isEyeShow', this.isEyeShow)
 			},
 			toMyAssets() {
 				uni.navigateTo({

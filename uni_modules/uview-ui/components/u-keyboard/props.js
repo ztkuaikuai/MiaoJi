@@ -79,6 +79,15 @@ export default {
         autoChange: {
             type: Boolean,
             default: uni.$u.props.keyboard.autoChange
-        }
+        },
+		// 秒记
+		secondOne: {
+			type: String,
+			default: '秒记1'
+		},
+		secondTwo: {
+			type: String,
+			default: '秒记2'
+		}
     }
 }

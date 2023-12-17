@@ -3,7 +3,10 @@
 		<view class="logo">
 			<u--image src="/static/logo.png" width="72px" height="72px" radius="20px" ></u--image>
 			<view class="version">
-				版本号：0.7.8 (Early Access)
+				版本号：0.8.0 (Early Access)
+			</view>
+			<view class="version">
+				代号："Suzumiya Haruhi no Yūutsu" 
 			</view>
 		</view>
 		<view class="main">
@@ -18,6 +21,23 @@
 				</view>
 			</mj-card>
 			<mj-card title="版本更新说明">
+				<view class="one-update">
+					<view class="title highlight">
+						0.8.0 —— 12月17日更新
+					</view>
+					<view class="row highlight">
+						- 添加秒记功能
+					</view>
+					<view class="row">
+						- 优化首页隐藏金额功能体验：现在可以持久化隐藏
+					</view>
+					<view class="row">
+						- 添加饮品和水果蔬菜分类
+					</view>
+					<view class="row">
+						- 捕捉多个小虫子
+					</view>
+				</view>
 				<view class="one-update">
 					<view class="title highlight">
 						0.7.8 —— 11月18日更新
@@ -80,9 +100,6 @@
 			</mj-card>
 			<mj-card title="未来更新计划">
 				<view class="one-update">
-					<view class="row">
-						- 记一笔页面添加秒记功能
-					</view>
 					<view class="row">
 						- 添加筛选功能
 					</view>

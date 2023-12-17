@@ -22,8 +22,8 @@
 		</uni-card>
 		<!-- 修改了uni-section的样式，背景色和装饰line颜色改变,padding -->
 		<view class="options">
-			<!-- 常用功能 -->
-			<uni-section class="section" title="常用功能" type="line" titleFontSize="32rpx"
+			<!-- 功能 -->
+			<uni-section class="section" title="功能" type="line" titleFontSize="32rpx"
 				titleColor="#212121"></uni-section>
 			<!-- grid组件 -->
 			<u-grid :border="false" @click="clickOption" col="4">
@@ -60,7 +60,7 @@
 							关于妙记
 						</view>
 						<view class="about-tag">
-							<u-tag text="v0.7.8" size="mini" @click="clickAbout"></u-tag>
+							<u-tag text="v0.8.0" size="mini" @click="clickAbout"></u-tag>
 						</view>
 					</view>
 					<uni-icons slot="icon" type="info" size="36rpx"></uni-icons>
@@ -103,6 +103,11 @@
 					{
 						icon: 'mj-layout',
 						title: '模板管理',
+						customPrefix: "miaoji"
+					},
+					{
+						icon: 'mj-second',
+						title: '秒记管理',
 						customPrefix: "miaoji"
 					},
 					{
@@ -164,6 +169,11 @@
 							url:"/pagesMy/bill-template/bill-template"
 						})
 						break
+					case 2:
+						uni.navigateTo({
+							url:"/pagesMy/seconds/seconds"
+						})
+						break
 					default:
 						uni.showToast({
 							title:"正在开发中~",
@@ -187,7 +197,7 @@
 			},
 			clickAuthor() {
 				uni.showModal({
-					content: "微信：ztkuaikuai",
+					content: "微信：kuaikuaitz",
 					cancelColor: "rgba(0,0,0,0.6)",
 					confirmColor:"#9fcba7",
 					showCancel:false
@@ -207,9 +217,6 @@
 					url: "/uni_modules/uni-id-pages/pages/userinfo/deactivate/deactivate"
 				})
 			},
-			
-			
-			
 			// 页面挂载时获取数据  1 如果有缓存，获取缓存进行渲染  2 若无缓存，获取db数据，并赋值  3 获取用户使用天数 4 存入缓存
 			async getUserInfo() {
 				try {
@@ -299,7 +306,7 @@
 				align-items: center;
 
 				.main {
-					margin-left: 12rpx;
+					margin-left: 24rpx;
 					margin-top: 8rpx;
 					display: flex;
 					flex-direction: column;

@@ -92,7 +92,7 @@
 					}
 				} else if (!this.dotDisabled && this.mode == 'number') {
 					if (!this.random) {
-						return [1, 2, 3, this.backspace, 4, 5, 6, '秒记1', 7, 8, 9, '秒记2', '再记', 0, this.dot, '保存'];
+						return [1, 2, 3, this.backspace, 4, 5, 6, this.secondOne, 7, 8, 9, this.secondTwo, '再记', 0, this.dot, '保存'];
 					} else {
 						return uni.$u.randomArray([1, 2, 3, 4, 5, 6, 7, 8, 9, this.dot, 0]);
 					}
