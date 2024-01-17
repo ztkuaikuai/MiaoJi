@@ -157,93 +157,103 @@ function categoryIconListForOther() {
 	}]
 }
 
-// 查询icon缓存是否过期
+/**
+ * 查询icon缓存是否过期
+ * 
+ * @returns true 过期 | false 未过期
+ */
 function checkIconExpired() {
-	
+	const iconExpiredInfo = uni.getStorageSync('icon-expired')
+	if (!iconExpiredInfo) return true
+	// 当前时间时间戳 单位：秒
+	const currentTime = Math.floor(new Date().getTime() / 1000)
+	if (iconExpiredInfo < currentTime) return true
+	return false
 }
 
 // 刷新icon缓存
 function refreshIconExpired() {
-	
+	// 获取当前时间添加3天的毫秒数
+	const threeDaysLater = new Date().getTime() + (3 * 24 * 60 * 60 * 1000)
+	// 转换为时间戳
+	const timestampAfter3Days = Math.floor(threeDaysLater / 1000)
+	uni.setStorageSync('icon-expired', timestampAfter3Days)
 }
 
 export function getCategoryIconListForExpend() {
-	/** 
-	 * 查询icon缓存是否已过期
-	 * 	如果未过期，缓存中是否有分类-支出样式
-	 * 		如果有，返回
-	 * 		如果没有，则从工具库进行赋值，并存入缓存
-	 * 	如果过期，刷新icon缓存过期时间，并从工具库进行赋值，将数据存入缓存
-	*/
-	if (uni.getStorageSync('mj-category-style-for-expend')) {
-		return uni.getStorageSync('mj-category-style-for-expend')
-	} else {
-		const iconListForExpend = categoryIconListForExpend()
-		uni.setStorage({
-			key: 'mj-category-style-for-expend',
-			data: iconListForExpend
-		})
-		return iconListForExpend
+	const isExpired = checkIconExpired()
+	if (!isExpired) {
+		// icon缓存未过期
+		//   缓存中是否有分类-支出样式 如果有，返回
+		if (uni.getStorageSync('mj-category-style-for-expend')) {
+			return uni.getStorageSync('mj-category-style-for-expend')
+		}
 	}
+	// icon缓存过期 或者 本地存储中没有该数据
+	// 1 刷新icon缓存时间
+	refreshIconExpired()
+	// 2 将新鲜数据存入缓存，并返回数据
+	const iconListForExpend = categoryIconListForExpend()
+	uni.setStorage({
+		key: 'mj-category-style-for-expend',
+		data: iconListForExpend
+	})
+	return iconListForExpend
 }
 
 export function getCategoryIconListForIncome() {
-	// 缓存中是否有分类-收入样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
-	if (uni.getStorageSync('mj-category-style-for-income')) {
-		return uni.getStorageSync('mj-category-style-for-income')
-	} else {
-		const iconListForIncome = categoryIconListForIncome()
-		uni.setStorage({
-			key: 'mj-category-style-for-income',
-			data: iconListForIncome
-		})
-		return iconListForIncome
+	const isExpired = checkIconExpired()
+	if (!isExpired) {
+		// icon缓存未过期
+		//   缓存中是否有分类-收入样式 如果有，返回
+		if (uni.getStorageSync('mj-category-style-for-income')) {
+			return uni.getStorageSync('mj-category-style-for-income')
+		}
 	}
+	// icon缓存过期 或者 本地存储中没有该数据
+	// 1 刷新icon缓存时间
+	refreshIconExpired()
+	// 2 将新鲜数据存入缓存，并返回数据
+	const iconListForIncome = categoryIconListForIncome()
+	uni.setStorage({
+		key: 'mj-category-style-for-income',
+		data: iconListForIncome
+	})
+	return iconListForIncome
 }
 
 
 export function getAssetsStyle() {
-	// 缓存中是否有资产样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
-	if (uni.getStorageSync('mj-assets-style')) {
-		return uni.getStorageSync('mj-assets-style')
-	} else {
-		const assetsStyle = assetIconList()
-		uni.setStorage({
-			key: 'mj-assets-style',
-			data: assetsStyle
-		})
-		return assetsStyle
+	const isExpired = checkIconExpired()
+	if (!isExpired) {
+		// icon缓存未过期
+		//   缓存中是否有资产样式 如果有，返回
+		if (uni.getStorageSync('mj-assets-style')) {
+			return uni.getStorageSync('mj-assets-style')
+		}
 	}
+	// icon缓存过期 或者 本地存储中没有该数据
+	// 1 刷新icon缓存时间
+	refreshIconExpired()
+	// 2 将新鲜数据存入缓存，并返回数据
+	const assetsStyle = assetIconList()
+	uni.setStorage({
+		key: 'mj-assets-style',
+		data: assetsStyle
+	})
+	return assetsStyle
 }
 
-
+/**
+ * 获取所有记一笔页面的分类icon
+ */
 export function getAllIconList() {
 	let allIconList = []
-	// 缓存中是否有分类-支出样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
-	if (uni.getStorageSync('mj-category-style-for-expend')) {
-		allIconList.push(...uni.getStorageSync('mj-category-style-for-expend')) 
-	} else {
-		const iconListForExpend = categoryIconListForExpend()
-		uni.setStorage({
-			key: 'mj-category-style-for-expend',
-			data: iconListForExpend
-		})
-		allIconList.push(...iconListForExpend)
-	}
-	// 缓存中是否有分类-收入样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
-	if (uni.getStorageSync('mj-category-style-for-income')) {
-		allIconList.push(...uni.getStorageSync('mj-category-style-for-income'))
-	} else {
-		const iconListForIncome = categoryIconListForIncome()
-		uni.setStorage({
-			key: 'mj-category-style-for-income',
-			data: iconListForIncome
-		})
-		allIconList.push(...iconListForIncome)
-	}
-	
-	// 加入其他icon样式
+	// 支出icon
+	allIconList.push(...getCategoryIconListForExpend())
+	// 收入icon
+	allIconList.push(...getCategoryIconListForIncome())
+	// 其他icon
 	allIconList.push(...categoryIconListForOther())
-	
 	return allIconList
 }
