@@ -1,21 +1,25 @@
+
+
+
+// 图标若更新了font-class样式，替换掉icon即可；type值关联账单，资产，不宜修改
 function assetIconList() {
 	return [{
-		icon: 'mj-zhifubao',
+		icon: 'mj-alipay',
 		title: '支付宝',
 		type: 'zhifubao',
 		color: '#06b4fd'
 	}, {
-		icon: 'mj-weixinzhifu',
+		icon: 'mj-wechat',
 		title: '微信钱包',
 		type: 'weixin',
 		color: '#6bcc03'
 	}, {
-		icon: 'mj-yinhangqia',
+		icon: 'mj-bank-card',
 		title: '银行卡',
 		type: 'bank',
 		color: '#ffcc01'
 	}, {
-		icon: 'mj-yue',
+		icon: 'mj-balance',
 		title: '余额',
 		type: 'yue',
 		color: '#fe9c01'
@@ -29,102 +33,102 @@ function assetIconList() {
 
 function categoryIconListForExpend() {
 	return [{
-			icon: 'mj-wucan',
+			icon: 'mj-meal',
 			title: '餐品',
 			type: 'dining'
 		},
 		{
-			icon: 'mj-naicha',
+			icon: 'mj-tea',
 			title: '饮品',
 			type: 'drink'
 		},
 		{
-			icon: 'mj-shuiguoshucai',
+			icon: 'mj-fruit',
 			title: '水果蔬菜',
 			type: 'fruits'
 		},
 		{
-			icon: 'mj-duogouwu',
+			icon: 'mj-shopping',
 			title: '购物',
 			type: 'shopping'
 		},
 		{
-			icon: 'mj-jiaotong',
+			icon: 'mj-bus',
 			title: '交通',
 			type: 'traffic'
 		},
 		{
-			icon: 'mj-zhusu',
+			icon: 'mj-earth',
 			title: '住宿',
 			type: 'accommodation'
 		},
 		{
-			icon: 'mj-fuzhi',
+			icon: 'mj-blank-calendar',
 			title: '日常',
 			type: 'daily'
 		},
 		{
-			icon: 'mj-youji',
+			icon: 'mj-study',
 			title: '学习',
 			type: 'study'
 		},
 		{
-			icon: 'mj-yule',
+			icon: 'mj-recreation',
 			title: '娱乐',
 			type: 'recreation'
 		},
 		{
-			icon: 'mj-meizhuang',
-			title: '美妆',
+			icon: 'mj-lipstick',
+			title: '化妆护肤',
 			type: 'beauty-makeup'
 		},
 		{
-			icon: 'mj-ziranfengguang',
+			icon: 'mj-navigation-arrow',
 			title: '旅游',
 			type: 'tour'
 		},
 		{
-			icon: 'mj-yiliao',
+			icon: 'mj-medical',
 			title: '医疗',
 			type: 'medical'
 		},
 		{
-			icon: 'mj-huiyuan',
+			icon: 'mj-vip',
 			title: '会员租用',
 			type: 'vip'
 		},
 		{
-			icon: 'mj-shouji',
+			icon: 'mj-communication',
 			title: '通讯',
 			type: 'communication'
 		},
 		{
-			icon: 'mj-renwen',
+			icon: 'mj-human-group',
 			title: '人情',
 			type: 'favour'
 		},
 		{
-			icon: 'mj-huobiduihuan',
+			icon: 'mj-yuan-circle',
 			title: '投资',
 			type: 'investment'
 		},
 		{
-			icon: 'mj-qinzi',
-			title: '母婴',
+			icon: 'mj-flower',
+			title: '亲子',
 			type: 'maternal-and-infant'
 		},
 		{
-			icon: 'mj-xiedaichongwu',
+			icon: 'mj-pet',
 			title: '宠物',
 			type: 'pet'
 		},
 		{
-			icon: 'mj-dianpuzhuangxiu',
+			icon: 'mj-paintbrush',
 			title: '装修',
 			type: 'decoration'
 		},
 		{
-			icon: 'mj-qita',
+			icon: 'mj-loop',
 			title: '其他',
 			type: 'other'
 		}
@@ -133,12 +137,12 @@ function categoryIconListForExpend() {
 
 function categoryIconListForIncome() {
 	return [{
-			icon: 'mj-gaoxiaofei',
+			icon: 'mj-income',
 			title: '主要收入',
 			type: 'primary-income'
 		},
 		{
-			icon: 'mj-dixiaofei',
+			icon: 'mj-other-income',
 			title: '其他收入',
 			type: 'other-income'
 		}
@@ -147,14 +151,30 @@ function categoryIconListForIncome() {
 
 function categoryIconListForOther() {
 	return [{
-		icon: 'mj-zhuanzhang',
+		icon: 'mj-transfer',
 		title: '内部转账',
 		type: 'transfer'
 	}]
 }
 
-function getCategoryIconListForExpend() {
-	// 缓存中是否有分类-支出样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
+// 查询icon缓存是否过期
+function checkIconExpired() {
+	
+}
+
+// 刷新icon缓存
+function refreshIconExpired() {
+	
+}
+
+export function getCategoryIconListForExpend() {
+	/** 
+	 * 查询icon缓存是否已过期
+	 * 	如果未过期，缓存中是否有分类-支出样式
+	 * 		如果有，返回
+	 * 		如果没有，则从工具库进行赋值，并存入缓存
+	 * 	如果过期，刷新icon缓存过期时间，并从工具库进行赋值，将数据存入缓存
+	*/
 	if (uni.getStorageSync('mj-category-style-for-expend')) {
 		return uni.getStorageSync('mj-category-style-for-expend')
 	} else {
@@ -167,7 +187,7 @@ function getCategoryIconListForExpend() {
 	}
 }
 
-function getCategoryIconListForIncome() {
+export function getCategoryIconListForIncome() {
 	// 缓存中是否有分类-收入样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
 	if (uni.getStorageSync('mj-category-style-for-income')) {
 		return uni.getStorageSync('mj-category-style-for-income')
@@ -182,7 +202,7 @@ function getCategoryIconListForIncome() {
 }
 
 
-function getAssetsStyle() {
+export function getAssetsStyle() {
 	// 缓存中是否有资产样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
 	if (uni.getStorageSync('mj-assets-style')) {
 		return uni.getStorageSync('mj-assets-style')
@@ -197,7 +217,7 @@ function getAssetsStyle() {
 }
 
 
-function getAllIconList() {
+export function getAllIconList() {
 	let allIconList = []
 	// 缓存中是否有分类-支出样式  如果有 则取缓存，如果没有，则从工具库进行赋值，并存入缓存
 	if (uni.getStorageSync('mj-category-style-for-expend')) {
@@ -226,19 +246,4 @@ function getAllIconList() {
 	allIconList.push(...categoryIconListForOther())
 	
 	return allIconList
-}
-
-// 注:export default 不可以在导入时使用解构赋值
-// export default {
-// 	getCategoryIconListForExpend,
-// 	getCategoryIconListForIncome,
-// 	getAssetsStyle,
-// 	getAllIconList
-// }
-// 修改: 使用export进行按需导入
-export {
-	getCategoryIconListForExpend,
-	getCategoryIconListForIncome,
-	getAssetsStyle,
-	getAllIconList
 }

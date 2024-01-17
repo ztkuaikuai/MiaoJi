@@ -37,7 +37,7 @@
 				<view class="asset-card" @click="chooseTransferAsset(0)">
 					<view class="left">
 						<view class="left-icon">
-							<uni-icons type="wallet" color="#6d6d6d" size="40rpx"></uni-icons>
+							<uni-icons type="mj-wallet" color="#6d6d6d" size="40rpx" customPrefix="miaoji"></uni-icons>
 						</view>
 						<view class="asset-type" :style="transferOutAssetStyle.title ? '' : 'color: #6d6d6d;'" >
 							{{transferOutAssetStyle.asset_name || transferOutAssetStyle.title  || '转出账户'}}
@@ -51,7 +51,7 @@
 				<view class="asset-card" @click="chooseTransferAsset(1)">
 					<view class="left">
 						<view class="left-icon">
-							<uni-icons type="wallet" color="#6d6d6d" size="40rpx"></uni-icons>
+							<uni-icons type="mj-wallet" color="#6d6d6d" size="40rpx" customPrefix="miaoji"></uni-icons>
 						</view>
 						<view class="asset-type" :style="transferIntoAssetStyle.title ? '' : 'color: #6d6d6d;'" >
 							{{transferIntoAssetStyle.asset_name || transferIntoAssetStyle.title || '转入账户'}}
@@ -63,23 +63,26 @@
 				</view>
 				
 				<view style="color: #6d6d6d;padding-left: 8rpx;font-size: 24rpx;">
-					手续费——从转出账户转出的钱=转出金额+手续费
+					手续费 —— 从转出账户转出的钱 = 转出金额 + 手续费
 				</view>
 				<u--form :model="transferInfo" :borderBottom="false" ref="uForm" errorType="toast">
 					<u-form-item prop="serviceCharge" :borderBottom="false">
-						<u--input 
+						<u-input 
 							v-model="transferInfo.serviceCharge" 
 							placeholder="手续费" 
 							placeholderStyle="color: #6d6d6d" 
 							type="digit" 
-							border="surround" clearable
+							border="surround" 
+							clearable
 							shape="circle" 
 							maxlength="8" 
 							fontSize="13px" 
 							:customStyle="inputStyle" 
-							prefixIcon="rmb-circle"
-							prefixIconStyle="color: #6d6d6d"
-						></u--input>
+						>
+							<template slot="prefix">
+								<uni-icons style="margin-right: 20rpx;" type="mj-yuan-circle" color="#6d6d6d" size="40rpx" customPrefix="miaoji"></uni-icons>
+							</template>
+						</u-input>
 					</u-form-item>
 				</u--form>
 			</view>

@@ -97,8 +97,9 @@
 					useDate: 0,
 				},
 				optionList: [{
-						icon: 'wallet',
-						title: '我的资产'
+						icon: 'mj-wallet',
+						title: '我的资产',
+						customPrefix: "miaoji"
 					},
 					{
 						icon: 'mj-layout',
@@ -116,14 +117,15 @@
 						customPrefix: "miaoji"
 					},
 					{
-						icon: 'mj-YUAN',
+						icon: 'mj-yuan-circle',
 						title: '预算设置',
 						customPrefix: "miaoji"
 					}
 				],
 				likeList: [{
-						icon: 'color',
-						title: '个性化'
+						icon: 'mj-individuation',
+						title: '个性化',
+						customPrefix: "miaoji"
 					}
 				],
 				showUserAssetsList: false,
