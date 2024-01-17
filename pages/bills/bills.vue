@@ -264,24 +264,25 @@
 				
 				// 遍历账单数据，计算每天的支出和收入总额
 				for (const dayData of this.userBillsByDay) {
-				  let dayExpense = 0;
-				  let dayIncome = 0;
-				  
+					let dayExpense = 0
+					let dayIncome = 0
+					
 				
-				  for (const bill of dayData) {
-				    if (bill.bill_type === 0 || bill.bill_type === 2) {
-				      dayExpense += bill.bill_amount;
-				    } else if (bill.bill_type === 1) {
-				      dayIncome += bill.bill_amount;
-				    }
-				  }
-				  // 将计算结果添加到结果对象中 
-				  result.categories.push(`${chartMonth}月${chartDay}日`);
-				  chartDay --
-				  result.series[0].data.push(dayExpense);
-				  result.series[1].data.push(dayIncome);
+					for (const bill of dayData) {
+						if (bill.bill_type === 0 || bill.bill_type === 2) {
+						  dayExpense += bill.bill_amount
+						} else if (bill.bill_type === 1) {
+						  dayIncome += bill.bill_amount
+						}
+					}
+					// 将计算结果添加到结果对象中 
+					result.categories.push(`${chartMonth}月${chartDay}日`)
+					chartDay --
+					
+					result.series[0].data.push(parseFloat(dayExpense.toFixed(2)))
+					result.series[1].data.push(parseFloat(dayIncome.toFixed(2)))
 				}
-				
+				console.log('result: ',result);
 				this.chartsDataColumn = result
 			},
 			// 触发日期选择器
