@@ -40,7 +40,6 @@
 				:key="index"
 				:userBillsFromDB="bills" 
 				:userAssetsFromDB="userAssets"
-				from="bill"
 			>
 			</mj-bill-card>
 			<view v-show="userBillsCount === 0">
@@ -234,6 +233,8 @@
 				// 用户点击确认删除账单触发
 				// 更新账单，更新过程中图表显示loading，账单更新完毕后更新图表
 				this.getMonthBills(this.month)
+				// 更新用户资产
+				this.getUserAssets()
 			},
 			getUserAssets() {
 				this.userAssets = uni.getStorageSync('mj-user-assets')

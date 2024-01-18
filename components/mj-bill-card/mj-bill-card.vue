@@ -52,7 +52,7 @@
 	const db = uniCloud.database()
 	export default {
 		name: "mj-bill-card",
-		props: ['userBillsFromDB','userAssetsFromDB','from'],
+		props: ['userBillsFromDB','userAssetsFromDB'],
 		// userBillsFromDB 中金额单位为元
 		data() {
 			return {
@@ -121,12 +121,10 @@
 								uni.$emit('updateMonthlyBillBalance')
 								await this.updateAssetBalance(bill)
 								// console.log('更新资产成功');
-								// 等待资产异步更新完成
+								// 等待资产异步更新完成，用户资产缓存更新完成
 								await this.asyncEmitUpdateAssets()
-								if (this.from === 'bill') {
-									// 更新账单页面
-									uni.$emit('updateBillPage')
-								}
+								// 更新账单页面
+								uni.$emit('updateBillPage')
 								uni.hideLoading()
 								uni.showToast({
 									title: "删除成功",

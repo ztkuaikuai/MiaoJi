@@ -57,8 +57,7 @@
 				v-for="(bills,index) in userBills"
 				:key="index"
 				:userBillsFromDB="bills.data" 
-				:userAssetsFromDB="userAssets" 
-				from="index"
+				:userAssetsFromDB="userAssets"
 			>
 			</mj-bill-card>
 			<view v-show="userBillsCount === 0">
