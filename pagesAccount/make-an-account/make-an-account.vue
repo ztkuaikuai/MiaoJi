@@ -339,10 +339,12 @@
 				// 获取分类列表，该用户所有资产信息，将用户资产信息添加对应资产icon样式
 				this.categoryIconListForExpend = getCategoryIconListForExpend()
 				this.categoryIconListForIncome = getCategoryIconListForIncome()
+				// 从缓存中读取用户资产信息
 				this.userAssets = uni.getStorageSync('mj-user-assets')
 				this.expendOrIncomeInfo.asset_id = this.userAssets.filter(asset => asset.default_asset === true)[0]?._id ?? ''
 				this.assetsStyle = getAssetsStyle()
 				this.addAssetStyle()
+				// 设置当前默认使用的资产
 				const currentAsset = this.userAssets.filter(asset => asset.default_asset === true)
 				this.currentAssetTitle = currentAsset[0]?.asset_name || currentAsset[0]?.assetStyle.title || '未选择资产'
 				// console.log('onLoad,initPage:用户资产列表',this.userAssets);
@@ -631,10 +633,10 @@
 					})
 					return
 				}
+				await this.upDateUserAssetBalance()
 				uni.switchTab({
 					url:"/pages/index/index"
 				})
-				this.upDateUserAssetBalance()
 			},
 			
 			// 添加转账账单
@@ -666,10 +668,10 @@
 					})
 					return
 				}
+				await this.upDateUserTwoAssetBalance()
 				uni.switchTab({
 					url:"/pages/index/index"
 				})
-				this.upDateUserTwoAssetBalance()
 			},
 			// 转账账单表单验证
 			async validatorTransferInfo() {
@@ -734,10 +736,8 @@
 				}
 				uni.$emit('updateBillsList')
 				uni.$emit('updateMonthlyBillBalance')
-				if(!this.isAddAgain) {
-					// 如果不是再记，则更新用户资产，并更新缓存
-					uni.$emit('updateAssetsList')
-				}
+				// 等待资产异步更新完成
+				await this.asyncEmitUpdateAssets()
 			},
 			// 更新用户 转出与转入 资产金额
 			async upDateUserTwoAssetBalance() {
@@ -759,7 +759,8 @@
 				})
 				uni.$emit('updateBillsList')
 				uni.$emit('updateMonthlyBillBalance')
-				uni.$emit('updateAssetsList')
+				// 等待资产异步更新完成
+				await this.asyncEmitUpdateAssets()
 			},
 			
 			
@@ -1033,10 +1034,7 @@
 				// 统一修改金额
 				userAssetsTemp.forEach(item => item.asset_balance /= 100)
 				// 保存在缓存中
-				uni.setStorage({
-					key:'mj-user-assets',
-					data: userAssetsTemp
-				})
+				uni.setStorageSync('mj-user-assets', userAssetsTemp)
 			},
 			/** 秒记相关方法 */
 			async getUserSeconds() {
@@ -1087,6 +1085,12 @@
 						})
 					}
 				}
+			},
+			// 异步更新资产
+			async asyncEmitUpdateAssets() {
+				return new Promise((resolve) => {
+					uni.$emit('updateAssetsList', {resolve})
+				})
 			}
 		}
 	}

@@ -35,13 +35,14 @@
 				<text>账单明细</text>
 			</view>
 			<!-- 需要 到达底部钩子，按需加载 -->
-				<mj-bill-card 
-					v-for="(bills,index) in userBillsByDay"
-					:key="index"
-					:userBillsFromDB="bills" 
-					:userAssetsFromDB="userAssets"
-				>
-				</mj-bill-card>
+			<mj-bill-card 
+				v-for="(bills,index) in userBillsByDay"
+				:key="index"
+				:userBillsFromDB="bills" 
+				:userAssetsFromDB="userAssets"
+				from="bill"
+			>
+			</mj-bill-card>
 			<view v-show="userBillsCount === 0">
 				<u-empty mode="list" text="没有找到符合条件的账单哦,快去记一笔吧"></u-empty>
 			</view>

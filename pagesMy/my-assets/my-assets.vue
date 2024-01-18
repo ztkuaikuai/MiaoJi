@@ -140,13 +140,13 @@
 		border-radius: 20px;
 		.top {
 			display: flex;
-			justify-content: flex-end;
+			justify-content: flex-start;
 			align-items: center;
 			.add {
 				color: $mj-text-color;
 				font-size: 24rpx;
 				box-sizing: border-box;
-				padding: 4px 8px;
+				padding: 4px 0px;
 				border-bottom: 2px solid $mj-theme-color;
 			}
 		}

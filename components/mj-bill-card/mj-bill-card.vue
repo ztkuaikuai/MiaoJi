@@ -52,7 +52,7 @@
 	const db = uniCloud.database()
 	export default {
 		name: "mj-bill-card",
-		props: ['userBillsFromDB','userAssetsFromDB'],
+		props: ['userBillsFromDB','userAssetsFromDB','from'],
 		// userBillsFromDB 中金额单位为元
 		data() {
 			return {
@@ -121,9 +121,12 @@
 								uni.$emit('updateMonthlyBillBalance')
 								await this.updateAssetBalance(bill)
 								// console.log('更新资产成功');
-								uni.$emit('updateAssetsList')
-								// 更新账单页面
-								uni.$emit('updateBillPage')
+								// 等待资产异步更新完成
+								await this.asyncEmitUpdateAssets()
+								if (this.from === 'bill') {
+									// 更新账单页面
+									uni.$emit('updateBillPage')
+								}
 								uni.hideLoading()
 								uni.showToast({
 									title: "删除成功",
@@ -202,6 +205,12 @@
 				if(this.today === uni.$u.timeFormat(Date.now(), 'mm月dd日')) this.today += ' 今天'
 				if(this.today === uni.$u.timeFormat(Date.now() - 86400000, 'mm月dd日')) this.today += ' 昨天'
 				if(this.today === uni.$u.timeFormat(Date.now() - 172800000, 'mm月dd日')) this.today += ' 前天'
+			},
+			// 异步更新资产
+			async asyncEmitUpdateAssets() {
+				return new Promise((resolve) => {
+					uni.$emit('updateAssetsList', {resolve})
+				})
 			}
 		},
 		watch: {
@@ -223,7 +232,7 @@
 						bill.assetStyle = this.assetsStyle.find(item => item.type === bill.asset_id[0]?.asset_type)  // 如果账单对应的资产被用户删除，则不赋值
 					})
 					this.setToday()
-					console.log('监听userBillsFromDB，赋值userbills',this.userBills );
+					// console.log('监听userBillsFromDB，赋值userbills',this.userBills );
 				}
 			},
 			userAssetsFromDB: {
