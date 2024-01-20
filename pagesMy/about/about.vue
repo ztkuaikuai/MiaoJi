@@ -3,7 +3,7 @@
 		<view class="logo">
 			<u--image src="/static/logo.png" width="72px" height="72px" radius="20px" ></u--image>
 			<view class="version">
-				版本号：0.8.0 (Early Access)
+				版本号：0.8.3 (Early Access)
 			</view>
 			<view class="version">
 				代号："Suzumiya Haruhi no Yūutsu" 
@@ -21,6 +21,23 @@
 				</view>
 			</mj-card>
 			<mj-card title="版本更新说明">
+				<view class="one-update">
+					<view class="title highlight">
+						0.8.3 —— 1月20日更新
+					</view>
+					<view class="row highlight">
+						- 更新账单分类图标，更加美观一致
+					</view>
+					<view class="row">
+						- 更换新logo
+					</view>
+					<view class="row">
+						- 替换带有性别歧视色彩的分类名称(母婴改为亲子;美妆改为化妆护肤)
+					</view>
+					<view class="row">
+						- 修改若干布局样式、杀掉多个小虫子
+					</view>
+				</view>
 				<view class="one-update">
 					<view class="title highlight">
 						0.8.0 —— 12月17日更新
@@ -80,7 +97,7 @@
 						- 添加分享朋友和朋友圈功能
 					</view>
 					<view class="row">
-						- 添加账单详情弹出框
+						- 添加账单详情弹出框：点击账单可以弹出账单详情
 					</view>
 				</view>
 				<view class="one-update">
