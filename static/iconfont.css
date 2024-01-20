@@ -2,12 +2,17 @@
   font-family: "miaoji"; /* Project id 4408203 */
   src: url('/static/iconfont.ttf') format('truetype');
 }
+
 .miaoji {
   font-family: "miaoji" !important;
   font-size: 16px;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.mj-flower:before {
+  content: "\e610";
 }
 
 .mj-reloadtime:before {
@@ -92,10 +97,6 @@
 
 .mj-lipstick:before {
   content: "\e60f";
-}
-
-.mj-flower:before {
-  content: "\e610";
 }
 
 .mj-loop:before {
