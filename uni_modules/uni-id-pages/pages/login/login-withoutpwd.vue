@@ -5,7 +5,7 @@
 			<image :src="logo"></image>
 		</view>
 		<!-- 顶部文字 -->
-		<text class="title">妙记——记录你的生活</text>
+		<text class="title">妙记 记录你的生活</text>
 		<!-- 快捷登录框 当url带参数时有效 -->
 		<template v-if="['apple','weixin', 'weixinMobile'].includes(type)">
 			<!-- <text class="tip">将根据第三方账号服务平台的授权范围获取你的信息</text> -->

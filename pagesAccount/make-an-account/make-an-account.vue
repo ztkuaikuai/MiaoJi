@@ -690,7 +690,7 @@
 					}catch(e){
 						return false
 					}
-				} 
+				}
 				if(!this.transferAccountInfo.asset_id || !this.transferAccountInfo.destination_asset_id) {
 					// console.log('有资产没填');
 					uni.showToast({

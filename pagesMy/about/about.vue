@@ -151,7 +151,7 @@
 			line-height: 48rpx;
 		}
 		.highlight {
-			color: $mj-theme-color;
+			color: $mj-theme-color-black;
 			font-weight: 700;
 		}
 		.one-update {
