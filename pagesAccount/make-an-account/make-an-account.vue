@@ -301,7 +301,8 @@
 				// 秒记数据
 				secondOneData: null,
 				secondTwoData: null,
-				throttleAddSecond: throttle(this.addSecond, 5000)
+				throttleAddSecond: throttle(this.addSecond, 5000),
+				secondId: ''
 			};
 		},
 		computed: {
@@ -574,14 +575,20 @@
 				this.tapSaveBtn()
 			},
 			// 用户点击保存按钮触发  判断类型，并触发相应逻辑
-			tapSaveBtn() {
+			async tapSaveBtn() {
 				if(!uni.$u.test.amount(this.keyboardInfo.balance)) return
 				if(this.isTemplate) {
 					// 如果是添加或编辑模板
 					if(this.isTemplateEdit) {
 						// 如果是编辑模板
 						// 通过模板id删除之前的模板
-						db.collection('mj-user-templates').doc(this.templateEditId).remove()
+						await db.collection('mj-user-templates').doc(this.templateEditId).remove()
+						// 根据模板id查询有无对应秒记
+						const res = await db.collection('mj-user-seconds').where(`template_id == "${this.templateEditId}"`).get()
+						// 如果存在对应秒记，则保存秒记id，在保存新模板后根据秒记id修改模板id
+						if (res.result.affectedDocs) {
+							this.secondId = res.result.data[0]._id
+						}
 					}
 					// 添加新模板
 					this.addOneTemplate()
@@ -929,10 +936,15 @@
 					this.expendOrIncomeInfo.bill_amount = Math.round(this.keyboardInfo.balance * 100)
 					this.expendOrIncomeInfo.bill_notes = this.keyboardInfo.notes
 					const {asset_id,bill_amount,bill_notes,bill_type,category_type} = this.expendOrIncomeInfo
-					await db.collection("mj-user-templates").add({
+					const res = await db.collection("mj-user-templates").add({
 						asset_id,bill_amount,bill_notes,bill_type,category_type
 					})
-					uni.navigateBack()
+					// 如果秒记id不为空，即修改的模板有对应绑定的秒记
+					if (this.secondId) {
+						// 更新秒记的模板id
+						const templateId = res.result.id
+						await this.updateSecondTempId(this.secondId, templateId)
+					}
 				} else {
 					// 类型为转账
 					// 添加转账账单
@@ -953,9 +965,15 @@
 					this.transferAccountInfo.bill_notes = `${this.transferAccountInfo.bill_notes + '-'}${transferOutTitle}转出至${transferInTitle},手续费${this.transferAccountInfo.bill_amount / 100}元`
 					// console.log('数据整理完毕，准备存入数据库',this.transferAccountInfo);
 					const {asset_id,bill_amount,bill_notes,bill_type,category_type,destination_asset_id,transfer_amount} = this.transferAccountInfo
-					await db.collection("mj-user-templates").add({asset_id, bill_amount, bill_type, category_type, destination_asset_id, transfer_amount, bill_notes})
-					uni.navigateBack()
+					const res = await db.collection("mj-user-templates").add({asset_id, bill_amount, bill_type, category_type, destination_asset_id, transfer_amount, bill_notes})
+					// 如果秒记id不为空，即修改的模板有对应绑定的秒记
+					if (this.secondId) {
+						// 更新秒记的模板id
+						const templateId = res.result.id
+						await this.updateSecondTempId(this.secondId, templateId)
+					}
 				}
+				uni.navigateBack()
 			},
 			// 点击添加模板按钮
 			goTemplatePage() {
@@ -1091,6 +1109,10 @@
 				return new Promise((resolve) => {
 					uni.$emit('updateAssetsList', {resolve})
 				})
+			},
+			// 更新秒记的模板id
+			async updateSecondTempId(secondId, tempId) {
+				await db.collection('mj-user-seconds').doc(secondId).update({template_id: tempId})
 			}
 		}
 	}
