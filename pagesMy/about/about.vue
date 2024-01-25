@@ -1,6 +1,6 @@
 <template>
 	<view class="about">
-		<view class="logo">
+		<view class="logo" @click="subMsg">
 			<u--image src="/static/logo.png" width="72px" height="72px" radius="20px" ></u--image>
 			<view class="version">
 				版本号：0.8.3 (Early Access)
@@ -137,11 +137,13 @@
 </template>
 
 <script>
+	import { subscribeMessage } from '@/utils/subscribeMessage.js'
 	export default {
-		data() {
-			return {
-				
-			};
+		methods: {
+			// 订阅版本更新说明消息
+			subMsg() {
+				subscribeMessage(['kGUsXGcTKBAA239WAxPCbn3Sv2svDGWTqsglYZMiqLI'])
+			}
 		}
 	}
 </script>

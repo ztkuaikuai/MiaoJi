@@ -1,0 +1,51 @@
+// 文档教程: https://uniapp.dcloud.net.cn/uniCloud/schema
+{
+	"bsonType": "object",
+	"description": "消息订阅表",
+	"required": ["msg_temp_id"],
+	"permission": {
+		"read": true,
+		"create": true,
+		"update": false,
+		"delete": false
+	},
+	"properties": {
+		"_id": {
+			"description": "ID，系统自动生成"
+		},
+		"user_id": {
+			"bsonType": "string",
+			"description": "外键，关联用户id",
+			"forceDefaultValue": {
+			  "$env": "uid"
+			},
+			"foreignKey": "uni-id-users._id"
+		},
+		"msg_temp_id": {
+			"bsonType": "string",
+			"description": "订阅消息模板id"
+		},
+		"state": {
+			"bsonType": "int",
+			"description": "用户订阅状态",
+			"forceDefaultValue": 1,
+			"enum": [
+				{
+					"text": "订阅",
+					"value": 1
+				},
+				{
+					"text": "取消订阅",
+					"value": 0
+				}
+			]
+		},
+		"create_date": {
+			"bsonType": "number",
+			"description": "创建时间",
+			"forceDefaultValue": {
+			  "$env": "now"
+			}
+		}
+	}
+}
