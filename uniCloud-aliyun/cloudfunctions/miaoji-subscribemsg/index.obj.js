@@ -1,3 +1,5 @@
+const mjSubscribemsg = uniCloud.importObject('miaoji-subscribemsg')
+
 module.exports = {
 	_before: function () { // 通用预处理器
 		
@@ -19,26 +21,16 @@ module.exports = {
 	
 	/**
 	 * 发布订阅消息
-	 * @param {Object} tmplId 信息模板id
-	 * @param {Object} data	模板数据
+	 * @param {string} tmplId 信息模板id
+	 * @param {object} data	模板数据
 	 */
 	async publish(tmplId, data) {
-		const dbJQL = uniCloud.databaseForJQL({ // 获取JQL database引用，此处需要传入云对象的clientInfo
-			clientInfo: this.getClientInfo()
-		})
-		// 根据模板id获取订阅此模板的用户数据
-		const pubsubList = dbJQL.collection('mj-submsg').where(` msg_temp_id == "${tmplId}" `).getTemp()
-		const userList = dbJQL.collection('uni-id-users').field('_id,wx_openid').getTemp()
-		const res = await dbJQL.collection(pubsubList, userList).get()
-		// 查询有无数据
-		if (!res.affectedDocs) {
-			throw new Error('此模板信息没有用户订阅')
+		let usersInfo
+		try{
+			usersInfo = await mjSubscribemsg.getUsersInfoByTmplId(tmplId)
+		}catch(e){
+			return e
 		}
-		// 数据中所有订阅用户的openid构成的数组
-		let openIds = res.data.map((item) => item.user_id[0].wx_openid.mp)
-		// 去重
-		openIds = Array.from(new Set(openIds))
-		console.log('openIds: ',openIds)
 		
 		// 引入uni-subscribemsg公共模块
 		const UniSubscribemsg = require('uni-subscribemsg');
@@ -47,9 +39,9 @@ module.exports = {
 			dcloudAppid: "__UNI__EE89725",
 			provider: "weixin-mp",
 		})
-		
-		// 循环openIds，给每个订阅用户发送信息
-		for (openId of openIds) {
+		// 循环usersInfo，给每个订阅用户发送信息
+		for (userInfo of usersInfo) {
+			const { openId } = userInfo
 			// 发送订阅消息
 			let response = await uniSubscribemsg.sendSubscribeMessage({
 				touser: openId,
@@ -62,5 +54,46 @@ module.exports = {
 			console.log('response', response);
 		}
 		
+	},
+	/**
+	 * 根据模板id获取由订阅用户组成的对象数组
+	 * @param {string} tmplId 信息模板id
+	 * @return {object} 包含用户id和openid的对象数组
+	 */
+	async getUsersInfoByTmplId(tmplId) {
+		const dbJQL = uniCloud.databaseForJQL({ // 获取JQL database引用，此处需要传入云对象的clientInfo
+			clientInfo: this.getClientInfo()
+		})
+		// 指定操作角色为admin
+		dbJQL.setUser({
+			role: ['admin']
+		})
+		// 根据模板id获取订阅此模板的用户数据
+		const pubsubList = dbJQL.collection('mj-submsg').where(` msg_temp_id == "${tmplId}" `).getTemp()
+		const userList = dbJQL.collection('uni-id-users').field('_id,wx_openid').getTemp()
+		const res = await dbJQL.collection(pubsubList, userList).get()
+		// 查询有无数据
+		if (!res.affectedDocs) {
+			throw new Error('此模板信息没有用户订阅')
+		}
+		let usersInfo = res.data.map(item => {
+			return {
+				uid: item.user_id[0]._id,
+				openId: item.user_id[0].wx_openid.mp
+			}
+		})
+		// 去重
+		usersInfo = await mjSubscribemsg.removeDuplicates(usersInfo, 'uid')
+		return usersInfo
+	},
+	/**
+	 * 过滤对象数组中的重复项
+	 * @param {Array} array 需要过滤的数组
+	 * @param {string} key 过滤的字段
+	 */
+	removeDuplicates(array, key) {
+	  return array.filter((item, index, self) =>
+	    index === self.findIndex((t) => t[key] === item[key])
+	  )
 	}
 }
