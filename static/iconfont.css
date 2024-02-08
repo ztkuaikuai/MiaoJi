@@ -11,6 +11,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.mj-notification:before {
+  content: "\e622";
+}
+
 .mj-flower:before {
   content: "\e610";
 }

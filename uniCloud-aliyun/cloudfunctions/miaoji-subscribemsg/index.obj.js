@@ -40,7 +40,7 @@ module.exports = {
 			provider: "weixin-mp",
 		})
 		// 循环usersInfo，给每个订阅用户发送信息
-		for (userInfo of usersInfo) {
+		for (const userInfo of usersInfo) {
 			const { openId } = userInfo
 			// 发送订阅消息
 			let response = await uniSubscribemsg.sendSubscribeMessage({

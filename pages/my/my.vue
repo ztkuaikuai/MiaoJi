@@ -130,8 +130,9 @@
 						customPrefix: "miaoji"
 					},
 					{
-						icon: 'notification',
-						title: '记账提醒'
+						icon: 'mj-notification',
+						title: '记账提醒',
+						customPrefix: "miaoji"
 					}
 				],
 				showUserAssetsList: false,
