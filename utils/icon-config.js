@@ -1,6 +1,3 @@
-
-
-
 // 图标若更新了font-class样式，替换掉icon即可；type值关联账单，资产，不宜修改
 function assetIconList() {
 	return [{
@@ -180,6 +177,7 @@ function refreshIconExpired() {
 	uni.setStorageSync('icon-expired', timestampAfter3Days)
 }
 
+// 获取记一笔页面的支出icon
 export function getCategoryIconListForExpend() {
 	const isExpired = checkIconExpired()
 	if (!isExpired) {
@@ -201,6 +199,7 @@ export function getCategoryIconListForExpend() {
 	return iconListForExpend
 }
 
+// 获取记一笔页面收入icon
 export function getCategoryIconListForIncome() {
 	const isExpired = checkIconExpired()
 	if (!isExpired) {
@@ -222,7 +221,7 @@ export function getCategoryIconListForIncome() {
 	return iconListForIncome
 }
 
-
+// 获取资产样式
 export function getAssetsStyle() {
 	const isExpired = checkIconExpired()
 	if (!isExpired) {

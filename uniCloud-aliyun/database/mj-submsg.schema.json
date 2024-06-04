@@ -6,7 +6,7 @@
 	"permission": {
 		"read": true,
 		"create": true,
-		"update": false,
+		"update": true,
 		"delete": false
 	},
 	"properties": {
@@ -39,6 +39,11 @@
 					"value": 0
 				}
 			]
+		},
+		"count": {
+			"bsonType": "int",
+			"description": "用户订阅代币",
+			"defaultValue": 1
 		},
 		"create_date": {
 			"bsonType": "number",

@@ -49,3 +49,7 @@ db.collection('mj-pubmsg').add({
 				}
 			}
 })
+
+const pubsubList = db.collection('mj-submsg').where(` msg_temp_id == "kGUsXGcTKBAA239WAxPCbn3Sv2svDGWTqsglYZMiqLI" `).getTemp()
+const userList = db.collection('uni-id-users').field('_id,wx_openid').getTemp()
+db.collection(pubsubList, userList).get()

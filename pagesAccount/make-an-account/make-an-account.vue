@@ -194,6 +194,8 @@
 	import { getCategoryIconListForExpend, getCategoryIconListForIncome, getAssetsStyle } from "@/utils/icon-config.js";
 	import { throttle } from '@/utils/throttle.js'
 	import { formatOneTemplate } from '@/utils/formatTemplate.js'
+	// 订阅消息
+	import { subscribeMessage } from '@/utils/subscribeMessage.js'
 	const db = uniCloud.database()
 	export default {
 		data() {
@@ -641,6 +643,8 @@
 					return
 				}
 				await this.upDateUserAssetBalance()
+				// 弹出订阅消息
+				this.subDayNotification()
 				uni.switchTab({
 					url:"/pages/index/index"
 				})
@@ -676,6 +680,8 @@
 					return
 				}
 				await this.upDateUserTwoAssetBalance()
+				// 弹出订阅消息
+				this.subDayNotification()
 				uni.switchTab({
 					url:"/pages/index/index"
 				})
@@ -1113,6 +1119,10 @@
 			// 更新秒记的模板id
 			async updateSecondTempId(secondId, tempId) {
 				await db.collection('mj-user-seconds').doc(secondId).update({template_id: tempId})
+			},
+			// 订阅每日记账提醒
+			subDayNotification() {
+				subscribeMessage(['n2kSsJNErg1EWpRrKqTDz2yZvyqC-LH7pLmudAsWNDE'])
 			}
 		}
 	}

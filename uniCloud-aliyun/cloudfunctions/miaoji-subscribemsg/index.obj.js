@@ -7,16 +7,27 @@ module.exports = {
 	
 	/**
 	 * 订阅模板
-	 * @param {Object} tmplId 存放模板id
+	 * @param {String} tmplId 存放模板id
 	 * @returns 消息订阅id
 	 */
-	async subscribe(tmplId) {	
+	async subscribe(tmplId) {
 		const dbJQL = uniCloud.databaseForJQL({ // 获取JQL database引用，此处需要传入云对象的clientInfo
 			clientInfo: this.getClientInfo()
 		})
-		return await dbJQL.collection('mj-submsg').add({
-			msg_temp_id: tmplId
-		})
+		// 查询是否已有数据
+		const res = await dbJQL.collection('mj-submsg').where(`user_id == $cloudEnv_uid && msg_temp_id == "${tmplId}" `).get()
+		if (res.affectedDocs) {
+			// 有数据，count++
+			const newCount = res.data[0].count + 1
+			return await dbJQL.collection('mj-submsg').where(`user_id == $cloudEnv_uid && msg_temp_id == "${tmplId}" `).update({
+				count: newCount
+			})
+		} else {
+			// 无数据，新增
+			return await dbJQL.collection('mj-submsg').add({
+				msg_temp_id: tmplId
+			})
+		}
 	},
 	
 	/**
@@ -31,7 +42,6 @@ module.exports = {
 		}catch(e){
 			return e
 		}
-		
 		// 引入uni-subscribemsg公共模块
 		const UniSubscribemsg = require('uni-subscribemsg');
 		// 初始化实例
@@ -47,13 +57,14 @@ module.exports = {
 				touser: openId,
 				template_id: tmplId,
 				page: "pages/index/index", // 小程序页面地址
-				miniprogram_state: "developer", // 跳转小程序类型：developer为开发版；trial为体验版；formal为正式版；默认为正式版
+				miniprogram_state: "trial", // 跳转小程序类型：developer为开发版；trial为体验版；formal为正式版；默认为正式版
 				lang: "zh_CN",
 				data
 			})
 			console.log('response', response);
 		}
-		
+		// 将用户订阅代币-1
+		mjSubscribemsg.minusCount(tmplId)
 	},
 	/**
 	 * 根据模板id获取由订阅用户组成的对象数组
@@ -69,7 +80,7 @@ module.exports = {
 			role: ['admin']
 		})
 		// 根据模板id获取订阅此模板的用户数据
-		const pubsubList = dbJQL.collection('mj-submsg').where(` msg_temp_id == "${tmplId}" `).getTemp()
+		const pubsubList = dbJQL.collection('mj-submsg').where(` msg_temp_id == "${tmplId}" && count > 0 `).getTemp()
 		const userList = dbJQL.collection('uni-id-users').field('_id,wx_openid').getTemp()
 		const res = await dbJQL.collection(pubsubList, userList).get()
 		// 查询有无数据
@@ -78,22 +89,28 @@ module.exports = {
 		}
 		let usersInfo = res.data.map(item => {
 			return {
+				count: item.count,
 				uid: item.user_id[0]._id,
 				openId: item.user_id[0].wx_openid.mp
 			}
 		})
-		// 去重
-		usersInfo = await mjSubscribemsg.removeDuplicates(usersInfo, 'uid')
 		return usersInfo
 	},
 	/**
-	 * 过滤对象数组中的重复项
-	 * @param {Array} array 需要过滤的数组
-	 * @param {string} key 过滤的字段
+	 * 根据模板id消耗订阅用户的代币
+	 * @param {string} tmplId 信息模板id
+	 * @return 
 	 */
-	removeDuplicates(array, key) {
-	  return array.filter((item, index, self) =>
-	    index === self.findIndex((t) => t[key] === item[key])
-	  )
+	async minusCount (tmplId) {
+		const db = uniCloud.database()
+		const dbCmd = db.command
+		
+		// 根据模板id更新订阅此模板的用户数据
+		await db.collection('mj-submsg').where({
+			msg_temp_id: tmplId,
+			count: dbCmd.gt(0)
+		}).update({
+			count: dbCmd.inc(-1)
+		})
 	}
 }
