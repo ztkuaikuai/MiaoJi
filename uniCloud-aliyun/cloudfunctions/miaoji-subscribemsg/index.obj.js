@@ -31,7 +31,7 @@ module.exports = {
 	},
 	
 	/**
-	 * 发布订阅消息
+	 * 发布订阅消息 (静态版: 给每个订阅用户发送同样的消息)
 	 * @param {string} tmplId 信息模板id
 	 * @param {object} data	模板数据
 	 */
@@ -57,7 +57,7 @@ module.exports = {
 				touser: openId,
 				template_id: tmplId,
 				page: "pages/index/index", // 小程序页面地址
-				miniprogram_state: "trial", // 跳转小程序类型：developer为开发版；trial为体验版；formal为正式版；默认为正式版
+				miniprogram_state: "formal", // 跳转小程序类型：developer为开发版；trial为体验版；formal为正式版；默认为正式版
 				lang: "zh_CN",
 				data
 			})

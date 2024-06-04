@@ -201,7 +201,7 @@
 				const resAll = await db.multiSend(res1,res2,res3)
 				return resAll.result.dataList
 			},
-			// 获取用户月账单的本月支出和本页收入
+			// 获取用户月账单的本月支出和本月收入
 			async getUserMonthlyBillBalance() {
 				// 筛选条件 bill_date 日期格式化成 2023-09 的字段，按照账单类型进行分组，并计算每个分组的总价
 				const res = await db.collection("mj-user-bills").where(`user_id == $cloudEnv_uid && dateToString(add(new Date(0),bill_date),"%Y-%m","+0800") == "${this.currentDate}"`).groupBy('bill_type').groupField('sum(bill_amount) as bill_amount_total').orderBy('bill_type asc').get()

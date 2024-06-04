@@ -85,7 +85,6 @@
 <script>
 	import UT from '@/utils/user-state.js'
 	import {mutations} from '@/uni_modules/uni-id-pages/common/store.js'
-	import { subscribeMessage } from '@/utils/subscribeMessage.js'
 	const db = uniCloud.database()
 	const uniIdCo = uniCloud.importObject('uni-id-co')
 	export default {
@@ -127,11 +126,6 @@
 					{
 						icon: 'mj-individuation',
 						title: '个性化',
-						customPrefix: "miaoji"
-					},
-					{
-						icon: 'mj-notification',
-						title: '记账提醒',
 						customPrefix: "miaoji"
 					}
 				],
@@ -192,9 +186,6 @@
 			},
 			clickLike(index) {
 				switch (index) {
-					case 1: 
-						this.subDayNotification()
-						break
 					default:
 						uni.showToast({
 							title:"正在开发中~",
@@ -277,10 +268,6 @@
 				const registerDateTimestamp = Date.parse(this.userInfo.registerDate)
 				let useDate = Date.now() - registerDateTimestamp
 				this.userInfo.useDate = Math.ceil(useDate / (1000 * 60 * 60 * 24))
-			},
-			// 订阅每日记账提醒
-			subDayNotification() {
-				subscribeMessage(['n2kSsJNErg1EWpRrKqTDz2yZvyqC-LH7pLmudAsWNDE'])
 			}
 		},
 		// 分享功能
