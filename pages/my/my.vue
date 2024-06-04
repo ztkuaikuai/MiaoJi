@@ -60,7 +60,7 @@
 							关于妙记
 						</view>
 						<view class="about-tag">
-							<u-tag text="v0.8.3" size="mini" @click="clickAbout"></u-tag>
+							<u-tag text="v0.8.6" size="mini" @click="clickAbout"></u-tag>
 						</view>
 					</view>
 					<uni-icons slot="icon" type="info" size="36rpx"></uni-icons>

@@ -3,7 +3,7 @@
 		<view class="logo" @click="subMsg">
 			<u--image src="/static/logo.png" width="72px" height="72px" radius="20px" ></u--image>
 			<view class="version">
-				版本号：0.8.3 (Early Access)
+				版本号：0.8.6 (Early Access)
 			</view>
 			<view class="version">
 				代号："Suzumiya Haruhi no Yūutsu" 
@@ -12,7 +12,7 @@
 		<view class="main">
 			<mj-card title="关于">
 				<view class="about-textarea">
-					妙记账单开发团队（以下简称“我们”）是我们自己的练手项目，仅供学习使用。如果你觉得妙记做的不错的话，可以给我们点个赞。如果你在寻找启动速度更快，记账更优雅的应用，可以去应用商店搜索<text class="highlight">小青账</text>下载，我们的项目借鉴了其UI界面和用户行为逻辑，在此基础上进行了简化，如果你想体验更完整流畅的记账，请下载<text class="highlight">小青账</text>。
+					妙记账单 ( 以下简称“妙记”) 是我们自己的练手项目，仅供学习使用。如果你觉得妙记做的不错的话，可以给我们点个赞。如果你在寻找启动速度更快，记账更优雅的应用，可以去应用商店搜索<text class="highlight">小青账</text>下载，我们的项目借鉴了其UI界面和用户行为逻辑，在此基础上进行了简化，如果你想体验更完整流畅的记账，请下载<text class="highlight">小青账</text>。
 				</view>
 			</mj-card>
 			<mj-card title="开源">
@@ -21,6 +21,20 @@
 				</view>
 			</mj-card>
 			<mj-card title="版本更新说明">
+				<view class="one-update">
+					<view class="title highlight">
+						0.8.6 —— 6月5日更新
+					</view>
+					<view class="row highlight">
+						- 新增每日记账提醒，点击上方logo有小惊喜哦
+					</view>
+					<view class="row">
+						- 优化秒记体验：绑定的模板更新后不会解绑了
+					</view>
+					<view class="row">
+						- 替换带有性别歧视色彩的分类名称 ( 母婴改为亲子 ; 美妆改为化妆护肤 )
+					</view>
+				</view>
 				<view class="one-update">
 					<view class="title highlight">
 						0.8.3 —— 1月20日更新
@@ -32,7 +46,7 @@
 						- 更换新logo
 					</view>
 					<view class="row">
-						- 替换带有性别歧视色彩的分类名称(母婴改为亲子;美妆改为化妆护肤)
+						- 替换带有性别歧视色彩的分类名称 ( 母婴改为亲子 ; 美妆改为化妆护肤 )
 					</view>
 					<view class="row">
 						- 修改若干布局样式、杀掉多个小虫子
