@@ -232,7 +232,7 @@
 				console.log('this.needShowIndex: ',this.needShowIndex);
 				this.userBillsOrderByDayArray = twoDimensionalArray
 				// console.log('更新后userBillsByDay',twoDimensionalArray);
-				this.userBillsByDay = twoDimensionalArray.slice(0, this.needShowIndex || 1)
+				this.userBillsByDay = twoDimensionalArray.slice(0, this.needShowIndex + 1)
 				console.log('userBillsByDay: ', this.userBillsByDay);
 				console.log('账单数据结构处理完毕', Date.now() - timeNow);
 				// 倒序排列
