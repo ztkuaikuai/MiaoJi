@@ -335,7 +335,12 @@
 		},
 		// 触底加载
 		onReachBottom() {
-			this.userBillsByDay.push(this.userBillsOrderByDayArray[++this.needShowIndex])
+			let oneDayBillArray = this.userBillsOrderByDayArray[++this.needShowIndex]
+			if (oneDayBillArray === undefined) return
+			while (oneDayBillArray.length === 0) {
+				oneDayBillArray = this.userBillsOrderByDayArray[++this.needShowIndex]
+			}
+			this.userBillsByDay.push(oneDayBillArray)
 		},
 		// 分享功能
 		onShareAppMessage () {
