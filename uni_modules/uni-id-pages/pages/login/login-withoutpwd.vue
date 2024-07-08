@@ -1,37 +1,39 @@
 <!-- 免密登录页 -->
 <template>
 	<view class="uni-content">
-		<view class="login-logo">
-			<image :src="logo"></image>
-		</view>
-		<!-- 顶部文字 -->
-		<text class="title">妙记 记录你的生活</text>
-		<!-- 快捷登录框 当url带参数时有效 -->
-		<template v-if="['apple','weixin', 'weixinMobile'].includes(type)">
-			<!-- <text class="tip">将根据第三方账号服务平台的授权范围获取你的信息</text> -->
-			<view class="quickLogin">
-				<image v-if="type !== 'weixinMobile'" @click="quickLogin" :src="imgSrc" mode="widthFix"
-					class="quickLoginBtn"></image>
-				<button v-else type="primary" open-type="getPhoneNumber" @getphonenumber="quickLogin"
-					class="uni-btn">微信授权手机号登录</button>
-				<!-- 按钮底部同意单选框 -->
-				<!-- <uni-id-pages-agreements scope="register" ref="agreements"></uni-id-pages-agreements> -->
+		<div class="flex-box">
+			<!-- 顶部logo+文字 -->
+			<view class="logo">
+				<u--image src="/static/logo.png" width="72px" height="72px" radius="20px" ></u--image>
+				<text class="title">妙记✨记录你的生活</text>
 			</view>
-		</template>
-		<template v-else>
-			<text class="tip">未注册的账号验证通过后将自动注册</text>
-			<view class="phone-box">
-				<view @click="chooseArea" class="area">+86</view>
-				<uni-easyinput :focus="focusPhone" @blur="focusPhone = false" class="input-box" type="number"
-					:inputBorder="false" v-model="phone" maxlength="11" placeholder="请输入手机号" />
-			</view>
-			<uni-id-pages-agreements scope="register" ref="agreements"></uni-id-pages-agreements>
-			<button class="uni-btn" type="primary" @click="toSmsPage">获取验证码</button>
-		</template>
+			<!-- 快捷登录框 当url带参数时有效 -->
+			<template v-if="['apple','weixin', 'weixinMobile'].includes(type)">
+				<!-- <text class="tip">将根据第三方账号服务平台的授权范围获取你的信息</text> -->
+				<view class="quickLogin">
+					<image v-if="type !== 'weixinMobile'" @click="quickLogin" :src="imgSrc" mode="widthFix"
+						class="quickLoginBtn"></image>
+					<button v-else type="primary" open-type="getPhoneNumber" @getphonenumber="quickLogin"
+						class="uni-btn">微信授权手机号登录</button>
+					<!-- 按钮底部同意单选框 -->
+					<!-- <uni-id-pages-agreements scope="register" ref="agreements"></uni-id-pages-agreements> -->
+				</view>
+			</template>
+			<template v-else>
+				<text class="tip">未注册的账号验证通过后将自动注册</text>
+				<view class="phone-box">
+					<view @click="chooseArea" class="area">+86</view>
+					<uni-easyinput :focus="focusPhone" @blur="focusPhone = false" class="input-box" type="number"
+						:inputBorder="false" v-model="phone" maxlength="11" placeholder="请输入手机号" />
+				</view>
+				<uni-id-pages-agreements scope="register" ref="agreements"></uni-id-pages-agreements>
+				<button class="uni-btn" type="primary" @click="toSmsPage">获取验证码</button>
+			</template>
+		</div>
 		<!-- 固定定位的快捷登录按钮 -->
 		<uni-id-pages-fab-login ref="uniFabLogin"></uni-id-pages-fab-login>
 		<!-- 用户隐私授权popup -->
-		<u-popup :show="showPrivacyAuthorize" round="20px" mode="center" :closeOnClickOverlay="false">
+		<u-popup :show="showPrivacyAuthorize" round="20px" mode="center" :closeOnClickOverlay="false" :safeAreaInsetBottom="false">
 			<view class="privacy-authorize">
 				<view class="title">
 					个人信息保护提示
@@ -63,7 +65,7 @@
 				phone: "", //手机号码
 				focusPhone: false,
 				logo: "/static/logo.png",
-				showPrivacyAuthorize: false,
+				showPrivacyAuthorize: false, // 是否显示隐私授权窗口
 				allowLogin: false,
 			}
 		},
@@ -207,10 +209,18 @@
 
 <style lang="scss" scoped>
 	@import "@/uni_modules/uni-id-pages/common/login-page.scss";
-
-	@media screen and (min-width: 690px) {
-		.uni-content {
-			height: 350px;
+	
+	.uni-content {
+		width: 750rpx;
+		height: 100vh;
+		padding: 0;
+		.flex-box {
+			width: 750rpx;
+			height: 100vh;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
 		}
 	}
 
@@ -311,5 +321,13 @@
 		.quickLogin {
 			height: auto;
 		}
+	}
+	
+	.logo {
+		height: 320rpx;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
 	}
 </style>
