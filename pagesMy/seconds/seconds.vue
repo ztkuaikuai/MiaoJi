@@ -1,7 +1,7 @@
 <template>
 	<view class="seconds">
 		<view class="linear-gradient"></view>
-		<mj-card title="提示">
+		<mj-card title="食用说明">
 			<view style="font-size: 28rpx;color: rgba(0, 0, 0, 0.6);">
 				秒记可<span style="font-weight: 700;">用于记录经常购买的账单</span>，如每天喝咖啡9.9元，可设置为秒记方便快速记账。
 			</view>
@@ -175,6 +175,7 @@
 					const index = this.templateList.findIndex(item => item._id === this.secondTwoData.tempId)
 					if (index !== -1) {
 						this.secondTwoTemp = formatOneTemplate(this.templateList[index])
+						console.log('this.secondTwoTemp: ',this.secondTwoTemp);
 					}
 				}
 			},

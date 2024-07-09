@@ -177,6 +177,11 @@
 							url:"/pagesMy/seconds/seconds"
 						})
 						break
+					case 3:
+						uni.navigateTo({
+							url:"/pagesMy/cron-accounting/cron-accounting"
+						})
+						break
 					default:
 						uni.showToast({
 							title:"正在开发中~",
