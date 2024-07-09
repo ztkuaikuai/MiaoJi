@@ -1,5 +1,6 @@
 <template>
-	<view>
+	<view class="temp">
+		<view class="linear-gradient"></view>
 		<mj-card title="提示">
 			<view style="font-size: 28rpx;color: rgba(0, 0, 0, 0.6);">
 				账单模板可<span style="font-weight: 700;">用于记录经常购买的账单</span>，如每天都吃香菇滑鸡11元，每月交房租1500元等，可保存为帐单模板<span style="font-weight: 700;">方便快速记账</span>。
@@ -49,6 +50,19 @@
 </script>
 
 <style lang="scss" scoped>
+	.temp {
+		position: relative;
+		.linear-gradient {
+			position: absolute;
+			top: -24rpx;
+			left: 0;
+			right: 0;
+			height: 130rpx;
+			background-image: linear-gradient(#9fcba7, #fafafa);
+			z-index: -1;
+		}
+	}
+	
 	.placeholder {
 		height: 64px;
 	}
