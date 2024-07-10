@@ -7,10 +7,15 @@
 			</view>
 		</mj-card>
 		<!-- 定时任务卡片：遍历展示用户定时任务 -->
-		<mj-card title="定时任务名称" v-for="n in 10">
+		<mj-card title="每月代肝" v-for="n in 3">
 			<template #right>
-				<view class="edit">
-					修改
+				<view class="right-btns">
+					<view class="btn del" @click="deleteCron(n)">
+						删除
+					</view>
+					<view class="btn edit" @click="editCron(n)">
+						修改
+					</view>
 				</view>
 			</template>
 			
@@ -21,7 +26,7 @@
 						预计2024年07月10日执行
 					</div>
 					<div class="info">
-						<span>执行2次结束</span>
+						<span class="rule">执行2次结束</span>
 						<span>每5天</span>
 						<span>已执行1次</span>
 					</div>
@@ -36,12 +41,14 @@
 		<view style="height: 64px;"></view>
 		<!-- 固定定位，最底下 -->
 		<view class="bottom-btn" >
-			<u-button text="添加" color="#9fcba7" shape="circle" @click="clickBottomBtn"></u-button>
+			<u-button text="添加" :color="mjThemeColor" shape="circle" @click="addCron"></u-button>
 		</view>
 	</view>
 </template>
 
 <script>
+	import { themeColor } from '@/uni.scss'
+	
 	export default {
 		data() {
 			return {
@@ -79,8 +86,50 @@
 				}
 			};
 		},
+		computed: {
+			mjThemeColor() {
+				return themeColor
+			}
+		},
 		methods: {
-			
+			deleteCron(id) {
+				uni.showModal({
+					content: "你确定删除该任务吗？（删除之后不可恢复哦）",
+					cancelColor: "rgba(0,0,0,0.6)",
+					confirmColor: themeColor,
+					success:async res =>  {
+						if(res.confirm) {
+							uni.showLoading({
+								title: "删除中",
+								mask: true
+							})
+							// 删除定时任务
+							await new Promise((resolve) => {
+								setTimeout(() => {
+									resolve('ok')
+								}, 1000)
+							})
+							uni.hideLoading()
+							uni.showToast({
+								title: "删除成功",
+								icon: "success"
+							})
+						}
+					}
+				})
+			},
+			editCron(id) {
+				// 拿到数据暂存在本地缓存
+				// 进入编辑任务页面
+				uni.navigateTo({
+					url:"/pagesMy/cron-accounting-edit/cron-accounting-edit",
+				})
+			},
+			addCron() {
+				uni.navigateTo({
+					url:"/pagesMy/cron-accounting-edit/cron-accounting-edit",
+				})
+			}
 		}
 	}
 </script>
@@ -113,9 +162,16 @@
 			.info {
 				margin-top: 8rpx;
 				span {
+					border-radius: 16px;
 					border: 1px solid $mj-text-color-grey;
 					margin-right: 8rpx;
+					padding: 2rpx 8rpx;
 					font-size: 20rpx;
+				}
+				.rule {
+					color: $mj-bg-color;
+					background-color: $mj-theme-color;
+					border-color: $mj-theme-color;
 				}
 			}
 		}
@@ -135,7 +191,7 @@
 			border: 2rpx solid $uni-color-warning;
 		}
 		.end {
-			border: 2rpx solid $uni-color-error;
+			border: 2rpx solid $mj-color-red;
 		}
 	}
 	
@@ -148,17 +204,29 @@
 		bottom: 20rpx;
 		opacity: 0.98;
 	}
-	
-	.edit {
+	.right-btns {
 		display: flex;
+		justify-content: center;
 		align-items: center;
-		box-sizing: border-box;
-		padding: 4px 8px;
-		margin-right: 4px;
-		border-radius: 16px;
-		font-size: 24rpx;
-		color: $mj-bg-color;
-		background-color: $mj-theme-color-2;
+		.btn {
+			display: flex;
+			align-items: center;
+			box-sizing: border-box;
+			padding: 4px 8px;
+			margin-right: 4px;
+			border-radius: 16px;
+			font-size: 24rpx;
+		}
+		.del {
+			color: $mj-color-red;
+			border: 1px solid $mj-color-red;
+		}
+		.edit {
+			color: $mj-bg-color;
+			background-color: $mj-theme-color-2;
+			border: 1px solid $mj-theme-color-2;
+		}
 	}
+	
 }
 </style>

@@ -99,6 +99,14 @@
 						"navigationBarTitleText": "定时记账",
 						"enablePullDownRefresh": false
 					}
+				},
+				{
+					"path" : "cron-accounting-edit/cron-accounting-edit",
+					"style" : 
+					{
+						"navigationBarTitleText" : "编辑任务",
+						"enablePullDownRefresh": false
+					}
 				}
 			]
 		}, {
