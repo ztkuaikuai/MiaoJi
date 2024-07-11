@@ -122,12 +122,12 @@
 				// 拿到数据暂存在本地缓存
 				// 进入编辑任务页面
 				uni.navigateTo({
-					url:"/pagesMy/cron-accounting-edit/cron-accounting-edit",
+					url:"/pagesMy/cron-accounting-edit/cron-accounting-edit?type=edit",
 				})
 			},
 			addCron() {
 				uni.navigateTo({
-					url:"/pagesMy/cron-accounting-edit/cron-accounting-edit",
+					url:"/pagesMy/cron-accounting-edit/cron-accounting-edit?type=add",
 				})
 			}
 		}

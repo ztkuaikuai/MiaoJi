@@ -57,7 +57,7 @@
 			</view>
 		</u-popup>
 		
-		<!-- 模板的popup -->
+		<!-- 选取模板的popup -->
 		<u-popup 
 			:show="showTemplate" 
 			:overlayStyle="{background: 'rgba(0, 0, 0, 0)'}" 
@@ -66,14 +66,8 @@
 		>
 			<view class="user-template-list">
 				<view class="header">
-					<view class="left">
-						取消
-					</view>
 					<view class="middle">
 						帐单模板
-					</view>
-					<view class="right" @click="goTemplatePage">
-						添加
 					</view>
 				</view>
 				<view class="template-list" :style="{maxHeight: windowHeight * 0.6 + 'rpx'}">
@@ -154,7 +148,7 @@
 					}
 				})
 				// 渲染秒记模板
-				this.renderSecondTemplate()
+				this.renderTwoSecondTemplates()
 			},
 			async getUserTemplate() {
 				// 获取模板信息
@@ -164,7 +158,7 @@
 				this.templateList = res.result.data
 				console.log('templateList: ',this.templateList);
 			},
-			renderSecondTemplate() {
+			renderTwoSecondTemplates() {
 				if (this.secondOneData.tempId) {
 					const index = this.templateList.findIndex(item => item._id === this.secondOneData.tempId)
 					if (index !== -1) {
@@ -332,18 +326,8 @@
 		
 		.header {
 			display: flex;
-			justify-content: space-between;
+			justify-content: center;
 			padding-top: 24rpx;
-			.left {
-				visibility: hidden;
-				box-sizing: border-box;
-				padding: 4px 8px;
-				margin-left: 8px;
-				background-color: $mj-theme-color;
-				border-radius: 16px;
-				font-size: 28rpx;
-				color: $mj-bg-color;
-			}
 			.middle {
 				text-align: center;
 				// scss中font另一种写法
@@ -351,16 +335,6 @@
 					size: 32rpx;
 					weight: bold;
 				}
-			}
-			.right {
-				visibility: hidden;
-				box-sizing: border-box;
-				padding: 4px 8px;
-				margin-right: 8px;
-				background-color: $mj-theme-color;
-				border-radius: 16px;
-				font-size: 28rpx;
-				color: $mj-bg-color;
 			}
 		}
 		.template-list {

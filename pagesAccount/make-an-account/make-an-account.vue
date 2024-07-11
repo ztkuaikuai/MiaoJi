@@ -157,15 +157,15 @@
 		
 		<!-- 展示日期选择器的组件 -->
 		<u-datetime-picker
-		                :show="showDatetimePicker"
-		                v-model="currentDate"
-		                mode="datetime"
-						:maxDate="Date.now()"
-						confirmColor="#9fcba7"
-						closeOnClickOverlay="true"
-						@close="showDatetimePicker = false"
-						@cancel="showDatetimePicker = false"
-						@confirm="getBillDate"
+			:show="showDatetimePicker"
+			v-model="currentDate"
+			mode="datetime"
+			:maxDate="Date.now()"
+			confirmColor="#9fcba7"
+			closeOnClickOverlay="true"
+			@close="showDatetimePicker = false"
+			@cancel="showDatetimePicker = false"
+			@confirm="getBillDate"
 		></u-datetime-picker>
 		
 		<!-- 模板的popup -->

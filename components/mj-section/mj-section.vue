@@ -1,7 +1,7 @@
 <template>
 	<view class="section" :style="[customStyle]">
 		<view class="left">
-			<mj-icon-with-background v-if="showIcon" :type="iconType" translateY="translateY(4rpx)" size="48rpx" customPrefix="miaoji" color="#a3a3a3" iconWrapperSize="64rpx" />
+			<mj-icon-with-background v-if="showIcon" :type="iconType" :translateY="translateY" size="48rpx" customPrefix="miaoji" color="#a3a3a3" iconWrapperSize="64rpx" />
 			<view class="info">
 				<view>{{title}}</view>
 				<view class="minor"><u--text :lines="1" :text="subTitle" color="rgba(0,0,0, 0.6)" size="24rpx"></u--text></view>
@@ -36,6 +36,11 @@
 			showIcon: {
 				type: Boolean,
 				default: true
+			},
+			// 图标Y轴偏移距离
+			translateY: {
+				type: String,
+				default: 'translateY(0rpx)'
 			}
 		},
 		data() {
