@@ -1,0 +1,97 @@
+// 文档教程: https://uniapp.dcloud.net.cn/uniCloud/schema
+{
+	"bsonType": "object",
+	"required": ["user_id", "template_id", "name", "state", "rule"],
+	"permission": {
+		"read": "doc.user_id == auth.uid",
+		"create": " 'USER' in auth.role",
+		"update": "doc.user_id == auth.uid",
+		"delete": "doc.user_id == auth.uid"
+	},
+	"properties": {
+		"_id": {
+			"description": "ID，系统自动生成"
+		},
+		"user_id": {
+			"bsonType": "string",
+			"description": "外键，关联用户id",
+			"forceDefaultValue": {
+				"$env": "uid"
+			},
+			"foreignKey": "uni-id-users._id"
+		},
+		"template_id": {
+			"bsonType": "string",
+			"description": "外键，关联模板id",
+			"foreignKey": "mj-user-templates._id"
+		},
+		"name": {
+			"bsonType": "string",
+			"description": "定时任务名称"
+		},
+		"create_date": {
+			"bsonType": "number",
+			"description": "创建时间",
+			"forceDefaultValue": {
+				"$env": "now"
+			}
+		},
+		"state": {
+			"bsonType": "int",
+			"description": "1 进行中 0 已暂停 -1 已结束",
+			"defaultValue": 1,
+			"enum": [-1, 0, 1]
+		},
+		"rule": {
+			"bsonType": "object",
+			"description": "定时记账规则",
+			"required": ["repetition_cycle", "start_time", "end_manner", "expected_next_execution_time"],
+			"properties": {
+				"repetition_cycle": {
+					"bsonType": "object",
+					"description": "重复周期",
+					"properties": {
+						"type": {
+							"bsonType": "string",
+							"description": "重复周期类型 day 按天重复"
+						},
+						"count": {
+							"bsonType": "int",
+							"description": "每n天执行一次"
+						}
+					}
+				},
+				"start_time": {
+					"bsonType": "string",
+					"description": "第一次定时记账开始时间  YYYY-MM-DD"
+				},
+				"end_manner": {
+					"bsonType": "object",
+					"description": "结束方式",
+					"properties": {
+						"type": {
+							"bsonType": "string",
+							"description": "结束类型： 永不结束 | 按次结束"
+						},
+						"count": {
+							"bsonType": "int",
+							"description": "执行n次结束"
+						}
+					}
+				},
+				"expected_next_execution_time": {
+					"bsonType": "string",
+					"description": "预计下次执行时间 根据规则生成，粒度为天 YYYY-MM-DD"
+				},
+				"recent_execution_time": {
+					"bsonType": "string",
+					"description": "最近执行时间 YYYY-MM-DD"
+				},
+				"executed_count": {
+					"bsonType": "int",
+					"description": "已执行次数"
+				}
+			}
+		}
+	}
+}

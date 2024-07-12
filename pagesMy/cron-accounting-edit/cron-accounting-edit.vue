@@ -146,14 +146,35 @@
 
 <script>
 	import { themeColor } from '@/uni.scss'
+	import { formatOneTemplate } from '@/utils/formatTemplate.js'
 	
 	const db = uniCloud.database()
 	export default {
-		onLoad({type}) {
-			console.log('CronEditType:',type);
+		async onLoad({type}) {
 			this.pageType = type
-		},
-		async mounted() {
+			
+			// 设置最初状态
+			if (type === 'add') {
+				this.initState = 1
+			} else if (type === 'edit') {
+				// 从本地缓存中取出数据
+				const data = uni.getStorageSync('oneCronData')
+				
+				// 回显数据
+				this.currentTemplete = data.template
+				delete data.template
+				this.initState = data.state
+				this.editInitForm = JSON.parse(JSON.stringify(data))
+				this.form = data
+				
+				
+				// 删除缓存
+				uni.removeStorage({
+					key: 'oneCronData'
+				})
+			}
+			
+			// 拿到模板数据
 			await this.getUserTemplate()
 		},
 		data() {
@@ -190,7 +211,9 @@
 						recent_execution_time: undefined,
 						executed_count: 0
 					}
-				}
+				},
+				// 类型为编辑时存储的原始数据
+				editInitForm: {}
 			}
 		},
 		computed: {
@@ -202,10 +225,11 @@
 					return this.form.state === 1
 				},
 				set(newValue) {
-					if (newValue) {
-						this.form.state = 1
-					} else {
-						this.form.state = this.initState
+					if (this.initState === 1) {
+						newValue ? this.form.state = 1 : this.form.state = 0
+					}
+					else {
+						newValue ? this.form.state = 1 : this.form.state = this.initState
 					}
 				}
 			},
@@ -225,7 +249,6 @@
 				const userAssets = db.collection("mj-user-assets").where('user_id == $cloudEnv_uid').field('_id,asset_type,user_id,asset_name').getTemp()
 				const res = await db.collection(temp, userAssets).get()
 				this.templateList = res.result.data
-				console.log('templateList: ',this.templateList);
 			},
 			getTemp(temp) {
 				this.currentTemplete = temp
@@ -244,8 +267,8 @@
 				}
 				this.showEndManner = false
 			},
-			saveForm() {
-				console.log('form:',this.form);
+			async saveForm() {
+				console.log('saveForm:',this.form);
 				// 表单验证
 				// 验证name是否不为空
 				if (!this.form.name) {
@@ -268,28 +291,75 @@
 				
 				// 判断是新增还是修改
 				if (this.pageType === 'add') {
-					this.addNewCron()
+					await this.addNewCron()
 				} else {
-					this.editCron()
+					await this.editCron()
 				}
+				// 回退到定时任务界面
+				uni.navigateBack()
 			},
-			addNewCron() {
+			async addNewCron() {
 				// 1 下次执行时间就是开始时间
 				this.form.rule.expected_next_execution_time = this.form.rule.start_time
-				
 				// 2 整理数据，添加至数据库
-				
-				// 3 判断是否需要立即执行一次
-				
+				await db.collection("mj-user-cron-accounting").add(this.form)
+				// 3 判断是否需要添加后，调用云函数执行该任务一次
+				const currentDate = uni.$u.timeFormat(Date.now())  // 'YYYY-MM-DD'
+				if (this.form.state === 1 && currentDate === this.form.rule.expected_next_execution_time) {
+					console.log('调用云函数执行该任务一次');
+				}
 			},
-			editCron() {
-				// 1 判断规则是否发生改变,若改变,重新计算下次执行时间
+			async editCron() {
+				// 1 判断规则rule是否发生改变,若改变,重新计算下次执行时间
+				if (this.isCronRuleChange()) {
+					this.form.rule.expected_next_execution_time = this.getNextExecutionTime(this.form.rule)
+				}
+				// 2 状态state是否发生改变,若改变,更新相关受影响的数据
+				let isNeedCall = false
 				
-				// 2 状态是否发生改变,若改变,更新相关受影响的数据
+				if (this.form.state === 1) {
+					if (this.initState === -1) {
+						// 状态：结束 => 启动  重置已执行次数
+						this.form.rule.executed_count = 0
+					}
+					
+					// 判断是否需要更新完毕后，调用云函数执行该任务一次
+					const currentDate = uni.$u.timeFormat(Date.now())  // 'YYYY-MM-DD'
+					if (currentDate >= this.form.rule.expected_next_execution_time) {
+						isNeedCall = true
+					}
+				}
+				
+				// 更新数据
+				const data = JSON.parse(JSON.stringify(this.form))
+				delete data._id
+				await db.collection('mj-user-cron-accounting').doc(this.form._id).update(data)
+				
+				// 调用云函数执行任务
+				if (isNeedCall) {
+					console.log('执行云函数');
+				}
+			},
+			// 判断规则是否改变
+			isCronRuleChange() {
+				const isRepetitionCycleChange = this.form.rule.repetition_cycle.count !== this.editInitForm.rule.repetition_cycle.count
+				const isStartTimeChange = this.form.rule.start_time !== this.editInitForm.rule.start_time
+				return isRepetitionCycleChange || isStartTimeChange
 			},
 			// 根据规则计算下次执行时间
 			getNextExecutionTime(rule) {
-				
+				let nextExecutionTime = ''
+				// 有无最近执行时间
+				if (rule.recent_execution_time) {
+					// 时间戳单位：毫秒
+					const dayTimestamp = rule.repetition_cycle.count * 24 * 60 * 60 * 1000
+					const recentTime = rule.recent_execution_time
+					const recentTimestamp = new Date(recentTime).getTime()
+					nextExecutionTime = uni.$u.timeFormat(recentTimestamp + dayTimestamp)
+				} else {
+					nextExecutionTime = rule.start_time
+				}
+				return nextExecutionTime
 			}
 		}
 	}
