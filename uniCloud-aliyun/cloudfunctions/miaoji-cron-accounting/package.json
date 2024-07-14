@@ -1,0 +1,7 @@
+{
+  "name": "miaoji-cron-accounting",
+  "dependencies": {},
+  "extensions": {
+    "uni-cloud-jql": {}
+  }
+}

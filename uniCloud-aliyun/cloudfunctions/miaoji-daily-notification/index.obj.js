@@ -13,7 +13,11 @@ module.exports = {
 	async test() {
 		await mjDailyNoti.dailyNotification()
 	},
-	async dailyNotification(){
+	/**
+	 * 向订阅用户发送每日记账提醒
+	 */
+	async dailyNotification() {
+		// 小程序订阅消息模板ID
 		const tmplId = 'n2kSsJNErg1EWpRrKqTDz2yZvyqC-LH7pLmudAsWNDE'
 		
 		const dbJQL = uniCloud.databaseForJQL({ // 获取JQL database引用，此处需要传入云对象的clientInfo
@@ -71,6 +75,7 @@ module.exports = {
 			const yesterdayRes = await dbJQL.collection("mj-user-bills").where(`user_id == "${userInfo.uid}" && dateToString(add(new Date(0),bill_date),"%Y-%m-%d","+0800") == "${yesterdayDate}"`).groupBy('bill_type').groupField('sum(bill_amount) as bill_amount_total').orderBy('bill_type asc').get()
 			console.log('yesterdayRes: ',yesterdayRes);
 			// 线上云函数不支持可选链操作符  es2020
+			// 原因：运行环境是nodejs 8
 			const yesterExpenseTempObj = yesterdayRes.data.filter(item => item.bill_type === 0)[0]
 			const yesterExpenseTemp = yesterExpenseTempObj && yesterExpenseTempObj.bill_amount_total ? (yesterExpenseTempObj.bill_amount_total / 100) : '0'
 			const yesterTransferBalanceTempObj = yesterdayRes.data.filter(item => item.bill_type === 2)[0]

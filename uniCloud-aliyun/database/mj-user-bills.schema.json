@@ -14,7 +14,7 @@
 		"user_id": {
 			"bsonType": "string",
 			"description": "外键，关联用户id",
-			"forceDefaultValue": {
+			"defaultValue": {
 			  "$env": "uid"
 			},
 			"foreignKey": "uni-id-users._id"
