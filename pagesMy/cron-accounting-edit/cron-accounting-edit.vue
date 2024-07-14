@@ -149,6 +149,7 @@
 	import { formatOneTemplate } from '@/utils/formatTemplate.js'
 	
 	const db = uniCloud.database()
+	const mjCronAccounting = uniCloud.importObject('miaoji-cron-accounting')
 	export default {
 		async onLoad({type}) {
 			this.pageType = type
@@ -302,11 +303,11 @@
 				// 1 下次执行时间就是开始时间
 				this.form.rule.expected_next_execution_time = this.form.rule.start_time
 				// 2 整理数据，添加至数据库
-				await db.collection("mj-user-cron-accounting").add(this.form)
+				const {result} = await db.collection("mj-user-cron-accounting").add(this.form)
 				// 3 判断是否需要添加后，调用云函数执行该任务一次
 				const currentDate = uni.$u.timeFormat(Date.now())  // 'YYYY-MM-DD'
 				if (this.form.state === 1 && currentDate === this.form.rule.expected_next_execution_time) {
-					console.log('调用云函数执行该任务一次');
+					mjCronAccounting.getCronAccountingById(result.id)
 				}
 			},
 			async editCron() {
@@ -334,10 +335,9 @@
 				const data = JSON.parse(JSON.stringify(this.form))
 				delete data._id
 				await db.collection('mj-user-cron-accounting').doc(this.form._id).update(data)
-				
 				// 调用云函数执行任务
 				if (isNeedCall) {
-					console.log('执行云函数');
+					mjCronAccounting.getCronAccountingById(this.form._id)
 				}
 			},
 			// 判断规则是否改变
