@@ -1,5 +1,6 @@
 <template>
 	<view class="my-assets">
+		<view class="linear-gradient"></view>
 		<mj-card title="净资产(元)——包含隐藏资产" titleFontSize="28rpx">
 			<view class="moneyContent">
 				<u--text mode="price" :text="totalAssets" size="56rpx" color="#219a6d"></u--text>
@@ -118,6 +119,16 @@
 
 <style lang="scss" scoped>
 .my-assets {
+	position: relative;
+	.linear-gradient {
+		position: absolute;
+		top: -24rpx;
+		left: 0;
+		right: 0;
+		height: 130rpx;
+		background-image: linear-gradient(#9fcba7, #fafafa);
+		z-index: -1;
+	}
 	.defaultAsset {
 		display: flex;
 		align-items: center;
@@ -140,13 +151,13 @@
 		border-radius: 20px;
 		.top {
 			display: flex;
-			justify-content: flex-end;
+			justify-content: flex-start;
 			align-items: center;
 			.add {
 				color: $mj-text-color;
 				font-size: 24rpx;
 				box-sizing: border-box;
-				padding: 4px 8px;
+				padding: 4px 0px;
 				border-bottom: 2px solid $mj-theme-color;
 			}
 		}

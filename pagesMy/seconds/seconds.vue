@@ -1,7 +1,7 @@
 <template>
 	<view class="seconds">
 		<view class="linear-gradient"></view>
-		<mj-card title="提示">
+		<mj-card title="食用说明">
 			<view style="font-size: 28rpx;color: rgba(0, 0, 0, 0.6);">
 				秒记可<span style="font-weight: 700;">用于记录经常购买的账单</span>，如每天喝咖啡9.9元，可设置为秒记方便快速记账。
 			</view>
@@ -9,16 +9,18 @@
 				<span style="font-weight: 700;">秒记比模板更加方便</span>，在记一笔页面使用秒记<span style="font-weight: 700;">相当于使用模板+点击保存</span>。
 			</view>
 		</mj-card>
+		<!-- 秒记1 -->
 		<mj-card :title="secondOneData.subTitle ? secondOneData.subTitle : secondOneData.title" :subTitle="secondOneData.subTitle ? secondOneData.title : ''">
-			<mj-bill-one-template :oneTemplate="secondOneTemp"></mj-bill-one-template>
+			<mj-bill-one-template :oneTemplate="secondOneTemp" @click.native="editSeconds(1)"></mj-bill-one-template>
 			<template #right>
 				<view @click="editSeconds(1)" class="edit">
 					修改
 				</view>
 			</template>
 		</mj-card>
+		<!-- 秒记2 -->
 		<mj-card :title="secondTwoData.subTitle ? secondTwoData.subTitle : secondTwoData.title" :subTitle="secondTwoData.subTitle ? secondTwoData.title : ''">
-			<mj-bill-one-template :oneTemplate="secondTwoTemp"></mj-bill-one-template>
+			<mj-bill-one-template :oneTemplate="secondTwoTemp" @click.native="editSeconds(2)"></mj-bill-one-template>
 			<template #right>
 				<view @click="editSeconds(2)" class="edit">
 					修改
@@ -48,34 +50,27 @@
 			</view>
 			<view style="width: 480rpx;">
 				<uni-section title="绑定模板" type="line" titleFontSize="32rpx" titleColor="#212121" white="true" />
-				<mj-bill-one-template  :oneTemplate="popTemplate" fromType="popup" @click.native="showTempSelect"></mj-bill-one-template>
+				<mj-bill-one-template  :oneTemplate="popTemplate" @click.native="showTempSelect"></mj-bill-one-template>
 			</view>
 			<view style="margin-top: 12rpx;">
 				<u-button shape="circle" type="primary" text="保存" :customStyle="btnStyle" size="normal" @click="saveSecond"></u-button>
 			</view>
 		</u-popup>
 		
-		<!-- 模板的popup -->
+		<!-- 选取模板的popup -->
 		<u-popup 
 			:show="showTemplate" 
 			:overlayStyle="{background: 'rgba(0, 0, 0, 0)'}" 
 			round="20px" 
-			zIndex="10076" 
-			:customStyle="tempPopStyle"
+			zIndex="10076"
 		>
 			<view class="user-template-list">
 				<view class="header">
-					<view class="left">
-						取消
-					</view>
 					<view class="middle">
 						帐单模板
 					</view>
-					<view class="right" @click="goTemplatePage">
-						添加
-					</view>
 				</view>
-				<view class="template-list">
+				<view class="template-list" :style="{maxHeight: windowHeight * 0.6 + 'rpx'}">
 					<mj-bill-template :templateList="templateList" pageType="account" @getTemp="getTemp"></mj-bill-template>
 				</view> 
 			</view>
@@ -94,15 +89,13 @@
 				showPop: false,
 				mainColor: themeColor,
 				secondName: '',
+				windowHeight: uni.getSystemInfoSync().windowHeight,
 				// pop框样式
 				popStyle: {
 					'box-sizing': 'border-box',
 					'padding': '0 24rpx 24rpx',
 					'bottom': '0rpx',
 					'transition': 'bottom 0.3s'
-				},
-				tempPopStyle: {
-					'max-height': '480rpx'
 				},
 				btnStyle: {
 					'width': '200rpx'
@@ -155,7 +148,7 @@
 					}
 				})
 				// 渲染秒记模板
-				this.renderSecondTemplate()
+				this.renderTwoSecondTemplates()
 			},
 			async getUserTemplate() {
 				// 获取模板信息
@@ -165,7 +158,7 @@
 				this.templateList = res.result.data
 				console.log('templateList: ',this.templateList);
 			},
-			renderSecondTemplate() {
+			renderTwoSecondTemplates() {
 				if (this.secondOneData.tempId) {
 					const index = this.templateList.findIndex(item => item._id === this.secondOneData.tempId)
 					if (index !== -1) {
@@ -176,6 +169,7 @@
 					const index = this.templateList.findIndex(item => item._id === this.secondTwoData.tempId)
 					if (index !== -1) {
 						this.secondTwoTemp = formatOneTemplate(this.templateList[index])
+						console.log('this.secondTwoTemp: ',this.secondTwoTemp);
 					}
 				}
 			},
@@ -242,7 +236,7 @@
 				console.log('保存',this.secondName, this.popTemplate);
 			},
 			showTempSelect() {
-				this.popStyle['bottom'] = '128rpx'
+				this.popStyle['bottom'] = `${this.windowHeight * 0.1}px`
 				this.showTemplate = true
 			},
 			hideTempPop() {
@@ -268,7 +262,7 @@
 				this.popTemplate = temp
 				this.popStyle['bottom'] = '0rpx'
 				this.showTemplate = false
-			}
+			},
 		}
 	}
 </script>
@@ -332,18 +326,8 @@
 		
 		.header {
 			display: flex;
-			justify-content: space-between;
+			justify-content: center;
 			padding-top: 24rpx;
-			.left {
-				visibility: hidden;
-				box-sizing: border-box;
-				padding: 4px 8px;
-				margin-left: 8px;
-				background-color: $mj-theme-color;
-				border-radius: 16px;
-				font-size: 28rpx;
-				color: $mj-bg-color;
-			}
 			.middle {
 				text-align: center;
 				// scss中font另一种写法
@@ -352,18 +336,8 @@
 					weight: bold;
 				}
 			}
-			.right {
-				box-sizing: border-box;
-				padding: 4px 8px;
-				margin-right: 8px;
-				background-color: $mj-theme-color;
-				border-radius: 16px;
-				font-size: 28rpx;
-				color: $mj-bg-color;
-			}
 		}
 		.template-list {
-			max-height: 400rpx;
 			overflow: auto;
 		}
 	}

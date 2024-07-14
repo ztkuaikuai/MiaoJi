@@ -1,5 +1,5 @@
 @font-face {
-  font-family: "miaoji"; /* Project id 4238310 */
+  font-family: "miaoji"; /* Project id 4408203 */
   src: url('/static/iconfont.ttf') format('truetype');
 }
 
@@ -11,112 +11,12 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.mj-second:before {
-  content: "\e6ad";
+.mj-notification:before {
+  content: "\e622";
 }
 
-.mj-shuiguoshucai:before {
-  content: "\e7b0";
-}
-
-.mj-naicha:before {
-  content: "\10121";
-}
-
-.mj-zhuanzhang:before {
-  content: "\e6a1";
-}
-
-.mj-creditcard:before {
-  content: "\e7de";
-}
-
-.mj-zhusu:before {
-  content: "\e646";
-}
-
-.mj-fuzhi:before {
-  content: "\e656";
-}
-
-.mj-huobiduihuan:before {
-  content: "\e65b";
-}
-
-.mj-youji:before {
-  content: "\e675";
-}
-
-.mj-qinzi:before {
-  content: "\e68c";
-}
-
-.mj-renwen:before {
-  content: "\e68d";
-}
-
-.mj-shouji:before {
-  content: "\e692";
-}
-
-.mj-yule:before {
-  content: "\e699";
-}
-
-.mj-ziranfengguang:before {
-  content: "\e69c";
-}
-
-.mj-duogouwu:before {
-  content: "\e6d4";
-}
-
-.mj-dixiaofei:before {
-  content: "\e6dd";
-}
-
-.mj-gaoxiaofei:before {
-  content: "\e6de";
-}
-
-.mj-wucan:before {
-  content: "\e6e8";
-}
-
-.mj-qita:before {
-  content: "\e6fe";
-}
-
-.mj-meizhuang:before {
-  content: "\e661";
-}
-
-.mj-jiaotong:before {
-  content: "\e61e";
-}
-
-.mj-dianpuzhuangxiu:before {
-  content: "\e616";
-}
-
-.mj-huiyuan:before {
-  content: "\e8a6";
-}
-
-.mj-xiedaichongwu:before {
-  content: "\e90d";
-}
-
-.mj-yiliao:before {
-  content: "\e6ee";
-}
-
-.mj-richangjiandu:before {
-  content: "\e61a";
-}
-
-.mj-YUAN:before {
-  content: "\e785";
+.mj-flower:before {
+  content: "\e610";
 }
 
 .mj-reloadtime:before {
@@ -131,23 +31,127 @@
   content: "\e794";
 }
 
+.mj-creditcard:before {
+  content: "\e7de";
+}
+
 .mj-stop:before {
   content: "\e842";
 }
 
-.mj-weixinzhifu:before {
+.mj-wechat:before {
+  content: "\e61e";
+}
+
+.mj-alipay:before {
+  content: "\e61f";
+}
+
+.mj-bank-card:before {
+  content: "\e620";
+}
+
+.mj-balance:before {
+  content: "\e621";
+}
+
+.mj-second:before {
+  content: "\e6ad";
+}
+
+.mj-tea:before {
+  content: "\e605";
+}
+
+.mj-wallet:before {
+  content: "\e606";
+}
+
+.mj-yuan-circle:before {
   content: "\e607";
 }
 
-.mj-zhifubao:before {
+.mj-earth:before {
+  content: "\e608";
+}
+
+.mj-vip:before {
+  content: "\e609";
+}
+
+.mj-blank-calendar:before {
   content: "\e60a";
 }
 
-.mj-yinhangqia:before {
+.mj-income:before {
   content: "\e60b";
 }
 
-.mj-yue:before {
+.mj-study:before {
   content: "\e60c";
+}
+
+.mj-recreation:before {
+  content: "\e60d";
+}
+
+.mj-bus:before {
+  content: "\e60e";
+}
+
+.mj-lipstick:before {
+  content: "\e60f";
+}
+
+.mj-loop:before {
+  content: "\e611";
+}
+
+.mj-medical:before {
+  content: "\e612";
+}
+
+.mj-navigation-arrow:before {
+  content: "\e613";
+}
+
+.mj-paintbrush:before {
+  content: "\e614";
+}
+
+.mj-pet:before {
+  content: "\e615";
+}
+
+.mj-individuation:before {
+  content: "\e616";
+}
+
+.mj-other-income:before {
+  content: "\e617";
+}
+
+.mj-shopping:before {
+  content: "\e618";
+}
+
+.mj-meal:before {
+  content: "\e619";
+}
+
+.mj-communication:before {
+  content: "\e61a";
+}
+
+.mj-transfer:before {
+  content: "\e61b";
+}
+
+.mj-human-group:before {
+  content: "\e61c";
+}
+
+.mj-fruit:before {
+  content: "\e61d";
 }
 

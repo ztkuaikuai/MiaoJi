@@ -37,7 +37,7 @@
 				<view class="asset-card" @click="chooseTransferAsset(0)">
 					<view class="left">
 						<view class="left-icon">
-							<uni-icons type="wallet" color="#6d6d6d" size="40rpx"></uni-icons>
+							<uni-icons type="mj-wallet" color="#6d6d6d" size="40rpx" customPrefix="miaoji"></uni-icons>
 						</view>
 						<view class="asset-type" :style="transferOutAssetStyle.title ? '' : 'color: #6d6d6d;'" >
 							{{transferOutAssetStyle.asset_name || transferOutAssetStyle.title  || '转出账户'}}
@@ -51,7 +51,7 @@
 				<view class="asset-card" @click="chooseTransferAsset(1)">
 					<view class="left">
 						<view class="left-icon">
-							<uni-icons type="wallet" color="#6d6d6d" size="40rpx"></uni-icons>
+							<uni-icons type="mj-wallet" color="#6d6d6d" size="40rpx" customPrefix="miaoji"></uni-icons>
 						</view>
 						<view class="asset-type" :style="transferIntoAssetStyle.title ? '' : 'color: #6d6d6d;'" >
 							{{transferIntoAssetStyle.asset_name || transferIntoAssetStyle.title || '转入账户'}}
@@ -63,23 +63,26 @@
 				</view>
 				
 				<view style="color: #6d6d6d;padding-left: 8rpx;font-size: 24rpx;">
-					手续费——从转出账户转出的钱=转出金额+手续费
+					手续费 —— 从转出账户转出的钱 = 转出金额 + 手续费
 				</view>
 				<u--form :model="transferInfo" :borderBottom="false" ref="uForm" errorType="toast">
 					<u-form-item prop="serviceCharge" :borderBottom="false">
-						<u--input 
+						<u-input 
 							v-model="transferInfo.serviceCharge" 
 							placeholder="手续费" 
 							placeholderStyle="color: #6d6d6d" 
 							type="digit" 
-							border="surround" clearable
+							border="surround" 
+							clearable
 							shape="circle" 
 							maxlength="8" 
 							fontSize="13px" 
 							:customStyle="inputStyle" 
-							prefixIcon="rmb-circle"
-							prefixIconStyle="color: #6d6d6d"
-						></u--input>
+						>
+							<template slot="prefix">
+								<uni-icons style="margin-right: 20rpx;" type="mj-yuan-circle" color="#6d6d6d" size="40rpx" customPrefix="miaoji"></uni-icons>
+							</template>
+						</u-input>
 					</u-form-item>
 				</u--form>
 			</view>
@@ -154,15 +157,15 @@
 		
 		<!-- 展示日期选择器的组件 -->
 		<u-datetime-picker
-		                :show="showDatetimePicker"
-		                v-model="currentDate"
-		                mode="datetime"
-						:maxDate="Date.now()"
-						confirmColor="#9fcba7"
-						closeOnClickOverlay="true"
-						@close="showDatetimePicker = false"
-						@cancel="showDatetimePicker = false"
-						@confirm="getBillDate"
+			:show="showDatetimePicker"
+			v-model="currentDate"
+			mode="datetime"
+			:maxDate="Date.now()"
+			confirmColor="#9fcba7"
+			closeOnClickOverlay="true"
+			@close="showDatetimePicker = false"
+			@cancel="showDatetimePicker = false"
+			@confirm="getBillDate"
 		></u-datetime-picker>
 		
 		<!-- 模板的popup -->
@@ -191,6 +194,8 @@
 	import { getCategoryIconListForExpend, getCategoryIconListForIncome, getAssetsStyle } from "@/utils/icon-config.js";
 	import { throttle } from '@/utils/throttle.js'
 	import { formatOneTemplate } from '@/utils/formatTemplate.js'
+	// 订阅消息
+	import { subscribeMessage } from '@/utils/subscribeMessage.js'
 	const db = uniCloud.database()
 	export default {
 		data() {
@@ -298,7 +303,8 @@
 				// 秒记数据
 				secondOneData: null,
 				secondTwoData: null,
-				throttleAddSecond: throttle(this.addSecond, 5000)
+				throttleAddSecond: throttle(this.addSecond, 5000),
+				secondId: ''
 			};
 		},
 		computed: {
@@ -336,10 +342,12 @@
 				// 获取分类列表，该用户所有资产信息，将用户资产信息添加对应资产icon样式
 				this.categoryIconListForExpend = getCategoryIconListForExpend()
 				this.categoryIconListForIncome = getCategoryIconListForIncome()
+				// 从缓存中读取用户资产信息
 				this.userAssets = uni.getStorageSync('mj-user-assets')
 				this.expendOrIncomeInfo.asset_id = this.userAssets.filter(asset => asset.default_asset === true)[0]?._id ?? ''
 				this.assetsStyle = getAssetsStyle()
 				this.addAssetStyle()
+				// 设置当前默认使用的资产
 				const currentAsset = this.userAssets.filter(asset => asset.default_asset === true)
 				this.currentAssetTitle = currentAsset[0]?.asset_name || currentAsset[0]?.assetStyle.title || '未选择资产'
 				// console.log('onLoad,initPage:用户资产列表',this.userAssets);
@@ -569,14 +577,20 @@
 				this.tapSaveBtn()
 			},
 			// 用户点击保存按钮触发  判断类型，并触发相应逻辑
-			tapSaveBtn() {
+			async tapSaveBtn() {
 				if(!uni.$u.test.amount(this.keyboardInfo.balance)) return
 				if(this.isTemplate) {
 					// 如果是添加或编辑模板
 					if(this.isTemplateEdit) {
 						// 如果是编辑模板
 						// 通过模板id删除之前的模板
-						db.collection('mj-user-templates').doc(this.templateEditId).remove()
+						await db.collection('mj-user-templates').doc(this.templateEditId).remove()
+						// 根据模板id查询有无对应秒记
+						const res = await db.collection('mj-user-seconds').where(`template_id == "${this.templateEditId}"`).get()
+						// 如果存在对应秒记，则保存秒记id，在保存新模板后根据秒记id修改模板id
+						if (res.result.affectedDocs) {
+							this.secondId = res.result.data[0]._id
+						}
 					}
 					// 添加新模板
 					this.addOneTemplate()
@@ -628,10 +642,12 @@
 					})
 					return
 				}
+				await this.upDateUserAssetBalance()
+				// 弹出订阅消息
+				this.subDayNotification()
 				uni.switchTab({
 					url:"/pages/index/index"
 				})
-				this.upDateUserAssetBalance()
 			},
 			
 			// 添加转账账单
@@ -663,10 +679,12 @@
 					})
 					return
 				}
+				await this.upDateUserTwoAssetBalance()
+				// 弹出订阅消息
+				this.subDayNotification()
 				uni.switchTab({
 					url:"/pages/index/index"
 				})
-				this.upDateUserTwoAssetBalance()
 			},
 			// 转账账单表单验证
 			async validatorTransferInfo() {
@@ -685,7 +703,7 @@
 					}catch(e){
 						return false
 					}
-				} 
+				}
 				if(!this.transferAccountInfo.asset_id || !this.transferAccountInfo.destination_asset_id) {
 					// console.log('有资产没填');
 					uni.showToast({
@@ -731,10 +749,8 @@
 				}
 				uni.$emit('updateBillsList')
 				uni.$emit('updateMonthlyBillBalance')
-				if(!this.isAddAgain) {
-					// 如果不是再记，则更新用户资产，并更新缓存
-					uni.$emit('updateAssetsList')
-				}
+				// 等待资产异步更新完成
+				await this.asyncEmitUpdateAssets()
 			},
 			// 更新用户 转出与转入 资产金额
 			async upDateUserTwoAssetBalance() {
@@ -756,7 +772,8 @@
 				})
 				uni.$emit('updateBillsList')
 				uni.$emit('updateMonthlyBillBalance')
-				uni.$emit('updateAssetsList')
+				// 等待资产异步更新完成
+				await this.asyncEmitUpdateAssets()
 			},
 			
 			
@@ -925,10 +942,15 @@
 					this.expendOrIncomeInfo.bill_amount = Math.round(this.keyboardInfo.balance * 100)
 					this.expendOrIncomeInfo.bill_notes = this.keyboardInfo.notes
 					const {asset_id,bill_amount,bill_notes,bill_type,category_type} = this.expendOrIncomeInfo
-					await db.collection("mj-user-templates").add({
+					const res = await db.collection("mj-user-templates").add({
 						asset_id,bill_amount,bill_notes,bill_type,category_type
 					})
-					uni.navigateBack()
+					// 如果秒记id不为空，即修改的模板有对应绑定的秒记
+					if (this.secondId) {
+						// 更新秒记的模板id
+						const templateId = res.result.id
+						await this.updateSecondTempId(this.secondId, templateId)
+					}
 				} else {
 					// 类型为转账
 					// 添加转账账单
@@ -949,9 +971,15 @@
 					this.transferAccountInfo.bill_notes = `${this.transferAccountInfo.bill_notes + '-'}${transferOutTitle}转出至${transferInTitle},手续费${this.transferAccountInfo.bill_amount / 100}元`
 					// console.log('数据整理完毕，准备存入数据库',this.transferAccountInfo);
 					const {asset_id,bill_amount,bill_notes,bill_type,category_type,destination_asset_id,transfer_amount} = this.transferAccountInfo
-					await db.collection("mj-user-templates").add({asset_id, bill_amount, bill_type, category_type, destination_asset_id, transfer_amount, bill_notes})
-					uni.navigateBack()
+					const res = await db.collection("mj-user-templates").add({asset_id, bill_amount, bill_type, category_type, destination_asset_id, transfer_amount, bill_notes})
+					// 如果秒记id不为空，即修改的模板有对应绑定的秒记
+					if (this.secondId) {
+						// 更新秒记的模板id
+						const templateId = res.result.id
+						await this.updateSecondTempId(this.secondId, templateId)
+					}
 				}
+				uni.navigateBack()
 			},
 			// 点击添加模板按钮
 			goTemplatePage() {
@@ -1030,10 +1058,7 @@
 				// 统一修改金额
 				userAssetsTemp.forEach(item => item.asset_balance /= 100)
 				// 保存在缓存中
-				uni.setStorage({
-					key:'mj-user-assets',
-					data: userAssetsTemp
-				})
+				uni.setStorageSync('mj-user-assets', userAssetsTemp)
 			},
 			/** 秒记相关方法 */
 			async getUserSeconds() {
@@ -1084,6 +1109,20 @@
 						})
 					}
 				}
+			},
+			// 异步更新资产
+			async asyncEmitUpdateAssets() {
+				return new Promise((resolve) => {
+					uni.$emit('updateAssetsList', {resolve})
+				})
+			},
+			// 更新秒记的模板id
+			async updateSecondTempId(secondId, tempId) {
+				await db.collection('mj-user-seconds').doc(secondId).update({template_id: tempId})
+			},
+			// 订阅每日记账提醒
+			subDayNotification() {
+				subscribeMessage(['n2kSsJNErg1EWpRrKqTDz2yZvyqC-LH7pLmudAsWNDE'])
 			}
 		}
 	}

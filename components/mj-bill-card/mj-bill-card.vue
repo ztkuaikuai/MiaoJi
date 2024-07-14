@@ -121,7 +121,8 @@
 								uni.$emit('updateMonthlyBillBalance')
 								await this.updateAssetBalance(bill)
 								// console.log('更新资产成功');
-								uni.$emit('updateAssetsList')
+								// 等待资产异步更新完成，用户资产缓存更新完成
+								await this.asyncEmitUpdateAssets()
 								// 更新账单页面
 								uni.$emit('updateBillPage')
 								uni.hideLoading()
@@ -138,6 +139,7 @@
 					})
 				} else {
 					// 修改账单  存入缓存，在记一笔页面读取
+					uni.setStorageSync('mj-bill-edit',bill)
 					// 如果是弹出框中点击修改，则隐藏弹出框
 					if(this.showBillDetails) {
 						this.showBillDetails = false
@@ -201,6 +203,12 @@
 				if(this.today === uni.$u.timeFormat(Date.now(), 'mm月dd日')) this.today += ' 今天'
 				if(this.today === uni.$u.timeFormat(Date.now() - 86400000, 'mm月dd日')) this.today += ' 昨天'
 				if(this.today === uni.$u.timeFormat(Date.now() - 172800000, 'mm月dd日')) this.today += ' 前天'
+			},
+			// 异步更新资产
+			async asyncEmitUpdateAssets() {
+				return new Promise((resolve) => {
+					uni.$emit('updateAssetsList', {resolve})
+				})
 			}
 		},
 		watch: {
@@ -222,7 +230,7 @@
 						bill.assetStyle = this.assetsStyle.find(item => item.type === bill.asset_id[0]?.asset_type)  // 如果账单对应的资产被用户删除，则不赋值
 					})
 					this.setToday()
-					console.log('监听userBillsFromDB，赋值userbills',this.userBills );
+					// console.log('监听userBillsFromDB，赋值userbills',this.userBills );
 				}
 			},
 			userAssetsFromDB: {

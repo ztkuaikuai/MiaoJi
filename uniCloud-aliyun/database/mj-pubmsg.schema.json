@@ -1,0 +1,36 @@
+// 文档教程: https://uniapp.dcloud.net.cn/uniCloud/schema
+{
+	"bsonType": "object",
+	"description": "消息发布表",
+	"required": ["msg_temp_id", "mag_data"],
+	"permission": {
+		"read": false,
+		"create": false,
+		"update": false,
+		"delete": false
+	},
+	"properties": {
+		"_id": {
+			"description": "ID，系统自动生成"
+		},
+		"create_date": {
+			"bsonType": "number",
+			"description": "创建时间",
+			"forceDefaultValue": {
+			  "$env": "now"
+			}
+		},
+		"name": {
+			"bsonType": "string",
+			"description": "模板名称"
+		},
+		"msg_temp_id": {
+			"bsonType": "string",
+			"description": "订阅消息模板id"
+		},
+		"msg_data": {
+			"bsonType": "object",
+			"description": "模板数据"
+		}
+	}
+}

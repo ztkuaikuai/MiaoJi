@@ -1,0 +1,9 @@
+{
+  "name": "miaoji-daily-notification",
+  "dependencies": {
+    "uni-subscribemsg": "file:../../../uni_modules/uni-subscribemsg/uniCloud/cloudfunctions/common/uni-subscribemsg"
+  },
+  "extensions": {
+    "uni-cloud-jql": {}
+  }
+}

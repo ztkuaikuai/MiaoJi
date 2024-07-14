@@ -1,32 +1,30 @@
 {
-	"pages": [
-		{
-			"path": "pages/index/index",
-			"style": {
-				"navigationBarTitleText": "妙记"
-			}
-		}, {
-			"path": "pages/bills/bills",
-			"style": {
-				"navigationBarTitleText": "账单",
-				"enablePullDownRefresh": false
-			}
-
-		}, {
-			"path": "pages/charts/charts",
-			"style": {
-				"navigationBarTitleText": "报表",
-				"enablePullDownRefresh": false
-			}
-
-		}, {
-			"path": "pages/my/my",
-			"style": {
-				"navigationBarTitleText": "我的",
-				"enablePullDownRefresh": false
-			}
+	"pages": [{
+		"path": "pages/index/index",
+		"style": {
+			"navigationBarTitleText": "妙记"
 		}
-	],
+	}, {
+		"path": "pages/bills/bills",
+		"style": {
+			"navigationBarTitleText": "账单",
+			"enablePullDownRefresh": false
+		}
+
+	}, {
+		"path": "pages/charts/charts",
+		"style": {
+			"navigationBarTitleText": "报表",
+			"enablePullDownRefresh": false
+		}
+
+	}, {
+		"path": "pages/my/my",
+		"style": {
+			"navigationBarTitleText": "我的",
+			"enablePullDownRefresh": false
+		}
+	}],
 	"subPackages": [{
 			"root": "pagesAccount",
 			"pages": [{
@@ -53,55 +51,64 @@
 		}, {
 			"root": "pagesMy",
 			"pages": [{
-				"path": "user-info/user-info",
-				"style": {
-					"navigationBarTitleText": "我的",
-					"enablePullDownRefresh": false
-				}
+					"path": "user-info/user-info",
+					"style": {
+						"navigationBarTitleText": "我的",
+						"enablePullDownRefresh": false
+					}
 
-			}, {
-				"path": "feedback/feedback",
-				"style": {
-					"navigationBarTitleText": "反馈",
-					"enablePullDownRefresh": false
-				}
+				}, {
+					"path": "feedback/feedback",
+					"style": {
+						"navigationBarTitleText": "反馈",
+						"enablePullDownRefresh": false
+					}
 
-			}    ,{
-                    "path" : "about/about",
-                    "style" :                                                                                    
-                {
-                    "navigationBarTitleText": "关于",
-                    "enablePullDownRefresh": false
-                }
-                
-                }
-                ,{
-                    "path" : "my-assets/my-assets",
-                    "style" :                                                                                    
-                {
-                    "navigationBarTitleText": "我的资产",
-                    "enablePullDownRefresh": false
-                }
-                
-                }
-                ,{
-                    "path" : "bill-template/bill-template",
-                    "style" :                                                                                    
-                {
-                    "navigationBarTitleText": "我的模板",
-                    "enablePullDownRefresh": false
-                }
-                
-                },
-                {
-                	"path" : "seconds/seconds",
-                	"style" : 
-                	{
-                		"navigationBarTitleText" : "秒记管理",
-                		"enablePullDownRefresh" : false
-                	}
-                }
-            ]
+				}, {
+					"path": "about/about",
+					"style": {
+						"navigationBarTitleText": "关于",
+						"enablePullDownRefresh": false
+					}
+
+				}, {
+					"path": "my-assets/my-assets",
+					"style": {
+						"navigationBarTitleText": "我的资产",
+						"enablePullDownRefresh": false
+					}
+
+				}, {
+					"path": "bill-template/bill-template",
+					"style": {
+						"navigationBarTitleText": "我的模板",
+						"enablePullDownRefresh": false
+					}
+
+				},
+				{
+					"path": "seconds/seconds",
+					"style": {
+						"navigationBarTitleText": "秒记管理",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
+					"path": "cron-accounting/cron-accounting",
+					"style": {
+						"navigationBarTitleText": "定时记账",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
+					"path" : "cron-accounting-edit/cron-accounting-edit",
+					"style" : 
+					{
+						"navigationBarTitleText" : "编辑任务",
+						"enablePullDownRefresh": false
+					}
+				}
+			]
 		}, {
 			"root": "pagesFilter",
 			"pages": [{
@@ -158,7 +165,7 @@
 	},
 	"tabBar": {
 		"color": "#c9c9c9",
-		"selectedColor": "#9fcba7",
+		"selectedColor": "#65915b",
 		"backgroundColor": "#fafafa",
 		"borderStyle": "white",
 		"list": [{
@@ -188,7 +195,7 @@
 		]
 	},
 	"uniIdRouter": {
-		"loginPage": "uni_modules/uni-id-pages/pages/login/login-withoutpwd", 
+		"loginPage": "uni_modules/uni-id-pages/pages/login/login-withoutpwd",
 		"needLogin": [
 			"pagesMy/.*",
 			"pagesAccount/.*",

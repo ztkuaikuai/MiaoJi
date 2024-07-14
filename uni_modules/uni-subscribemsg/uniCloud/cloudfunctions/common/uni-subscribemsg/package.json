@@ -1,0 +1,16 @@
+{
+  "name": "uni-subscribemsg",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "uni-open-bridge-common": "file:../../../../../uni-open-bridge-common/uniCloud/cloudfunctions/common/uni-open-bridge-common",
+    "uni-config-center": "file:../../../../../uni-config-center/uniCloud/cloudfunctions/common/uni-config-center"
+  }
+}

@@ -1,6 +1,7 @@
 <template>
-	<view>
-		<mj-card title="提示">
+	<view class="temp">
+		<view class="linear-gradient"></view>
+		<mj-card title="食用说明">
 			<view style="font-size: 28rpx;color: rgba(0, 0, 0, 0.6);">
 				账单模板可<span style="font-weight: 700;">用于记录经常购买的账单</span>，如每天都吃香菇滑鸡11元，每月交房租1500元等，可保存为帐单模板<span style="font-weight: 700;">方便快速记账</span>。
 			</view>
@@ -9,7 +10,8 @@
 		<view class="bill-template-wrapper">
 			<mj-bill-template :templateList="templateList" @updateList="getUserTemplate" pageType="temp"></mj-bill-template>
 		</view>
-		<view class="placeholder"></view>
+		<!-- 防挡 -->
+		<view style="height: 64px;"></view>
 		<!-- 固定定位，最底下 -->
 		<view class="bottom-btn" >
 			<u-button text="添加模板" color="#9fcba7" shape="circle" @click="clickBottomBtn"></u-button>
@@ -49,9 +51,19 @@
 </script>
 
 <style lang="scss" scoped>
-	.placeholder {
-		height: 64px;
+	.temp {
+		position: relative;
+		.linear-gradient {
+			position: absolute;
+			top: -24rpx;
+			left: 0;
+			right: 0;
+			height: 130rpx;
+			background-image: linear-gradient(#9fcba7, #fafafa);
+			z-index: -1;
+		}
 	}
+	
 	.bottom-btn {
 		box-sizing: border-box;
 		z-index: 999;

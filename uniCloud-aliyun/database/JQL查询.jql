@@ -34,3 +34,22 @@ const userAssets = db.collection("mj-user-assets").field('_id,asset_type,user_id
 db.collection(userMonthBills, userAssets).get()
 
 db.collection("uni-id-users").get()
+
+db.collection('mj-submsg').remove()
+
+db.collection('mj-pubmsg').add({
+	name: '测试',
+	msg_temp_id: 'kGUsXGcTKBAA239WAxPCbn3Sv2svDGWTqsglYZMiqLI',
+	msg_data: {
+				character_string1: {
+					value: "v0.8.3"
+				},
+				thing2: {
+					value: "啊啊啊啊啊啊啊啊啊"
+				}
+			}
+})
+
+const pubsubList = db.collection('mj-submsg').where(` msg_temp_id == "kGUsXGcTKBAA239WAxPCbn3Sv2svDGWTqsglYZMiqLI" `).getTemp()
+const userList = db.collection('uni-id-users').field('_id,wx_openid').getTemp()
+db.collection(pubsubList, userList).get()

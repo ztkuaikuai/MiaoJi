@@ -57,7 +57,7 @@
 				v-for="(bills,index) in userBills"
 				:key="index"
 				:userBillsFromDB="bills.data" 
-				:userAssetsFromDB="userAssets" 
+				:userAssetsFromDB="userAssets"
 			>
 			</mj-bill-card>
 			<view v-show="userBillsCount === 0">
@@ -201,7 +201,7 @@
 				const resAll = await db.multiSend(res1,res2,res3)
 				return resAll.result.dataList
 			},
-			// 获取用户月账单的本月支出和本页收入
+			// 获取用户月账单的本月支出和本月收入
 			async getUserMonthlyBillBalance() {
 				// 筛选条件 bill_date 日期格式化成 2023-09 的字段，按照账单类型进行分组，并计算每个分组的总价
 				const res = await db.collection("mj-user-bills").where(`user_id == $cloudEnv_uid && dateToString(add(new Date(0),bill_date),"%Y-%m","+0800") == "${this.currentDate}"`).groupBy('bill_type').groupField('sum(bill_amount) as bill_amount_total').orderBy('bill_type asc').get()
@@ -214,7 +214,7 @@
 				this.monthlyIncome = Number(monthlyIncomeTemp)
 			},
 			// 获取用户资产列表
-			async getUserAssets() {
+			async getUserAssets(params = false) {
 				// console.log("getUserAssets");
 				const res = await db.collection("mj-user-assets").where(" user_id == $cloudEnv_uid ").get()
 				this.userAssets = []
@@ -233,10 +233,10 @@
 				// 统一修改金额
 				this.userAssets.forEach(item => item.asset_balance /= 100)
 				// 保存在缓存中
-				uni.setStorage({
-					key:'mj-user-assets',
-					data: this.userAssets
-				})
+				uni.setStorageSync('mj-user-assets', this.userAssets)
+				if (params) {
+					params.resolve('ok')
+				}
 			}
 		},
 		onUnload(){

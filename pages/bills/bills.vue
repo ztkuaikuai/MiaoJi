@@ -35,13 +35,13 @@
 				<text>账单明细</text>
 			</view>
 			<!-- 需要 到达底部钩子，按需加载 -->
-				<mj-bill-card 
-					v-for="(bills,index) in userBillsByDay"
-					:key="index"
-					:userBillsFromDB="bills" 
-					:userAssetsFromDB="userAssets"
-				>
-				</mj-bill-card>
+			<mj-bill-card 
+				v-for="(bills,index) in userBillsByDay"
+				:key="index"
+				:userBillsFromDB="bills"
+				:userAssetsFromDB="userAssets"
+			>
+			</mj-bill-card>
 			<view v-show="userBillsCount === 0">
 				<u-empty mode="list" text="没有找到符合条件的账单哦,快去记一笔吧"></u-empty>
 			</view>
@@ -105,6 +105,10 @@
 					monthlyExpend: 0,
 					monthlyIncome: 0
 				},
+				// 按天展示的账单索引
+				needShowIndex: 0,
+				// 按天倒叙排序的二维数组
+				userBillsOrderByDayArray: []
 			};
 		},
 		computed: {
@@ -168,6 +172,8 @@
 				}
 			},
 			async getMonthBills(month) {
+				const timeNow = Date.now()
+				console.log('开始获取并处理账单数据结构');
 				// 如果非初始化
 				if(!this.initBillCard) {
 					// 重置账单和图表数据
@@ -179,7 +185,7 @@
 				const userMonthBills = db.collection("mj-user-bills").where(`user_id == $cloudEnv_uid && dateToString(add(new Date(0),bill_date),"%Y-%m","+0800") == "${month}"`).orderBy('bill_date desc').getTemp()
 				const userAssets = db.collection("mj-user-assets").where('user_id == $cloudEnv_uid').field('_id,asset_type,user_id,asset_name').getTemp()
 				const res = await db.collection(userMonthBills,userAssets).get()
-				
+				console.log(res.result.data);
 				// 根据账单计算月支出和月收入
 				this.userBills = res.result.data
 				// 统一修改金额为 元
@@ -212,7 +218,7 @@
 				for (let i = 0; i < numberOfDays; i++) {
 					twoDimensionalArray.push([]);
 				}
-				// 判断 每个bill中的bill_date的记账日 例如 09  08  07
+				// 判断 每个bill中的bill_date的记账日 例如  09  08  07
 				// 用numberOfDays 减去 bill_date得到索引
 				// 根据索引 push 此bill 进入对应的数组 arr[index].push(bill)
 				this.userBills.forEach(bill => {
@@ -220,8 +226,15 @@
 					const index = numberOfDays - billDay
 					twoDimensionalArray[index].push(bill)
 				})
+				
+				// 得到需要展示的天数索引（>=6条账单数据）
+				this.needShowIndex = this.findNeewShowIndex(twoDimensionalArray)
+				console.log('this.needShowIndex: ',this.needShowIndex);
+				this.userBillsOrderByDayArray = twoDimensionalArray
 				// console.log('更新后userBillsByDay',twoDimensionalArray);
-				this.userBillsByDay = twoDimensionalArray
+				this.userBillsByDay = twoDimensionalArray.slice(0, this.needShowIndex + 1)
+				console.log('userBillsByDay: ', this.userBillsByDay);
+				console.log('账单数据结构处理完毕', Date.now() - timeNow);
 				// 倒序排列
 				// [[今天的账单],[昨天的账单],[前天账单],[9月6日账单]……[9月1日账单]]
 				// [[月末的账单],…………[月初的账单]]
@@ -233,6 +246,8 @@
 				// 用户点击确认删除账单触发
 				// 更新账单，更新过程中图表显示loading，账单更新完毕后更新图表
 				this.getMonthBills(this.month)
+				// 更新用户资产
+				this.getUserAssets()
 			},
 			getUserAssets() {
 				this.userAssets = uni.getStorageSync('mj-user-assets')
@@ -260,28 +275,29 @@
 					// 如果是以0开头，则去除开头的0
 					chartMonth = chartMonth.replace(/^0+/, '');
 				}
-				let chartDay = this.userBillsByDay.length
+				let chartDay = this.userBillsOrderByDayArray.length
 				
 				// 遍历账单数据，计算每天的支出和收入总额
-				for (const dayData of this.userBillsByDay) {
-				  let dayExpense = 0;
-				  let dayIncome = 0;
-				  
+				for (const dayData of this.userBillsOrderByDayArray) {
+					let dayExpense = 0
+					let dayIncome = 0
+					
 				
-				  for (const bill of dayData) {
-				    if (bill.bill_type === 0 || bill.bill_type === 2) {
-				      dayExpense += bill.bill_amount;
-				    } else if (bill.bill_type === 1) {
-				      dayIncome += bill.bill_amount;
-				    }
-				  }
-				  // 将计算结果添加到结果对象中 
-				  result.categories.push(`${chartMonth}月${chartDay}日`);
-				  chartDay --
-				  result.series[0].data.push(dayExpense);
-				  result.series[1].data.push(dayIncome);
+					for (const bill of dayData) {
+						if (bill.bill_type === 0 || bill.bill_type === 2) {
+						  dayExpense += bill.bill_amount
+						} else if (bill.bill_type === 1) {
+						  dayIncome += bill.bill_amount
+						}
+					}
+					// 将计算结果添加到结果对象中 
+					result.categories.push(`${chartMonth}月${chartDay}日`)
+					chartDay --
+					
+					result.series[0].data.push(parseFloat(dayExpense.toFixed(2)))
+					result.series[1].data.push(parseFloat(dayIncome.toFixed(2)))
 				}
-				
+				console.log('result: ',result);
 				this.chartsDataColumn = result
 			},
 			// 触发日期选择器
@@ -306,6 +322,25 @@
 				const totalDays = date.getDate();
 				return totalDays;
 			},
+			// 找到需要展示的天数索引
+			findNeewShowIndex(twoDimensionalArray) {
+				let index = 0
+				let length = 0
+				for (let array of twoDimensionalArray) {
+					length += array.length
+					if (length >= 6) return index
+					index++
+				}
+			}
+		},
+		// 触底加载
+		onReachBottom() {
+			let oneDayBillArray = this.userBillsOrderByDayArray[++this.needShowIndex]
+			if (oneDayBillArray === undefined) return
+			while (oneDayBillArray.length === 0) {
+				oneDayBillArray = this.userBillsOrderByDayArray[++this.needShowIndex]
+			}
+			this.userBillsByDay.push(oneDayBillArray)
 		},
 		// 分享功能
 		onShareAppMessage () {
@@ -326,7 +361,6 @@
 
 <style lang="scss" scoped>
 .bills {
-	position: relative;
 	.header-fixed {
 		position: fixed;
 		width: 100%;
@@ -345,7 +379,7 @@
 	}
 	.linear-gradient {
 		position: absolute;
-		top: -18rpx;
+		top: 80rpx;
 		left: 0;
 		right: 0;
 		height: 100rpx;

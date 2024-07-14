@@ -368,7 +368,6 @@
 
 <style lang="scss">
 	.charts {
-		position: relative;
 		.header-fixed {
 			position: fixed;
 			width: 100%;
@@ -391,7 +390,7 @@
 		}
 		.linear-gradient {
 			position: absolute;
-			top: -18rpx;
+			top: 80rpx;
 			left: 0;
 			right: 0;
 			height: 100rpx;

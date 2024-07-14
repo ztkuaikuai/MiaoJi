@@ -156,7 +156,7 @@
 			display: flex;
 			justify-content: flex-end;
 			align-items: center;
-
+			margin-bottom: 10px;
 			.btn {
 				display: flex;
 				align-items: center;
@@ -174,11 +174,14 @@
 			.edit {
 				color: $mj-bg-color;
 				background-color: $mj-theme-color-2;
+				border: 1px solid $mj-theme-color-2;
 			}
 		}
 		.content {
 			max-height: 580rpx;
 			overflow-y: auto;
+			box-sizing: border-box;
+			padding-bottom: 20px;
 			.category {
 				display: flex;
 				justify-content: start;

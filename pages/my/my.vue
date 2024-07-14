@@ -60,7 +60,7 @@
 							关于妙记
 						</view>
 						<view class="about-tag">
-							<u-tag text="v0.8.0" size="mini" @click="clickAbout"></u-tag>
+							<u-tag text="🎉v1.0.0" size="mini" @click="clickAbout"></u-tag>
 						</view>
 					</view>
 					<uni-icons slot="icon" type="info" size="36rpx"></uni-icons>
@@ -97,8 +97,9 @@
 					useDate: 0,
 				},
 				optionList: [{
-						icon: 'wallet',
-						title: '我的资产'
+						icon: 'mj-wallet',
+						title: '我的资产',
+						customPrefix: "miaoji"
 					},
 					{
 						icon: 'mj-layout',
@@ -116,14 +117,16 @@
 						customPrefix: "miaoji"
 					},
 					{
-						icon: 'mj-YUAN',
+						icon: 'mj-yuan-circle',
 						title: '预算设置',
 						customPrefix: "miaoji"
 					}
 				],
-				likeList: [{
-						icon: 'color',
-						title: '个性化'
+				likeList: [
+					{
+						icon: 'mj-individuation',
+						title: '个性化',
+						customPrefix: "miaoji"
 					}
 				],
 				showUserAssetsList: false,
@@ -172,6 +175,11 @@
 					case 2:
 						uni.navigateTo({
 							url:"/pagesMy/seconds/seconds"
+						})
+						break
+					case 3:
+						uni.navigateTo({
+							url:"/pagesMy/cron-accounting/cron-accounting"
 						})
 						break
 					default:

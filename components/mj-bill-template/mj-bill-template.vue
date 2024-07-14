@@ -76,10 +76,14 @@
 				// 修改模板
 				// 1 将改模板存入缓存，在记一笔页面读取缓存
 				// 2 进入记一笔页面
+				// 3 隐藏pop框
 				uni.setStorageSync('mj-user-temp-template',this.templateDetails)
 				uni.navigateTo({
 					url: `/pagesAccount/make-an-account/make-an-account?type=templateEdit`
 				})
+				setTimeout(() => {
+					this.showBillDetails = false
+				}, 2000)
 			},
 			async deleteTemp() {
 				uni.showModal({

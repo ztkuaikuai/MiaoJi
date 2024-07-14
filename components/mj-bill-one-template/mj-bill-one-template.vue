@@ -22,7 +22,7 @@
 				<mj-icon-with-background></mj-icon-with-background>
 				<view class="info">
 					<view>未绑定模板</view>
-					<view class="minor" v-if="true"><u--text :lines="1" :text="fromType ? '点我绑定模板' : '快去点击修改按钮绑定模板吧!'" color="rgba(0,0,0, 0.6)" size="24rpx"></u--text></view>
+					<view class="minor" v-if="true"><u--text :lines="1" :text="'快点我绑定模板吧!'" color="rgba(0,0,0, 0.6)" size="24rpx"></u--text></view>
 				</view>
 			</view>
 		</template>
@@ -32,7 +32,7 @@
 <script>
 	export default {
 		name:"mj-bill-one-template",
-		props: ['oneTemplate','fromType'],
+		props: ['oneTemplate'],
 		data() {
 			return {
 				
