@@ -2,7 +2,8 @@
 	"pages": [{
 		"path": "pages/index/index",
 		"style": {
-			"navigationBarTitleText": "妙记"
+			"navigationBarTitleText": "妙记",
+			"enablePullDownRefresh": false
 		}
 	}, {
 		"path": "pages/bills/bills",
