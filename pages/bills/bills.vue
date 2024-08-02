@@ -17,7 +17,7 @@
 					:chartData="chartsDataColumn" 
 					:ontouch="true" 
 					canvasId="uchartscolumn1" 
-					:canvas2d="true" 
+					:canvas2d="true"
 				/>
 			</view>
 		</view>
@@ -34,7 +34,6 @@
 				<u-icon name="order" size="48rpx" color="#212121"></u-icon>
 				<text>账单明细</text>
 			</view>
-			<!-- 需要 到达底部钩子，按需加载 -->
 			<mj-bill-card 
 				v-for="(bills,index) in userBillsByDay"
 				:key="index"
@@ -228,7 +227,7 @@
 				})
 				
 				// 得到需要展示的天数索引（>=6条账单数据）
-				this.needShowIndex = this.findNeewShowIndex(twoDimensionalArray)
+				this.needShowIndex = this.findNeedShowIndex(twoDimensionalArray) ?? numberOfDays
 				console.log('this.needShowIndex: ',this.needShowIndex);
 				this.userBillsOrderByDayArray = twoDimensionalArray
 				// console.log('更新后userBillsByDay',twoDimensionalArray);
@@ -322,8 +321,8 @@
 				const totalDays = date.getDate();
 				return totalDays;
 			},
-			// 找到需要展示的天数索引
-			findNeewShowIndex(twoDimensionalArray) {
+			// 找到 帐单数>=6时 所在索引 
+			findNeedShowIndex(twoDimensionalArray) {
 				let index = 0
 				let length = 0
 				for (let array of twoDimensionalArray) {
