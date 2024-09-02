@@ -216,6 +216,7 @@
 			color: $mj-text-color-grey;
 			height: 48rpx;
 			background-color: $mj-bg-color;
+			padding: 8rpx 0 4rpx;
 		}
 		.bottom {
 			display: flex;

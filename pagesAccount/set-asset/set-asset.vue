@@ -92,9 +92,11 @@
 						},
 						{
 							validator: (rule, value, callback) => {
+								value = value.toString()
+								if (value === '0') value = '0.00'
 								return uni.$u.test.amount(value)
 							},
-							message: '最多填写两位小数。如果金额设置为0，请填入0.00'
+							message: '最多填写两位小数'
 						},
 					]
 				},

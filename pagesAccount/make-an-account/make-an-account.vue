@@ -342,8 +342,9 @@
 				// 获取分类列表，该用户所有资产信息，将用户资产信息添加对应资产icon样式
 				this.categoryIconListForExpend = getCategoryIconListForExpend()
 				this.categoryIconListForIncome = getCategoryIconListForIncome()
-				// 从缓存中读取用户资产信息
-				this.userAssets = uni.getStorageSync('mj-user-assets')
+				// 从缓存中读取用户资产信息，金额从大到小排序
+				const storageUserAssets = uni.getStorageSync('mj-user-assets')
+				this.userAssets = storageUserAssets.sort((a, b) => b.asset_balance - a.asset_balance)
 				this.expendOrIncomeInfo.asset_id = this.userAssets.filter(asset => asset.default_asset === true)[0]?._id ?? ''
 				this.assetsStyle = getAssetsStyle()
 				this.addAssetStyle()
