@@ -7,6 +7,7 @@ module.exports = {
 		
 	},
 	// 定时任务触发函数
+	// 需要在uniCloud后台配置定时器触发，参考文档：https://uniapp.dcloud.io/uniCloud/trigger
 	// 每日凌晨4点半执行定时任务
 	_timing: async function () {
 		await mjCronAccounting.getTodayCronAccountingList()

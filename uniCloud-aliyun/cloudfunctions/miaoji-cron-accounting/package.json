@@ -1,5 +1,7 @@
 {
   "name": "miaoji-cron-accounting",
+  "version": "1.0.0",
+  "description": "定时记账模块",
   "dependencies": {},
   "extensions": {
     "uni-cloud-jql": {}

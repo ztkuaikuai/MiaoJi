@@ -61,7 +61,7 @@ module.exports = {
 				lang: "zh_CN",
 				data
 			})
-			console.log('response', response);
+			console.log('response', response)
 		}
 		// 将用户订阅代币-1
 		mjSubscribemsg.minusCount(tmplId)

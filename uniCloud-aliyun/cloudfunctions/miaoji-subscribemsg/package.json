@@ -1,5 +1,7 @@
 {
   "name": "miaoji-subscribemsg",
+  "version": "1.0.0",
+  "description": "订阅消息模块，参考文档：https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/subscribe-message.html",
   "dependencies": {
     "uni-subscribemsg": "file:../../../uni_modules/uni-subscribemsg/uniCloud/cloudfunctions/common/uni-subscribemsg"
   },

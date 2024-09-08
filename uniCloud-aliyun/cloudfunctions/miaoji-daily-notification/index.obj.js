@@ -6,6 +6,7 @@ module.exports = {
 
 	},
 	// 定时任务触发函数
+	// 需要在uniCloud后台配置定时器触发，参考文档：https://uniapp.dcloud.io/uniCloud/trigger
 	// 每日下午7点半执行，向订阅用户发送每日记账提醒
 	_timing: async function () {
 		await mjDailyNoti.dailyNotification()
@@ -18,7 +19,7 @@ module.exports = {
 	 */
 	async dailyNotification() {
 		// 小程序订阅消息模板ID
-		const tmplId = 'n2kSsJNErg1EWpRrKqTDz2yZvyqC-LH7pLmudAsWNDE'
+		const TMPL_ID = 'n2kSsJNErg1EWpRrKqTDz2yZvyqC-LH7pLmudAsWNDE'
 		
 		const dbJQL = uniCloud.databaseForJQL({ // 获取JQL database引用，此处需要传入云对象的clientInfo
 			clientInfo: this.getClientInfo()
@@ -28,7 +29,7 @@ module.exports = {
 			role: ['admin']
 		})
 		
-		const usersInfo = await mjSubscribemsg.getUsersInfoByTmplId(tmplId)
+		const usersInfo = await mjSubscribemsg.getUsersInfoByTmplId(TMPL_ID)
 		
 		// 引入uni-subscribemsg公共模块
 		const UniSubscribemsg = require('uni-subscribemsg');
@@ -47,24 +48,24 @@ module.exports = {
 		
 		function getYesterdayDate() {
 		  // 创建一个新的Date对象，它将自动设置为当前日期和时间
-		  const today = new Date();
+		  const today = new Date()
 		
 		  // 获取昨天的日期，通过减去一天来实现
-		  const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+		  const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000)
 		
 		  // 获取年、月、日
-		  const year = yesterday.getFullYear();
-		  const month = yesterday.getMonth() + 1; // getMonth()返回的月份是从0开始的
-		  const day = yesterday.getDate();
+		  const year = yesterday.getFullYear()
+		  const month = yesterday.getMonth() + 1 // getMonth()返回的月份是从0开始的
+		  const day = yesterday.getDate()
 		
 		  // 格式化日期，确保月份和日期是两位数
-		  const formattedMonth = month < 10 ? '0' + month : month;
-		  const formattedDay = day < 10 ? '0' + day : day;
+		  const formattedMonth = month < 10 ? '0' + month : month
+		  const formattedDay = day < 10 ? '0' + day : day
 		
 		  // 组合年、月、日，形成所需的格式
-		  const formattedDate = `${year}-${formattedMonth}-${formattedDay}`;
+		  const formattedDate = `${year}-${formattedMonth}-${formattedDay}`
 		
-		  return formattedDate;
+		  return formattedDate
 		}
 		const yesterdayDate = getYesterdayDate()
 		
@@ -73,7 +74,7 @@ module.exports = {
 			console.log('userInfo',userInfo)
 			// 获取昨日支出、收入
 			const yesterdayRes = await dbJQL.collection("mj-user-bills").where(`user_id == "${userInfo.uid}" && dateToString(add(new Date(0),bill_date),"%Y-%m-%d","+0800") == "${yesterdayDate}"`).groupBy('bill_type').groupField('sum(bill_amount) as bill_amount_total').orderBy('bill_type asc').get()
-			console.log('yesterdayRes: ',yesterdayRes);
+			console.log('yesterdayRes: ',yesterdayRes)
 			// 线上云函数不支持可选链操作符  es2020
 			// 原因：运行环境是nodejs 8
 			const yesterExpenseTempObj = yesterdayRes.data.filter(item => item.bill_type === 0)[0]
@@ -100,7 +101,7 @@ module.exports = {
 			// 发送订阅消息
 			let response = await uniSubscribemsg.sendSubscribeMessage({
 				touser: userInfo.openId,
-				template_id: tmplId,
+				template_id: TMPL_ID,
 				page: "pages/index/index", // 小程序页面地址
 				miniprogram_state: "formal", // 跳转小程序类型：developer为开发版；trial为体验版；formal为正式版；默认为正式版
 				lang: "zh_CN",
@@ -119,12 +120,9 @@ module.exports = {
 					}
 				}
 			})
-			console.log('response', response);
-			
+			console.log('response', response)
 		}
 		// 将用户订阅代币-1
-		mjSubscribemsg.minusCount(tmplId)
+		mjSubscribemsg.minusCount(TMPL_ID)
 	}
-	
-	
 }

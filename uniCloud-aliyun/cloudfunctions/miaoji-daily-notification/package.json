@@ -1,5 +1,7 @@
 {
   "name": "miaoji-daily-notification",
+  "version": "1.0.0",
+  "description": "每日记账提醒模块",
   "dependencies": {
     "uni-subscribemsg": "file:../../../uni_modules/uni-subscribemsg/uniCloud/cloudfunctions/common/uni-subscribemsg"
   },
