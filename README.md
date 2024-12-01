@@ -4,6 +4,16 @@
 
 妙记是基于 Vue2 的 Uniapp 和 Unicloud 制作的轻量记账应用。目前有微信小程序端和使用 uni-admin 搭建的后台管理 web 端。
 
+## 演示
+
+![宣传图1](https://mp-32a9c741-ee12-48ed-86c1-aaeb62c1a109.cdn.bspapp.com/cloudstorage/mj-assets/bigBanner1.png)
+
+![宣传图2](https://mp-32a9c741-ee12-48ed-86c1-aaeb62c1a109.cdn.bspapp.com/cloudstorage/mj-assets/bigBanner2.png)
+
+![宣传图3](https://mp-32a9c741-ee12-48ed-86c1-aaeb62c1a109.cdn.bspapp.com/cloudstorage/mj-assets/bigBanner3.png)
+
+![二维码](https://mp-32a9c741-ee12-48ed-86c1-aaeb62c1a109.cdn.bspapp.com/cloudstorage/mj-assets/qrcode.jpg)
+
 ## 快速启动⭐
 
 ### 前提条件
