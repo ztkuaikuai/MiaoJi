@@ -74,9 +74,9 @@
 				<u-cell title="退出登录" :isLink="true" @click="logout">
 					<uni-icons slot="icon" type="mj-logout" size="32rpx" customPrefix="miaoji"></uni-icons>
 				</u-cell>
-				<u-cell title="注销账号" :isLink="true" @click="deactivate">
+				<!-- <u-cell title="注销账号" :isLink="true" @click="deactivate">
 					<uni-icons slot="icon" type="mj-stop" size="32rpx" customPrefix="miaoji"></uni-icons>
-				</u-cell>
+				</u-cell> -->
 			</u-cell-group>
 		</view>
 	</view>
