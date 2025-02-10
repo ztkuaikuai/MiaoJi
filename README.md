@@ -23,9 +23,8 @@ fork 项目到你的仓库拷贝或者直接通过 `git clone` 命令拷贝[妙�
 ### 初始化项目
 
 1. 右键 uniCloud 文件夹，关联你的云服务空间。
-2. 上传所有的云函数和数据库表。右键uniCloud文件夹中的   `cloudfunctions` ，点击「上传所有云函数、公共模块及Actions」；右键 `database` ，点击「上传所有DB Schema(含扩展)」。
-    > 如果中途有弹窗，云函数点击「替换」，云数据库勾选「全部创建」后点「是」。
-3. 创建uni-id配置文件。在 `/uni_modules/uni-config-center/uniCloud/cloudfunctions/common/uni-config-center` 下创建 `uni-id` 
+
+2. 创建uni-id配置文件。在 `/uni_modules/uni-config-center/uniCloud/cloudfunctions/common/uni-config-center` 下创建 `uni-id` 
 文件夹，然后在 `uni-id` 文件夹中创建 `config.json` ，内容为下：
 
 ```json
@@ -51,6 +50,9 @@ fork 项目到你的仓库拷贝或者直接通过 `git clone` 命令拷贝[妙�
 	"userRegisterDefaultRole": ["USER"]
 }
 ```
+
+3. 上传所有的云函数和数据库表。右键uniCloud文件夹中的   `cloudfunctions` ，点击「上传所有云函数、公共模块及Actions」；右键 `database` ，点击「上传所有DB Schema(含扩展)」。
+    > 如果中途有弹窗，云函数点击「替换」，云数据库勾选「全部创建」后点「是」。
 
 4. 在 `manifest.json` 中更新你的配置。微信小程序配置，将 appid 替换成你自己小程序的 appid ；基础配置，将「uni-app 应用标识」重新获取，利用查找替换将项目中带有 `__UNI__EE89725` 的替换成你自己的。
 
