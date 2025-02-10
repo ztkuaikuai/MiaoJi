@@ -6,7 +6,7 @@
 
 ## 演示
 
-![二维码](https://mp-32a9c741-ee12-48ed-86c1-aaeb62c1a109.cdn.bspapp.com/cloudstorage/mj-assets/qrcode.jpg)
+![小程序二维码](https://webp.kuaikuaitz.top/%E5%B0%8F%E7%A8%8B%E5%BA%8F%E4%BA%8C%E7%BB%B4%E7%A0%81.jpg)
 
 ## 快速启动⭐
 
