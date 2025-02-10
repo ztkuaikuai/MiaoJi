@@ -12,9 +12,9 @@
 
 ### 前提条件
 
-1. 妙记通过HBuilderX进行开发，在微信开发者工具中预览效果。所以需要你先下载[HBuilderX](https://hx.dcloud.net.cn/README)和[微信开发者工具](https://developers.weixin.qq.com/miniprogram/dev/devtools/devtools.html)。
+1. 妙记通过 HBuilderX 进行开发，在微信开发者工具中预览效果。所以需要你先下载 [HBuilderX](https://hx.dcloud.net.cn/README) 和[微信开发者工具](https://developers.weixin.qq.com/miniprogram/dev/devtools/devtools.html)。
 
-2. 妙记使用UniCloud作为云开发平台（可以理解为服务端），需要你在[UniCloud控制台](https://unicloud.dcloud.net.cn/)注册登录并创建服务空间，免费的就行，以便后续开发使用。
+2. 妙记使用 UniCloud 作为云开发平台（可以理解为服务端），需要你在 [UniCloud 控制台](https://unicloud.dcloud.net.cn/)注册登录并创建服务空间，免费的就行，以便后续开发使用。
 
 ### 拷贝项目
 
@@ -24,7 +24,7 @@ fork 项目到你的仓库拷贝或者直接通过 `git clone` 命令拷贝[妙�
 
 1. 右键 uniCloud 文件夹，关联你的云服务空间。
 
-2. 创建uni-id配置文件。在 `/uni_modules/uni-config-center/uniCloud/cloudfunctions/common/uni-config-center` 下创建 `uni-id` 
+2. 创建 uni-id 配置文件。在 `/uni_modules/uni-config-center/uniCloud/cloudfunctions/common/uni-config-center` 下创建 `uni-id` 
 文件夹，然后在 `uni-id` 文件夹中创建 `config.json` ，内容为下：
 
 ```json
@@ -51,7 +51,7 @@ fork 项目到你的仓库拷贝或者直接通过 `git clone` 命令拷贝[妙�
 }
 ```
 
-3. 上传所有的云函数和数据库表。右键uniCloud文件夹中的   `cloudfunctions` ，点击「上传所有云函数、公共模块及Actions」；右键 `database` ，点击「上传所有DB Schema(含扩展)」。
+3. 上传所有的云函数和数据库表。右键 uniCloud 文件夹中的   `cloudfunctions` ，点击「上传所有云函数、公共模块及 Actions」；右键 `database` ，点击「上传所有 DB Schema (含扩展)」。
     > 如果中途有弹窗，云函数点击「替换」，云数据库勾选「全部创建」后点「是」。
 
 4. 在 `manifest.json` 中更新你的配置。微信小程序配置，将 appid 替换成你自己小程序的 appid ；基础配置，将「uni-app 应用标识」重新获取，利用查找替换将项目中带有 `__UNI__EE89725` 的替换成你自己的。
@@ -90,9 +90,9 @@ uni.scss                // 全局的样式文件
 ```
 
 ## 项目需求跟踪记录
-> 欢迎提交Issues和PR
+> 欢迎提交 Issues 和 PR
 
-[产品有不足或Bug？点我提出需求](https://siu9p6v1zlb.feishu.cn/share/base/form/shrcnNwskrIIk1t1IkOMgG4gisd)
+[产品有不足或 Bug ？点我提出需求](https://siu9p6v1zlb.feishu.cn/share/base/form/shrcnNwskrIIk1t1IkOMgG4gisd)
 
 ## 1.0.0(2024.07.14) "Suzumiya Haruhi no Shôshitsu"
 **⭐添加定时记账功能**
