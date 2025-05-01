@@ -4,6 +4,8 @@
 
 妙记是基于 Vue2 的 Uniapp 和 Unicloud 制作的轻量记账应用。目前有微信小程序端和使用 uni-admin 搭建的后台管理 web 端。
 
+*你可以通过 DeepWiki 生成的[项目文档](https://deepwiki.com/ztkuaikuai/MiaoJi)来详细了解该项目的结构和实现*。
+
 ## 演示
 
 ![小程序二维码](https://webp.kuaikuaitz.top/%E5%B0%8F%E7%A8%8B%E5%BA%8F%E4%BA%8C%E7%BB%B4%E7%A0%81.jpg)
