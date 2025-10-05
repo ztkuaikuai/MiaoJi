@@ -152,7 +152,7 @@
 	@import "../../libs/css/components.scss";
 	$u-number-keyboard-background-color:#9fcba7 !default;
 	$u-number-keyboard-padding:0 !default;
-	$u-number-keyboard-button-width:187.5rpx !default;
+	$u-number-keyboard-button-width:180rpx !default;
 	$u-number-keyboard-button-margin:0 !default;
 	$u-number-keyboard-button-height: 90rpx!default;
 	$u-number-keyboard-button-background-color:#9fcba7 !default;
